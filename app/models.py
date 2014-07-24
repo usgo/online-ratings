@@ -1,17 +1,8 @@
 
-from flask import Flask, render_template
-from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import Security, SQLAlchemyUserDatastore, \
     UserMixin, RoleMixin, login_required
 
-# Create app
-app = Flask(__name__)
-app.config['DEBUG'] = True
-app.config['SECRET_KEY'] = 'super-secret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-
-# Create database connection object
-db = SQLAlchemy(app)
+from app import db, app
 
 # Define models
 roles_users = db.Table('roles_users',
@@ -34,7 +25,7 @@ class User(db.Model, UserMixin):
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
+security = Security(app, user_datastore) 
 
 # Create a user to test with
 @app.before_first_request
@@ -43,11 +34,3 @@ def create_user():
     user_datastore.create_user(email='foo@foo.bar', password='baz')
     db.session.commit()
 
-# Views
-@app.route('/')
-@login_required
-def home():
-    return render_template('index.html')
-
-if __name__ == '__main__':
-    app.run()
