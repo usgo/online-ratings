@@ -1,6 +1,6 @@
 
 from flask.ext.security import Security, SQLAlchemyUserDatastore, \
-    UserMixin, RoleMixin, login_required
+    UserMixin, RoleMixin
 
 from app import db, app
 
@@ -23,6 +23,35 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
+# Other models.
+class Player(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nick = db.Column(db.String(80))
+    go_server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
+    go_server = db.relationship('GoServer', backref=db.backref('players', lazy='dynamic'))
+
+class Key(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    player = db.relationship('Player', backref=db.backref('keys', lazy='dynamic'))
+    go_server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
+    go_server = db.relationship('GoServer')
+
+class Result(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    white_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    black_id = db.Column(db.Integer, db.ForeignKey('player.id')) 
+    date_played = db.Column(db.DateTime)
+    reported = db.Column(db.DateTime)
+    rated = db.Column(db.Boolean)
+    sgf = db.Column(db.LargeBinary)
+
+class GoServer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    url = db.Column(db.String(180))
+
+
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore) 
@@ -32,5 +61,8 @@ security = Security(app, user_datastore)
 def create_user():
     db.create_all()
     user_datastore.create_user(email='foo@foo.bar', password='baz')
+    user_datastore.create_role(name='user', description='default role')
+    user_datastore.create_role(name='server_admin', description='Admin of a Go Server')
+    user_datastore.create_role(name='ratings_admin', description='Admin of AGA-Online Ratings')
     db.session.commit()
 
