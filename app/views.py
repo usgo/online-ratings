@@ -9,5 +9,3 @@ from app import app
 @login_required
 def home():
     return render_template('index.html')
-
-
