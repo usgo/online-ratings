@@ -1,4 +1,3 @@
-
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
@@ -15,5 +14,3 @@ db = SQLAlchemy(app)
 
 from app import models as _
 from app import views as _
-
-
