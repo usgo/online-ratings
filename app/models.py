@@ -98,10 +98,10 @@ def create_test_data():
 
     db.session.add(GoServer(name='KGS',
                             url='http://gokgs.com',
-                            token='secret-kgs'))
+                            token='secret_kgs'))
     db.session.add(GoServer(name='IGS',
                             url='http://pandanet.com',
-                            token='secret-igs'))
+                            token='secret_igs'))
 
     db.session.add(GoServerAccount(nick='Foo',
                                    user_id=1,
