@@ -1,6 +1,7 @@
 from flask.ext.security import login_required
 from flask import jsonify, request
-from app import app, db, models
+from app import app, db
+from app.models import Game, GoServer, GoServerAccount
 from datetime import datetime
 
 
@@ -41,15 +42,15 @@ def postresult():
     if None in data.values():
         return jsonify(error='malformed request')
 
-    gs = models.GoServer.query.filter_by(token=data['server_tok']).first()
+    gs = GoServer.query.filter_by(token=data['server_tok']).first()
     if gs is None:
         return jsonify(error='server access token unknown or expired')
 
-    b = models.GoServerAccount.query.filter_by(token=data['b_tok']).first()
+    b = GoServerAccount.query.filter_by(token=data['b_tok']).first()
     if b is None or b.go_server_id != gs.id:
         return jsonify(error='user access token unknown or expired')
 
-    w = models.GoServerAccount.query.filter_by(token=data['w_tok']).first()
+    w = GoServerAccount.query.filter_by(token=data['w_tok']).first()
     if w is None or w.go_server_id != gs.id:
         return jsonify(error='user access token unknown or expired')
 
@@ -65,12 +66,12 @@ def postresult():
         return jsonify(error='date must be of the form year-month-day')
 
     rated = data['rated'] == 'True'
-    game = models.Game(white=w,
-                       black=b,
-                       rated=rated,
-                       date_played=date_played,
-                       date_reported=datetime.now(),
-                       result=data['result'])
+    game = Game(white=w,
+                black=b,
+                rated=rated,
+                date_played=date_played,
+                date_reported=datetime.now(),
+                result=data['result'])
     db.session.add(game)
     db.session.commit()
     return jsonify(message='OK')
@@ -91,11 +92,11 @@ def verifyuser():
     if user_tok is None or server_tok is None:
         return jsonify(error='malformed request')
 
-    gs = models.GoServer.query.filter_by(token=server_tok).first()
+    gs = GoServer.query.filter_by(token=server_tok).first()
     if gs is None:
         return jsonify(error='server access token unknown or expired')
 
-    user_acct = models.GoServerAccount.query.filter_by(token=user_tok).first()
+    user_acct = GoServerAccount.query.filter_by(token=user_tok).first()
     if user_acct is None:
         return jsonify(error='user access token unknown or expired')
 
