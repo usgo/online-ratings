@@ -3,6 +3,7 @@ from flask import jsonify, request
 from app import app, db
 from app.models import Game, GoServer, GoServerAccount
 from datetime import datetime
+from dateutil.parser import parse as parse_iso8601
 
 
 def _result_str_valid(result):
@@ -61,9 +62,9 @@ def postresult():
         return jsonify(error='format of result is incorrect')
 
     try:
-        date_played = datetime.strptime(data['date'], '%Y-%m-%d')
-    except:
-        return jsonify(error='date must be of the form year-month-day')
+        date_played = parse_iso8601(data['date'])
+    except TypeError:
+        return jsonify(error='date must be in ISO 8601 format')
 
     rated = data['rated'] == 'True'
     game = Game(white=w,
