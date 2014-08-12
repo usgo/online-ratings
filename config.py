@@ -1,6 +1,6 @@
 import os
 
-_basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class BaseConfiguration(object):
@@ -13,7 +13,7 @@ class BaseConfiguration(object):
     THREADS_PER_PAGE = 8
 
     DATABASE = 'app.db'
-    DATABASE_PATH = os.path.join(_basedir, DATABASE)
+    DATABASE_PATH = os.path.join(basedir, DATABASE)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
 
     SECURITY_REGISTERABLE = True
@@ -24,7 +24,7 @@ class TestConfiguration(BaseConfiguration):
     TESTING = True
 
     DATABASE = 'tests.db'
-    DATABASE_PATH = os.path.join(_basedir, DATABASE)
+    DATABASE_PATH = os.path.join(basedir, DATABASE)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # + DATABASE_PATH
 
 
