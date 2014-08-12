@@ -1,6 +1,7 @@
-from flask.ext.security import Security, SQLAlchemyUserDatastore, \
-    UserMixin, RoleMixin
-from app import db, app
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+
+db = SQLAlchemy()
 
 # Define models
 roles_users = db.Table(
@@ -79,14 +80,10 @@ class Game(db.Model):
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
 
 
 # Create data for testing
-@app.before_first_request
 def create_test_data():
-    db.create_all()
-
     user_datastore.create_user(email='foo@foo.com', password='foo')
     user_datastore.create_user(email='bar@bar.com', password='bar')
     user_datastore.create_user(email='baz@baz.com', password='baz')

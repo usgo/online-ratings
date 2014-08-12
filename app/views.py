@@ -1,15 +1,17 @@
 from flask.ext.security import login_required
-from flask import render_template, jsonify
-from app import app, db
-from app.models import Game, GoServerAccount
+from flask import Blueprint, render_template, jsonify
+from .models import db, Game, GoServerAccount
 
-@app.route('/')
+ratings = Blueprint("ratings", __name__)
+
+
+@ratings.route('/')
 @login_required
 def home():
     return render_template('index.html')
 
 
-@app.route('/Player', methods=['GET'])
+@ratings.route('/Player', methods=['GET'])
 def player():
     players = GoServerAccount.query.all()
     data = {

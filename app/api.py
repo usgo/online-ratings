@@ -1,7 +1,7 @@
 from flask.ext.security import login_required
 from flask import jsonify, request
-from app import app, db
-from app.models import Game, GoServer, GoServerAccount
+from .models import db, Game, GoServer, GoServerAccount
+from .views import ratings
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
 
@@ -26,7 +26,7 @@ def _result_str_valid(result):
     return False
 
 
-@app.route('/PostResult', methods=['POST'])
+@ratings.route('/PostResult', methods=['POST'])
 def postresult():
     """Post a new game result to the database.
 
@@ -78,7 +78,7 @@ def postresult():
     return jsonify(message='OK')
 
 
-@app.route('/VerifyUser', methods=['GET'])
+@ratings.route('/VerifyUser', methods=['GET'])
 def verifyuser():
     """Verify that the specified user has a valid AGA account.
 
@@ -107,7 +107,7 @@ def verifyuser():
     return jsonify(message='OK')
 
 
-@app.route('/GetToken', methods=['POST'])
+@ratings.route('/GetToken', methods=['POST'])
 def getservertoken():
     """Obtain a new access token for the server."""
     # input: credentials (uname and pwd)
