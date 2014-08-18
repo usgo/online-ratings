@@ -18,6 +18,7 @@ class FlaskTestCase(BaseTestCase):
         expected = dict(message='OK')
         actual = r.json
         self.assertEqual(expected, actual)
+        self.assertEqual(r.status_code, 200)
 
     def test_VerifyUser_BadServerTok(self):
         from app.models import create_test_data
@@ -25,9 +26,10 @@ class FlaskTestCase(BaseTestCase):
 
         q = {'server_tok': 'bad', 'user_tok': 'secret_baz'}
         r = self.client.get(self.VerifyUser, query_string=q)
-        expected = dict(error='server access token unknown or expired')
+        expected = dict(message='server access token unknown or expired')
         actual = r.json
         self.assertEqual(expected, actual)
+        self.assertEqual(r.status_code, 404)
 
     def test_VerifyUser_UnknownUser(self):
         from app.models import create_test_data
@@ -35,9 +37,10 @@ class FlaskTestCase(BaseTestCase):
 
         q = {'server_tok': 'secret_kgs', 'user_tok': 'bad'}
         r = self.client.get(self.VerifyUser, query_string=q)
-        expected = dict(error='user access token unknown or expired')
+        expected = dict(message='user access token unknown or expired')
         actual = r.json
         self.assertEqual(expected, actual)
+        self.assertEqual(r.status_code, 404)
 
     def test_VerifyUser_UserMismatch(self):
         from app.models import create_test_data
@@ -45,9 +48,10 @@ class FlaskTestCase(BaseTestCase):
 
         q = {'server_tok': 'secret_kgs', 'user_tok': 'secret_baz'}
         r = self.client.get(self.VerifyUser, query_string=q)
-        expected = dict(error='user/server access token mismatch')
+        expected = dict(message='user/server access token mismatch')
         actual = r.json
         self.assertEqual(expected, actual)
+        self.assertEqual(r.status_code, 404)
 
     def test_VerifyUser_BadRequest(self):
         from app.models import create_test_data
@@ -55,18 +59,21 @@ class FlaskTestCase(BaseTestCase):
 
         q = {'server_tok': 'secret_kgs'}
         r = self.client.get(self.VerifyUser, query_string=q)
-        expected = dict(error='malformed request')
+        expected = dict(message='malformed request')
         actual = r.json
         self.assertEqual(expected, actual)
+        self.assertEqual(r.status_code, 400)
 
         q = {'user_tok': 'secret_foo'}
         r = self.client.get(self.VerifyUser, query_string=q)
-        expected = dict(error='malformed request')
+        expected = dict(message='malformed request')
         actual = r.json
         self.assertEqual(expected, actual)
+        self.assertEqual(r.status_code, 400)
 
         q = 'invalid_request_param'
         r = self.client.get(self.VerifyUser, query_string=q)
-        expected = dict(error='malformed request')
+        expected = dict(message='malformed request')
         actual = r.json
         self.assertEqual(expected, actual)
+        self.assertEqual(r.status_code, 400)

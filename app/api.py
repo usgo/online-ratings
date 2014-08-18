@@ -1,9 +1,17 @@
 from flask.ext.security import login_required
 from flask import jsonify, request
+from .api_exception import ApiException
 from .models import db, Game, GoServer, GoServerAccount
 from .views import ratings
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
+
+
+@ratings.errorhandler(ApiException)
+def handle_api_exception(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
 
 
 def _result_str_valid(result):
@@ -41,30 +49,33 @@ def postresult():
         'date': request.args.get('date')
     }
     if None in data.values():
-        return jsonify(error='malformed request')
+        raise ApiException('malformed request')
 
     gs = GoServer.query.filter_by(token=data['server_tok']).first()
     if gs is None:
-        return jsonify(error='server access token unknown or expired')
+        raise ApiException('server access token unknown or expired',
+                           status_code=404)
 
     b = GoServerAccount.query.filter_by(token=data['b_tok']).first()
     if b is None or b.go_server_id != gs.id:
-        return jsonify(error='user access token unknown or expired')
+        raise ApiException('user access token unknown or expired',
+                           status_code=404)
 
     w = GoServerAccount.query.filter_by(token=data['w_tok']).first()
     if w is None or w.go_server_id != gs.id:
-        return jsonify(error='user access token unknown or expired')
+        raise ApiException('user access token unknown or expired',
+                           status_code=404)
 
     if data['rated'] not in ['True', 'False']:
-        return jsonify(error='rated must be set to True or False')
+        raise ApiException('rated must be set to True or False')
 
     if not _result_str_valid(data['result']):
-        return jsonify(error='format of result is incorrect')
+        raise ApiException('format of result is incorrect')
 
     try:
         date_played = parse_iso8601(data['date'])
     except TypeError:
-        return jsonify(error='date must be in ISO 8601 format')
+        raise ApiException(error='date must be in ISO 8601 format')
 
     rated = data['rated'] == 'True'
     game = Game(white=w,
@@ -86,23 +97,26 @@ def verifyuser():
     The method returns OK if and only if:
         - server token is valid
         - user token is valid for the given server
-        - TODO: user's AGA is active
+        - TODO: confirm that the user's AGA account is active
     """
     user_tok = request.args.get('user_tok')
     server_tok = request.args.get('server_tok')
     if user_tok is None or server_tok is None:
-        return jsonify(error='malformed request')
+        raise ApiException('malformed request')
 
     gs = GoServer.query.filter_by(token=server_tok).first()
     if gs is None:
-        return jsonify(error='server access token unknown or expired')
+        raise ApiException('server access token unknown or expired',
+                           status_code=404)
 
     user_acct = GoServerAccount.query.filter_by(token=user_tok).first()
     if user_acct is None:
-        return jsonify(error='user access token unknown or expired')
+        raise ApiException('user access token unknown or expired',
+                           status_code=404)
 
     if user_acct.go_server_id != gs.id:
-        return jsonify(error='user/server access token mismatch')
+        raise ApiException('user/server access token mismatch',
+                           status_code=404)
 
     return jsonify(message='OK')
 
@@ -112,4 +126,4 @@ def getservertoken():
     """Obtain a new access token for the server."""
     # input: credentials (uname and pwd)
     # output: [token | error (invalid credentials]
-    return jsonify(error='service not yet implemented')
+    raise ApiException('service not yet implemented')
