@@ -30,5 +30,10 @@ Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper insta
 The standard `unittest` module has a discovery feature that will automatically find and run tests.  The directions given below will search for tests in any file named `test_*.py`.
 ```
   $ cd <repo root directory>
-  $ python -m unittest discover
+  $ python -m unittest
+```
+To see other options for running tests, you may:
+```
+  $ cd <repo root directory>
+  $ python -m unittest --help
 ```
