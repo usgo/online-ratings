@@ -1,19 +1,11 @@
-
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.security import Security
+from .models import db, user_datastore
+from .views import ratings
+from .api import *
 
-# Create app
 app = Flask(__name__)
-app.config['DEBUG'] = True
-app.config['SECRET_KEY'] = 'super-secret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-app.config['SECURITY_REGISTERABLE'] = True
-app.config['SECURITY_TRACKABLE'] = True
-
-# Create database connection object
-db = SQLAlchemy(app)
-
-from app import models as _
-from app import views as _
-
-
+app.config.from_object('config.DebugConfiguration')
+db.init_app(app)
+security = Security(app, user_datastore)
+app.register_blueprint(ratings)
