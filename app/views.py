@@ -1,6 +1,6 @@
 from flask.ext.security import login_required
 from flask import Blueprint, render_template, jsonify, current_app, url_for
-from .models import GoServerAccount
+from .models import User
 
 ratings = Blueprint("ratings", __name__)
 
@@ -26,12 +26,12 @@ def api_list():
 
 @ratings.route('/Player', methods=['GET'])
 def player():
-    players = GoServerAccount.query.all()
+    players = User.query.all()
     data = {
         "num_accounts": len(players),
         "accounts": []
     }
     for p in players:
-        account = {'id': p.id, 'nick': p.nick, 'email': p.user.email}
+        account = {'id': p.id, 'AGA ID': p.aga_id, 'email': p.email}
         data['accounts'].append(account)
     return jsonify(data)

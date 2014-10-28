@@ -1,7 +1,7 @@
 from flask.ext.security import login_required
 from flask import jsonify, request
 from .api_exception import ApiException
-from .models import db, Game, GoServer, GoServerAccount
+from .models import db, Game, GoServer, User
 from .views import ratings
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
@@ -56,13 +56,13 @@ def postresult():
         raise ApiException('server access token unknown or expired',
                            status_code=404)
 
-    b = GoServerAccount.query.filter_by(token=data['b_tok']).first()
-    if b is None or b.go_server_id != gs.id:
+    b = User.query.filter_by(token=data['b_tok']).first()
+    if b is None:
         raise ApiException('user access token unknown or expired',
                            status_code=404)
 
-    w = GoServerAccount.query.filter_by(token=data['w_tok']).first()
-    if w is None or w.go_server_id != gs.id:
+    w = User.query.filter_by(token=data['w_tok']).first()
+    if w is None:
         raise ApiException('user access token unknown or expired',
                            status_code=404)
 
@@ -109,13 +109,9 @@ def verifyuser():
         raise ApiException('server access token unknown or expired',
                            status_code=404)
 
-    user_acct = GoServerAccount.query.filter_by(token=user_tok).first()
+    user_acct = User.query.filter_by(token=user_tok).first()
     if user_acct is None:
         raise ApiException('user access token unknown or expired',
-                           status_code=404)
-
-    if user_acct.go_server_id != gs.id:
-        raise ApiException('user/server access token mismatch',
                            status_code=404)
 
     return jsonify(message='OK')

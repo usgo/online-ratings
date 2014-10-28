@@ -31,6 +31,7 @@ class User(db.Model, UserMixin):
     last_login_ip = db.Column(db.String(25))
     current_login_ip = db.Column(db.String(25))
     login_count = db.Column(db.Integer)
+    token = db.Column(db.String(80))
 
 
 class GoServer(db.Model):
@@ -40,32 +41,23 @@ class GoServer(db.Model):
     token = db.Column(db.String(80))
 
 
-class GoServerAccount(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nick = db.Column(db.String(80))
-
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', backref=db.backref('user', lazy='dynamic'))
-
-    go_server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
-    go_server = db.relationship('GoServer',
-                                backref=db.backref('go_server',
-                                                   lazy='dynamic'))
-
-    token = db.Column(db.String(80))
-
-
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    white_id = db.Column(db.Integer, db.ForeignKey('go_server_account.id'))
-    white = db.relationship('GoServerAccount',
+    server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
+    game_server = db.relationship('GoServer',
+                                  foreign_keys=server_id,
+                                  backref=db.backref('game_server_id',
+                                                     lazy='dynamic'))
+
+    white_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    white = db.relationship('User',
                             foreign_keys=white_id,
                             backref=db.backref('w_server_account',
                                                lazy='dynamic'))
 
-    black_id = db.Column(db.Integer, db.ForeignKey('go_server_account.id'))
-    black = db.relationship('GoServerAccount',
+    black_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    black = db.relationship('User',
                             foreign_keys=black_id,
                             backref=db.backref('b_server_account',
                                                lazy='dynamic'))
@@ -84,9 +76,16 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 # Create data for testing
 def create_test_data():
-    user_datastore.create_user(email='foo@foo.com', password='foo')
-    user_datastore.create_user(email='bar@bar.com', password='bar')
-    user_datastore.create_user(email='baz@baz.com', password='baz')
+    user_datastore.create_user(email='foo@foo.com',
+                               password='foo',
+                               token='secret_foo')
+    user_datastore.create_user(email='bar@bar.com',
+                               password='bar',
+                               token='secret_bar')
+    user_datastore.create_user(email='baz@baz.com',
+                               password='baz',
+                               token='secret_baz')
+
     user_datastore.create_role(name='user', description='default role')
     user_datastore.create_role(name='server_admin',
                                description='Admin of a Go Server')
@@ -100,21 +99,8 @@ def create_test_data():
                             url='http://pandanet.com',
                             token='secret_igs'))
 
-    db.session.add(GoServerAccount(nick='Foo',
-                                   user_id=1,
-                                   go_server_id=1,
-                                   token='secret_foo'))
-    db.session.add(GoServerAccount(nick='Bar',
-                                   user_id=2,
-                                   go_server_id=1,
-                                   token='secret_bar'))
-    db.session.add(GoServerAccount(nick='Baz',
-                                   user_id=3,
-                                   go_server_id=2,
-                                   token='secret_baz'))
-
-    db.session.add(Game(white_id=1, black_id=2, rated=True, result="B+0.5"))
-    db.session.add(Game(white_id=1, black_id=2, rated=True, result="W+39.5"))
-    db.session.add(Game(white_id=1, black_id=2, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5"))
+    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="W+39.5"))
+    db.session.add(Game(server_id=2, white_id=1, black_id=2, rated=True, result="W+Resign"))
 
     db.session.commit()

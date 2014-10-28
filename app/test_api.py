@@ -66,14 +66,6 @@ class TestCase_PostResult(BaseTestCase):
             self.assertEqual(expected, actual)
             self.assertEqual(r.status_code, 404)
 
-            # User token is good, but for different server
-            q[param] = 'secret_baz'
-            r = self.client.post(self.PostResult, query_string=q)
-            expected = dict(message='user access token unknown or expired')
-            actual = r.json
-            self.assertEqual(expected, actual)
-            self.assertEqual(r.status_code, 404)
-
     def test_PostResult_Rated(self):
         from app.models import create_test_data
         create_test_data()
@@ -155,17 +147,6 @@ class TestCase_VerifyUser(BaseTestCase):
         q = {'server_tok': 'secret_kgs', 'user_tok': 'bad'}
         r = self.client.get(self.VerifyUser, query_string=q)
         expected = dict(message='user access token unknown or expired')
-        actual = r.json
-        self.assertEqual(expected, actual)
-        self.assertEqual(r.status_code, 404)
-
-    def test_VerifyUser_UserMismatch(self):
-        from app.models import create_test_data
-        create_test_data()
-
-        q = {'server_tok': 'secret_kgs', 'user_tok': 'secret_baz'}
-        r = self.client.get(self.VerifyUser, query_string=q)
-        expected = dict(message='user/server access token mismatch')
         actual = r.json
         self.assertEqual(expected, actual)
         self.assertEqual(r.status_code, 404)
