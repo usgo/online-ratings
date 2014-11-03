@@ -1,33 +1,20 @@
 from flask.ext.security import login_required
-from flask import current_app, jsonify, request, url_for
+from flask import jsonify, request
+from . import api
 from .api_exception import ApiException
-from .models import db, Game, GoServer, User
-from .views import ratings
+from app.models import db, Game, GoServer, User
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
 
 
-@ratings.errorhandler(ApiException)
+@api.errorhandler(ApiException)
 def handle_api_exception(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
 
 
-@ratings.route('/api')
-def api_list():
-    '''return a json list of api endpoints'''
-    urls = {}
-    for rule in current_app.url_map.iter_rules():
-        if rule.endpoint is not 'static':
-            urls[rule.endpoint] = {
-                'methods': ','.join(rule.methods),
-                'url': url_for(rule.endpoint)
-            }
-    return jsonify(urls)
-
-
-@ratings.route('/Player', methods=['GET'])
+@api.route('/Player', methods=['GET'])
 def player():
     players = User.query.all()
     data = {
@@ -61,7 +48,7 @@ def _result_str_valid(result):
     return False
 
 
-@ratings.route('/PostResult', methods=['POST'])
+@api.route('/PostResult', methods=['POST'])
 def postresult():
     """Post a new game result to the database.
 
@@ -116,7 +103,7 @@ def postresult():
     return jsonify(message='OK')
 
 
-@ratings.route('/VerifyUser', methods=['GET'])
+@api.route('/VerifyUser', methods=['GET'])
 def verifyuser():
     """Verify that the specified user has a valid AGA account.
 
@@ -144,7 +131,7 @@ def verifyuser():
     return jsonify(message='OK')
 
 
-@ratings.route('/GetToken', methods=['POST'])
+@api.route('/GetToken', methods=['POST'])
 def getservertoken():
     """Obtain a new access token for the server."""
     # input: credentials (uname and pwd)

@@ -2,13 +2,14 @@ from flask import Flask
 from flask.ext.security import Security
 from .models import db, user_datastore
 from .views import ratings
-from .api import *
+from .api_1_0 import api as api_1_0_blueprint
 
 app = Flask(__name__)
 app.config.from_object('config.DebugConfiguration')
 db.init_app(app)
 security = Security(app, user_datastore)
 app.register_blueprint(ratings)
+app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 
 
 #TODO: remove the following init function, which destroys any existing app

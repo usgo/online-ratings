@@ -7,7 +7,7 @@ from tests import BaseTestCase
 
 class TestCase_PostResult(BaseTestCase):
 
-    PostResult = 'http://localhost:5000/PostResult'
+    PostResult = 'http://localhost:5000/api/v1.0/PostResult'
     good_param_set = {
         'server_tok': 'secret_kgs',
         'b_tok': 'secret_foo',
@@ -116,7 +116,7 @@ class TestCase_PostResult(BaseTestCase):
 
 class TestCase_VerifyUser(BaseTestCase):
 
-    VerifyUser = 'http://localhost:5000/VerifyUser'
+    VerifyUser = 'http://localhost:5000/api/v1.0/VerifyUser'
 
     def test_VerifyUser_GoodUser(self):
         from app.models import create_test_data
