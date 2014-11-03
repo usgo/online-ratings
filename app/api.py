@@ -1,5 +1,5 @@
 from flask.ext.security import login_required
-from flask import jsonify, request
+from flask import current_app, jsonify, request, url_for
 from .api_exception import ApiException
 from .models import db, Game, GoServer, User
 from .views import ratings
@@ -14,7 +14,34 @@ def handle_api_exception(error):
     return response
 
 
+@ratings.route('/api')
+def api_list():
+    '''return a json list of api endpoints'''
+    urls = {}
+    for rule in current_app.url_map.iter_rules():
+        if rule.endpoint is not 'static':
+            urls[rule.endpoint] = {
+                'methods': ','.join(rule.methods),
+                'url': url_for(rule.endpoint)
+            }
+    return jsonify(urls)
+
+
+@ratings.route('/Player', methods=['GET'])
+def player():
+    players = User.query.all()
+    data = {
+        "num_accounts": len(players),
+        "accounts": []
+    }
+    for p in players:
+        account = {'id': p.id, 'AGA ID': p.aga_id, 'email': p.email}
+        data['accounts'].append(account)
+    return jsonify(data)
+
+
 def _result_str_valid(result):
+
     """Check the format of a result string per the SGF file format.
 
     See http://www.red-bean.com/sgf/ for details.

@@ -1,6 +1,8 @@
 from flask.ext.security import login_required
-from flask import Blueprint, render_template, jsonify, current_app, url_for
-from .models import User
+from flask import Blueprint, render_template
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import Required, Length, Email, Regexp, EqualTo
+from wtforms import ValidationError
 
 ratings = Blueprint("ratings", __name__)
 
@@ -9,29 +11,3 @@ ratings = Blueprint("ratings", __name__)
 @login_required
 def home():
     return render_template('index.html')
-
-
-@ratings.route('/api')
-def api_list():
-    '''return a json list of api endpoints'''
-    urls = {}
-    for rule in current_app.url_map.iter_rules():
-        if rule.endpoint is not 'static':
-            urls[rule.endpoint] = {
-                'methods': ','.join(rule.methods),
-                'url': url_for(rule.endpoint)
-            }
-    return jsonify(urls)
-
-
-@ratings.route('/Player', methods=['GET'])
-def player():
-    players = User.query.all()
-    data = {
-        "num_accounts": len(players),
-        "accounts": []
-    }
-    for p in players:
-        account = {'id': p.id, 'AGA ID': p.aga_id, 'email': p.email}
-        data['accounts'].append(account)
-    return jsonify(data)
