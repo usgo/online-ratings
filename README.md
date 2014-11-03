@@ -37,3 +37,7 @@ To see other options for running tests, you may:
   $ cd <repo root directory>
   $ python -m unittest --help
 ```
+
+## Questions?
+The developer mail list can be found here:
+https://groups.google.com/forum/#!forum/usgo-online-ratings
