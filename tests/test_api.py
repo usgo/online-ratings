@@ -1,4 +1,4 @@
-from app.test_base import BaseTestCase
+from tests import BaseTestCase
 
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vii-unit-testing
 # http://flask.pocoo.org/docs/testing/#testing

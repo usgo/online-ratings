@@ -1,6 +1,6 @@
 from flask.ext.testing import TestCase
-from . import app, db
-from app.views import ratings
+from app import app, db
+from app import ratings
 
 # The test strategy is based on the tutorial found here:
 # https://realpython.com/blog/python/python-web-applications-with-flask-part-iii/
