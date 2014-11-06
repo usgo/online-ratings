@@ -31,14 +31,14 @@ class User(db.Model, UserMixin):
     last_login_ip = db.Column(db.String(25))
     current_login_ip = db.Column(db.String(25))
     login_count = db.Column(db.Integer)
-    token = db.Column(db.String(80))
+    token = db.Column(db.String(80), unique=True)
 
 
 class GoServer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
     url = db.Column(db.String(180))
-    token = db.Column(db.String(80))
+    token = db.Column(db.String(80), unique=True)
 
 
 class Game(db.Model):
