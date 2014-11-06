@@ -17,3 +17,10 @@ class ApiException(Exception):
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
+
+
+@api.errorhandler(ApiException)
+def handle_api_exception(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response

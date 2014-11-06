@@ -1,17 +1,9 @@
 from flask.ext.security import login_required
 from flask import jsonify, request
 from . import api
-from .api_exception import ApiException
 from app.models import db, Game, GoServer, User
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
-
-
-@api.errorhandler(ApiException)
-def handle_api_exception(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
 
 
 @api.route('/Player', methods=['GET'])
