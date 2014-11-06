@@ -1,3 +1,6 @@
+from . import api
+
+
 class ApiException(Exception):
     """A common exception type for API errors."""
 

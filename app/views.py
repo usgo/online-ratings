@@ -1,6 +1,6 @@
 from flask.ext.security import login_required
 from flask import Blueprint, render_template
-from uuid import uuid4
+from .tokengen import UUIDTokenGenerator as TokenGenerator
 from . import db
 
 ratings = Blueprint("ratings", __name__)
@@ -17,6 +17,7 @@ def user_registered_sighandler(app, user, confirm_token):
     Generate a token for the newly registered user.
     This signal handler is called every time a new user is registered.
     '''
-    user.token = str(uuid4())
+    token = TokenGenerator()
+    user.token = token.create()
     db.session.add(user)
     db.session.commit()
