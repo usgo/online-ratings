@@ -97,7 +97,7 @@ def create_test_data():
     u = user_datastore.create_user(email='admin@kgs.com',
                                    password='kgs',
                                    token='secret_kgs')
-    user_datastore.add_role_to_user(u, role_aga_admin)
+    user_datastore.add_role_to_user(u, role_gs_admin)
 
     u = user_datastore.create_user(email='foo@foo.com',
                                    password='foo',
