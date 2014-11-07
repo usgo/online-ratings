@@ -76,21 +76,44 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 # Create data for testing
 def create_test_data():
-    user_datastore.create_user(email='foo@foo.com',
-                               password='foo',
-                               token='secret_foo')
-    user_datastore.create_user(email='bar@bar.com',
-                               password='bar',
-                               token='secret_bar')
-    user_datastore.create_user(email='baz@baz.com',
-                               password='baz',
-                               token='secret_baz')
+    role_user = user_datastore.create_role(
+        name='user',
+        description='default role'
+    )
+    role_gs_admin = user_datastore.create_role(
+        name='server_admin',
+        description='Admin of a Go Server'
+    )
+    role_aga_admin = user_datastore.create_role(
+        name='ratings_admin',
+        description='Admin of AGA-Online Ratings'
+    )
 
-    user_datastore.create_role(name='user', description='default role')
-    user_datastore.create_role(name='server_admin',
-                               description='Admin of a Go Server')
-    user_datastore.create_role(name='ratings_admin',
-                               description='Admin of AGA-Online Ratings')
+    u = user_datastore.create_user(email='admin@usgo.com',
+                                   password='usgo',
+                                   token='secret_usgo')
+    user_datastore.add_role_to_user(u, role_aga_admin)
+
+    u = user_datastore.create_user(email='admin@kgs.com',
+                                   password='kgs',
+                                   token='secret_kgs')
+    user_datastore.add_role_to_user(u, role_aga_admin)
+
+    u = user_datastore.create_user(email='foo@foo.com',
+                                   password='foo',
+                                   token='secret_foo')
+    user_datastore.add_role_to_user(u, role_user)
+
+    u = user_datastore.create_user(email='bar@bar.com',
+                                   password='bar',
+                                   token='secret_bar')
+    user_datastore.add_role_to_user(u, role_user)
+
+    u = user_datastore.create_user(email='baz@baz.com',
+                                   password='baz',
+                                   token='secret_baz')
+    user_datastore.add_role_to_user(u, role_user)
+
 
     db.session.add(GoServer(name='KGS',
                             url='http://gokgs.com',
