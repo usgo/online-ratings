@@ -1,4 +1,5 @@
 from flask import Flask
+from flask.ext.bootstrap import Bootstrap
 from flask.ext.security import Security, user_registered
 from .models import db, user_datastore
 from .views import ratings, user_registered_sighandler
@@ -7,6 +8,7 @@ from .api_1_0 import api as api_1_0_blueprint
 app = Flask(__name__)
 app.config.from_object('config.DebugConfiguration')
 db.init_app(app)
+bootstrap = Bootstrap(app)
 
 security = Security(app, user_datastore)
 user_registered.connect(user_registered_sighandler)

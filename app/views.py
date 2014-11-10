@@ -1,7 +1,10 @@
 from flask import Blueprint, render_template
 from flask.ext.login import current_user
 from flask.ext.security import login_required
+from flask.ext.security import roles_required
 from .tokengen import UUIDTokenGenerator as TokenGenerator
+from .forms import AddGameServerForm
+from .models import GoServer
 from . import db, user_datastore
 
 ratings = Blueprint("ratings", __name__)
@@ -17,6 +20,22 @@ def home():
 @login_required
 def viewprofile():
     return render_template('profile.html', user=current_user)
+
+
+@ratings.route('/AddGameServer', methods=['GET', 'POST'])
+@login_required
+@roles_required('ratings_admin')
+def addgameserver():
+    form = AddGameServerForm()
+    gs = GoServer()
+    if form.validate_on_submit():
+        token = TokenGenerator()
+        gs.name = form.gs_name.data
+        gs.url = form.gs_url.data
+        gs.token = token.create()
+        db.session.add(gs)
+        db.session.commit()
+    return render_template('gameserver.html', form=form, gs=gs)
 
 
 def user_registered_sighandler(app, user, confirm_token):
