@@ -1,5 +1,6 @@
 from flask import jsonify, request
-from . import api, api_exception
+from . import api
+from app.api_1_0.api_exception import ApiException
 from app.models import db, Game, GoServer, User
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
@@ -40,33 +41,33 @@ def postresult():
         'date': request.args.get('date')
     }
     if None in data.values():
-        raise api_exception.ApiException('malformed request')
+        raise ApiException('malformed request')
 
     gs = GoServer.query.filter_by(token=data['server_tok']).first()
     if gs is None:
-        raise api_exception.ApiException('server access token unknown or expired',
+        raise ApiException('server access token unknown or expired',
                            status_code=404)
 
     b = User.query.filter_by(token=data['b_tok']).first()
     if b is None:
-        raise api_exception.ApiException('user access token unknown or expired',
+        raise ApiException('user access token unknown or expired',
                            status_code=404)
 
     w = User.query.filter_by(token=data['w_tok']).first()
     if w is None:
-        raise api_exception.ApiException('user access token unknown or expired',
+        raise ApiException('user access token unknown or expired',
                            status_code=404)
 
     if data['rated'] not in ['True', 'False']:
-        raise api_exception.ApiException('rated must be set to True or False')
+        raise ApiException('rated must be set to True or False')
 
     if not _result_str_valid(data['result']):
-        raise api_exception.ApiException('format of result is incorrect')
+        raise ApiException('format of result is incorrect')
 
     try:
         date_played = parse_iso8601(data['date'])
     except TypeError:
-        raise api_exception.ApiException(error='date must be in ISO 8601 format')
+        raise ApiException(error='date must be in ISO 8601 format')
 
     rated = data['rated'] == 'True'
     game = Game(white=w,
