@@ -19,7 +19,7 @@ def _result_str_valid(result):
         if score in ['R', 'Resign', 'T', 'Time', 'F', 'Forfeit']:
             return True
         try:
-            numeric_score = float(score)
+            score = float(score)
             return True
         except ValueError:
             return False
