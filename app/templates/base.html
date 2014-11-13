@@ -1,0 +1,39 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Online Ratings Database{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle"
+                data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">AGA Online Ratings</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Account<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/ViewProfile">Profile</a></li>
+                        <li><a href="/change">Change Password</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown pull-right"><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% block page_content %}{% endblock %}
+</div>
+{% endblock %}

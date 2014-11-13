@@ -1,7 +1,8 @@
-<html>
-  <head>
-  </head>
-  <body>
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block page_content %}
     User profile:
     <br><br>
     <table border>
@@ -10,5 +11,4 @@
       <tr><td>Email</td><td>{{ user.email }}</td></tr>
       <tr><td>Token</td><td>{{ user.token }}</td></tr>
     </table>
-  </body>
-</html>
+{% endblock %}
