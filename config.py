@@ -22,6 +22,10 @@ class BaseConfiguration(object):
     SECURITY_REGISTERABLE = True
     SECURITY_TRACKABLE = True
 
+    SECURITY_SEND_REGISTER_EMAIL = False
+    SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
+    SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
+
 
 class TestConfiguration(BaseConfiguration):
     TESTING = True
