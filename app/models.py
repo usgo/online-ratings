@@ -1,5 +1,6 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+from flask.ext.security.utils import encrypt_password
 
 db = SQLAlchemy()
 
@@ -90,27 +91,27 @@ def create_test_data():
     )
 
     u = user_datastore.create_user(email='admin@usgo.com',
-                                   password='usgo',
+                                   password=encrypt_password('usgo'),
                                    token='secret_usgo')
     user_datastore.add_role_to_user(u, role_aga_admin)
 
     u = user_datastore.create_user(email='admin@kgs.com',
-                                   password='kgs',
+                                   password=encrypt_password('kgs'),
                                    token='secret_kgs')
     user_datastore.add_role_to_user(u, role_gs_admin)
 
     u = user_datastore.create_user(email='foo@foo.com',
-                                   password='foo',
+                                   password=encrypt_password('foo'),
                                    token='secret_foo')
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='bar@bar.com',
-                                   password='bar',
+                                   password=encrypt_password('bar'),
                                    token='secret_bar')
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='baz@baz.com',
-                                   password='baz',
+                                   password=encrypt_password('baz'),
                                    token='secret_baz')
     user_datastore.add_role_to_user(u, role_user)
 
