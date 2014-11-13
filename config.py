@@ -18,6 +18,7 @@ class BaseConfiguration(object):
 
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
     SECURITY_PASSWORD_SALT = 'SuPeRsEcReTsAlT'
+    SECURITY_CHANGEABLE = True
     SECURITY_REGISTERABLE = True
     SECURITY_TRACKABLE = True
 
