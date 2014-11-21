@@ -1,20 +1,22 @@
+{% extends "base.html" %}
+
 {% import "bootstrap/wtf.html" as wtf %}
 
-<html>
-  <head>
-  </head>
-  <body>
-    Game server info:
-    <br><br>
-    {% if gs.name %}
-    <table border>
-      <th>Field</th><th>Value</th>
-      <tr><td>Name</td><td>{{ gs.name }}</td></tr>
-      <tr><td>URL</td><td>{{ gs.url }}</td></tr>
-      <tr><td>Token</td><td>{{ gs.token }}</td></tr>
-    </table>
-    {% else %}
-        {{ wtf.quick_form(form) }}
-    {% endif %}
-  </body>
-</html>
+{% block title %}Home{% endblock %}
+
+{% block page_content %}
+
+Game server info:
+<br><br>
+{% if gs.name %}
+<table border>
+    <th>Field</th><th>Value</th>
+    <tr><td>Name</td><td>{{ gs.name }}</td></tr>
+    <tr><td>URL</td><td>{{ gs.url }}</td></tr>
+    <tr><td>Token</td><td>{{ gs.token }}</td></tr>
+</table>
+{% else %}
+    {{ wtf.quick_form(form) }}
+{% endif %}
+
+{% endblock %}
