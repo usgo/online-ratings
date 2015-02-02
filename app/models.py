@@ -70,6 +70,9 @@ class Game(db.Model):
     rated = db.Column(db.Boolean)
     game_record = db.Column(db.LargeBinary)
 
+    def __str__(self):
+        return "Game between %d (b) and %d (w), result %s" % (self.black_id, self.white_id, self.result)
+
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -92,22 +95,24 @@ def create_test_data():
 
     u = user_datastore.create_user(email='admin@usgo.com',
                                    password=encrypt_password('usgo'),
-                                   token='secret_usgo')
+                                   token='secret_usgo', id=99)
     user_datastore.add_role_to_user(u, role_aga_admin)
 
     u = user_datastore.create_user(email='admin@kgs.com',
                                    password=encrypt_password('kgs'),
-                                   token='secret_kgs')
+                                   token='secret_kgs', id=109)
     user_datastore.add_role_to_user(u, role_gs_admin)
 
     u = user_datastore.create_user(email='foo@foo.com',
                                    password=encrypt_password('foo'),
-                                   token='secret_foo')
+                                   token='secret_foo',
+                                   id=1)
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='bar@bar.com',
                                    password=encrypt_password('bar'),
-                                   token='secret_bar')
+                                   token='secret_bar',
+                                   id=2)
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='baz@baz.com',

@@ -4,7 +4,7 @@ from flask.ext.security import login_required
 from flask.ext.security import roles_required
 from .tokengen import UUIDTokenGenerator as TokenGenerator
 from .forms import AddGameServerForm
-from .models import GoServer
+from .models import GoServer, Game
 from . import db, user_datastore
 
 ratings = Blueprint("ratings", __name__)
@@ -19,7 +19,10 @@ def home():
 @ratings.route('/ViewProfile')
 @login_required
 def viewprofile():
-    return render_template('profile.html', user=current_user)
+    games = Game.query.filter(Game.white_id == current_user.id).all()
+    print(games)
+    print([s for s in map(str,Game.query.all())])
+    return render_template('profile.html', user=current_user, games=games)
 
 
 @ratings.route('/AddGameServer', methods=['GET', 'POST'])

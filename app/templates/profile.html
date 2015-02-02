@@ -10,5 +10,12 @@
       <tr><td>AGA ID</td><td>{{ user.aga_id }}</td></tr>
       <tr><td>Email</td><td>{{ user.email }}</td></tr>
       <tr><td>Token</td><td>{{ user.token }}</td></tr>
+      <tr><td>ID</td><td>{{ user.id }}</td></tr>
     </table>
+
+    {% if games %}
+        {% for game in games %}
+            {{ game }}
+        {% endfor %}
+    {% endif %}
 {% endblock %}
