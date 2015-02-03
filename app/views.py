@@ -19,9 +19,13 @@ def home():
 @ratings.route('/ViewProfile')
 @login_required
 def viewprofile():
-    games = Game.query.filter(Game.white_id == current_user.id).all()
-    print(games)
-    print([s for s in map(str,Game.query.all())])
+    if current_user.is_server_admin():
+        games = ['woot']
+    if current_user.is_ratings_admin():
+        games = Game.query.limit(30).all()
+    else: 
+        games = Game.query.filter(Game.white_id == current_user.id).all()
+        games.extend(Game.query.filter(Game.black_id == current_user.id).all())
     return render_template('profile.html', user=current_user, games=games)
 
 

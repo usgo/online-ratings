@@ -12,6 +12,7 @@ roles_users = db.Table(
 )
 
 
+#used by ext.security
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
@@ -34,6 +35,12 @@ class User(db.Model, UserMixin):
     login_count = db.Column(db.Integer)
     token = db.Column(db.Text, unique=True)
 
+    def is_server_admin(self):
+        return self.has_role('server_admin')
+
+    def is_ratings_admin(self):
+        return self.has_role('ratings_admin')
+
 
 class GoServer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,6 +48,8 @@ class GoServer(db.Model):
     url = db.Column(db.String(180))
     token = db.Column(db.Text, unique=True)
 
+    def __str__(self):
+        return self.name
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,7 +80,7 @@ class Game(db.Model):
     game_record = db.Column(db.LargeBinary)
 
     def __str__(self):
-        return "Game between %d (b) and %d (w), result %s" % (self.black_id, self.white_id, self.result)
+        return "Game on %s between %d (b) and %d (w), result %s" % (self.game_server, self.black_id, self.white_id, self.result)
 
 
 # Setup Flask-Security
@@ -131,5 +140,7 @@ def create_test_data():
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5"))
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="W+39.5"))
     db.session.add(Game(server_id=2, white_id=1, black_id=2, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=2, white_id=2, black_id=1, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=2, white_id=2, black_id=1, rated=True, result="W+Resign"))
 
     db.session.commit()
