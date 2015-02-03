@@ -17,20 +17,14 @@ class TestCase_PostResult(BaseTestCase):
         'date': '2014-08-19T10:30:00Z'
     }
 
-    def test_PostResult_Success(self):
-        from app.models import create_test_data
-        create_test_data()
-
+    def test_PostResult_Success(self): 
         r = self.client.post(self.PostResult, query_string=self.good_param_set)
         expected = dict(message='OK')
         actual = r.json
         self.assertEqual(expected, actual)
         self.assertEqual(r.status_code, 200)
 
-    def test_PostResult_MissingParam(self):
-        from app.models import create_test_data
-        create_test_data()
-
+    def test_PostResult_MissingParam(self): 
         for k in self.good_param_set.keys():
             q = self.good_param_set.copy()
             q.pop(k, None)  # on each iteration, remove 1 param
@@ -41,9 +35,6 @@ class TestCase_PostResult(BaseTestCase):
             self.assertEqual(r.status_code, 400)
 
     def test_PostResult_BadServerTok(self):
-        from app.models import create_test_data
-        create_test_data()
-
         q = self.good_param_set.copy()
         q['server_tok'] = 'bad_tok'
         r = self.client.post(self.PostResult, query_string=q)
@@ -53,9 +44,6 @@ class TestCase_PostResult(BaseTestCase):
         self.assertEqual(r.status_code, 404)
 
     def test_PostResult_BadUserTok(self):
-        from app.models import create_test_data
-        create_test_data()
-
         for param in ['w_tok', 'b_tok']:
             # User token is bad
             q = self.good_param_set.copy()
@@ -67,9 +55,6 @@ class TestCase_PostResult(BaseTestCase):
             self.assertEqual(r.status_code, 404)
 
     def test_PostResult_Rated(self):
-        from app.models import create_test_data
-        create_test_data()
-
         q = self.good_param_set.copy()
         for value in ['True', 'False']:
             q['rated'] = value
@@ -87,9 +72,6 @@ class TestCase_PostResult(BaseTestCase):
         self.assertEqual(r.status_code, 400)
 
     def test_PostResult_Result(self):
-        from app.models import create_test_data
-        create_test_data()
-
         q = self.good_param_set.copy()
         good_results = [
             'W+0.5', 'B+100',

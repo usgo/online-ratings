@@ -93,7 +93,7 @@ def create_test_data():
         description='Admin of AGA-Online Ratings'
     )
 
-    u = user_datastore.create_user(email='admin@usgo.com',
+    u = user_datastore.create_user(email='admin@usgo.org',
                                    password=encrypt_password('usgo'),
                                    token='secret_usgo', id=99)
     user_datastore.add_role_to_user(u, role_aga_admin)

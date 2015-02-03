@@ -15,6 +15,8 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         db.create_all()
+        from app.models import create_test_data
+        create_test_data()
 
     def tearDown(self):
         db.session.remove()
