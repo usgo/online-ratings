@@ -139,8 +139,11 @@ def create_test_data():
 
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5"))
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="W+39.5"))
-    db.session.add(Game(server_id=2, white_id=1, black_id=2, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=2, white_id=3, black_id=2, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=2, white_id=3, black_id=1, rated=True, result="W+Resign"))
     db.session.add(Game(server_id=2, white_id=2, black_id=1, rated=True, result="W+Resign"))
-    db.session.add(Game(server_id=2, white_id=2, black_id=1, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5"))
+    db.session.add(Game(server_id=1, white_id=3, black_id=2, rated=True, result="W+39.5"))
+    db.session.add(Game(server_id=2, white_id=1, black_id=3, rated=True, result="W+Resign"))
 
     db.session.commit()

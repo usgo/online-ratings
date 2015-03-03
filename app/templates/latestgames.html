@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block page_content %}
+    {% if games %}
+        {% for game in games %}
+        <br>
+            {{ game }}
+        {% endfor %}
+    {% endif %}
+{% endblock %}
