@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}users{% endblock %}
+
+{% block page_content %}
+
+    <table border class="table">
+      <tr>
+        <th>AGA ID</th> 
+        <th>Email</th>
+        <th>User ID</th> </tr>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.aga_id }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.id }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+
+
+{% endblock %}

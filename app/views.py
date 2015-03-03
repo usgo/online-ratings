@@ -2,9 +2,10 @@ from flask import Blueprint, render_template
 from flask.ext.login import current_user
 from flask.ext.security import login_required
 from flask.ext.security import roles_required
+from flask.ext.security import roles_accepted
 from .tokengen import UUIDTokenGenerator as TokenGenerator
 from .forms import AddGameServerForm
-from .models import GoServer, Game
+from .models import GoServer, Game, User
 from . import db, user_datastore
 
 ratings = Blueprint("ratings", __name__)
@@ -37,6 +38,40 @@ def latestgames():
         games = Game.query.filter(Game.white_id == current_user.id).all()
         games.extend(Game.query.filter(Game.black_id == current_user.id).all())
     return render_template('latestgames.html', user=current_user, games=games)
+
+@ratings.route('/Servers')
+@login_required
+@roles_required('ratings_admin')
+def servers():
+    if current_user.is_server_admin():
+        #TODO: fetch games for admins' server.
+        games = Game.query.filter(Game.server_id == current_user.server_id).all()
+    if current_user.is_ratings_admin():
+        games = Game.query.limit(30).all()
+    else: 
+        games = Game.query.filter(Game.white_id == current_user.id).all()
+        games.extend(Game.query.filter(Game.black_id == current_user.id).all())
+    return render_template('server.html', user=current_user, games=games)
+
+
+@ratings.route('/Users')
+@login_required
+@roles_required('ratings_admin')
+def users():
+    users = User.query.limit(30).all()
+    return render_template('users.html', user=current_user, users=users)
+
+@ratings.route('/Players')
+@login_required
+@roles_accepted('ratings_admin', 'server_admin')
+def players():
+     #TODO: make this use bootstrap-table and load from /api/player_info
+    if current_user.is_server_admin():
+        #TODO: make /api/player_info fetch players for admins' server.
+        users = [foo]
+    if current_user.is_ratings_admin():
+        users = User.query.limit(30).all()
+    return render_template('users.html', user=current_user, users=users)
 
 
 

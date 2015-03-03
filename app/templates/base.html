@@ -18,6 +18,26 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="/">Home</a></li>
+                {% if current_user.has_role('ratings_admin') %}
+                <li class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Ratings Admin<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li> <a href="/Servers">Game Servers</a></li> 
+                        <li> <a href="/LatestGames">Latest Games</a></li>
+                        <li> <a href="/AllPlayers">Players</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+                {% if current_user.has_role('server_admin') %}
+                <li class="dropdown">
+                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Server Admin<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li> <a href="/Servers">Game Servers</a></li> 
+                        <li> <a href="/LatestGames">Latest Games</a></li>
+                        <li> <a href="/AllPlayers">Players</a></li>
+                    </ul>
+                </li>
+                {% endif %}
                 <li class="dropdown">
                     <a href="#" data-toggle="dropdown" class="dropdown-toggle">Account<b class="caret"></b></a>
                     <ul class="dropdown-menu">

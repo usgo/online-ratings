@@ -41,7 +41,6 @@ class User(db.Model, UserMixin):
     def is_ratings_admin(self):
         return self.has_role('ratings_admin')
 
-
 class GoServer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
