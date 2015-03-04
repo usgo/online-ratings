@@ -1,9 +1,10 @@
 from flask import jsonify, request
 from . import api
 from app.api_1_0.api_exception import ApiException
-from app.models import db, Game, GoServer, User
+from app.models import db, Game, GoServer, User, Player
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
+import logging
 
 
 def _result_str_valid(result):
@@ -45,18 +46,24 @@ def postresult():
 
     gs = GoServer.query.filter_by(token=data['server_tok']).first()
     if gs is None:
-        raise ApiException('server access token unknown or expired',
+        raise ApiException('server access token unknown or expired: %s' % data['server_tok'],
                            status_code=404)
 
-    b = User.query.filter_by(token=data['b_tok']).first()
-    if b is None:
-        raise ApiException('user access token unknown or expired',
+    b = Player.query.filter_by(token=data['b_tok']).first()
+    if b is None or b.user_id is None:
+        raise ApiException('user access token unknown or expired: %s' % data['b_tok'],
                            status_code=404)
+    logging.info(str(b))
+    b = User.query.get(b.user_id)
+    logging.info(str(b))
 
-    w = User.query.filter_by(token=data['w_tok']).first()
-    if w is None:
-        raise ApiException('user access token unknown or expired',
+    w = Player.query.filter_by(token=data['w_tok']).first()
+    if w is None or w.user_id is None:
+        raise ApiException('user access token unknown or expired: %s' % data['w_tok'],
                            status_code=404)
+    logging.info(str(w))
+    w = User.query.get(w.user_id)
+    logging.info(str(w))
 
     if data['rated'] not in ['True', 'False']:
         raise ApiException('rated must be set to True or False')
@@ -76,6 +83,7 @@ def postresult():
                 date_played=date_played,
                 date_reported=datetime.now(),
                 result=data['result'])
+    logging.info("saving game: %s " % str(game))
     db.session.add(game)
     db.session.commit()
     return jsonify(message='OK')

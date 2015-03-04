@@ -4,14 +4,13 @@ from tests import BaseTestCase
 # http://flask.pocoo.org/docs/testing/#testing
 # https://github.com/mjhea0/flaskr-tdd
 
-
 class TestCase_PostResult(BaseTestCase):
 
     PostResult = 'http://localhost:5000/api/v1.0/PostResult'
     good_param_set = {
         'server_tok': 'secret_kgs',
-        'b_tok': 'secret_foo',
-        'w_tok': 'secret_bar',
+        'b_tok': 'secret_foo_KGS',
+        'w_tok': 'secret_bar_KGS',
         'rated': 'True',
         'result': 'B+0.5',
         'date': '2014-08-19T10:30:00Z'
@@ -38,7 +37,7 @@ class TestCase_PostResult(BaseTestCase):
         q = self.good_param_set.copy()
         q['server_tok'] = 'bad_tok'
         r = self.client.post(self.PostResult, query_string=q)
-        expected = dict(message='server access token unknown or expired')
+        expected = dict(message='server access token unknown or expired: bad_tok')
         actual = r.json
         self.assertEqual(expected, actual)
         self.assertEqual(r.status_code, 404)
@@ -49,7 +48,7 @@ class TestCase_PostResult(BaseTestCase):
             q = self.good_param_set.copy()
             q[param] = 'bad_user_tok'
             r = self.client.post(self.PostResult, query_string=q)
-            expected = dict(message='user access token unknown or expired')
+            expected = dict(message='user access token unknown or expired: bad_user_tok')
             actual = r.json
             self.assertEqual(expected, actual)
             self.assertEqual(r.status_code, 404)

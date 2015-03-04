@@ -7,6 +7,13 @@ from .api_1_0 import api as api_1_0_blueprint
 
 app = Flask(__name__)
 app.config.from_object('config.DebugConfiguration')
+
+if app.debug:
+    import logging
+    import sys
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO,stream=sys.stderr) 
+    app.logger.addHandler(logging.StreamHandler())
+    logging.info("set up logging")
 db.init_app(app)
 bootstrap = Bootstrap(app)
 

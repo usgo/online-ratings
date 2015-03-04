@@ -1,6 +1,7 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from flask.ext.security.utils import encrypt_password
+from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
 
@@ -33,13 +34,16 @@ class User(db.Model, UserMixin):
     last_login_ip = db.Column(db.String(25))
     current_login_ip = db.Column(db.String(25))
     login_count = db.Column(db.Integer)
-    token = db.Column(db.Text, unique=True)
+    players = relationship("Player")
 
     def is_server_admin(self):
         return self.has_role('server_admin')
 
     def is_ratings_admin(self):
         return self.has_role('ratings_admin')
+
+    def __str__(self):
+        return "AGA %s, %s" % (self.aga_id, self.email)
 
 class GoServer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,6 +53,16 @@ class GoServer(db.Model):
 
     def __str__(self):
         return self.name
+
+class Player(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20))
+    server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    token = db.Column(db.Text, unique=True)
+
+    def __str__(self):
+        return "Player %s on server %s, user %s" % (self.name, self.server_id, self.user_id)
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -103,36 +117,40 @@ def create_test_data():
 
     u = user_datastore.create_user(email='admin@usgo.org',
                                    password=encrypt_password('usgo'),
-                                   token='secret_usgo', id=99)
+                                   id=99)
     user_datastore.add_role_to_user(u, role_aga_admin)
 
     u = user_datastore.create_user(email='admin@kgs.com',
                                    password=encrypt_password('kgs'),
-                                   token='secret_kgs', id=109)
+                                   id=109)
     user_datastore.add_role_to_user(u, role_gs_admin)
 
     u = user_datastore.create_user(email='foo@foo.com',
                                    password=encrypt_password('foo'),
-                                   token='secret_foo',
                                    id=1)
+    db.session.add(Player(name="FooPlayer",server_id=1,user_id=1,token="secret_foo_KGS"))
+    db.session.add(Player(name="FooPlayer",server_id=2,user_id=1,token="secret_foo_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='bar@bar.com',
                                    password=encrypt_password('bar'),
-                                   token='secret_bar',
                                    id=2)
+    db.session.add(Player(name="BarPlayer",server_id=1,user_id=2,token="secret_bar_KGS"))
+    db.session.add(Player(name="BarPlayer",server_id=2,user_id=2,token="secret_bar_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='baz@baz.com',
                                    password=encrypt_password('baz'),
-                                   token='secret_baz')
+                                   id=3)
+    db.session.add(Player(name="BazPlayer",server_id=1,user_id=3,token="secret_baz_KGS"))
+    db.session.add(Player(name="BazPlayer",server_id=2,user_id=3,token="secret_baz_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
 
-    db.session.add(GoServer(name='KGS',
+    db.session.add(GoServer(id=1, name='KGS',
                             url='http://gokgs.com',
                             token='secret_kgs'))
-    db.session.add(GoServer(name='IGS',
+    db.session.add(GoServer(id=2, name='IGS',
                             url='http://pandanet.com',
                             token='secret_igs'))
 
