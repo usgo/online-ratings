@@ -59,6 +59,8 @@ class Player(db.Model):
     name = db.Column(db.String(20))
     server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', foreign_keys=user_id)
+
     token = db.Column(db.Text, unique=True)
 
     def __str__(self):
@@ -73,14 +75,14 @@ class Game(db.Model):
                                   backref=db.backref('game_server_id',
                                                      lazy='dynamic'))
 
-    white_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    white = db.relationship('User',
+    white_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    white = db.relationship('Player',
                             foreign_keys=white_id,
                             backref=db.backref('w_server_account',
                                                lazy='dynamic'))
 
-    black_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    black = db.relationship('User',
+    black_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    black = db.relationship('Player',
                             foreign_keys=black_id,
                             backref=db.backref('b_server_account',
                                                lazy='dynamic'))
@@ -128,22 +130,22 @@ def create_test_data():
     u = user_datastore.create_user(email='foo@foo.com',
                                    password=encrypt_password('foo'),
                                    id=1)
-    db.session.add(Player(name="FooPlayer",server_id=1,user_id=1,token="secret_foo_KGS"))
-    db.session.add(Player(name="FooPlayer",server_id=2,user_id=1,token="secret_foo_IGS"))
+    db.session.add(Player(id=1,name="FooPlayer",server_id=1,user_id=1,token="secret_foo_KGS"))
+    db.session.add(Player(id=4,name="FooPlayer",server_id=2,user_id=1,token="secret_foo_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='bar@bar.com',
                                    password=encrypt_password('bar'),
                                    id=2)
-    db.session.add(Player(name="BarPlayer",server_id=1,user_id=2,token="secret_bar_KGS"))
-    db.session.add(Player(name="BarPlayer",server_id=2,user_id=2,token="secret_bar_IGS"))
+    db.session.add(Player(id=2,name="BarPlayer",server_id=1,user_id=2,token="secret_bar_KGS"))
+    db.session.add(Player(id=5,name="BarPlayer",server_id=2,user_id=2,token="secret_bar_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='baz@baz.com',
                                    password=encrypt_password('baz'),
                                    id=3)
-    db.session.add(Player(name="BazPlayer",server_id=1,user_id=3,token="secret_baz_KGS"))
-    db.session.add(Player(name="BazPlayer",server_id=2,user_id=3,token="secret_baz_IGS"))
+    db.session.add(Player(id=3,name="BazPlayer",server_id=1,user_id=3,token="secret_baz_KGS"))
+    db.session.add(Player(id=6,name="BazPlayer",server_id=2,user_id=3,token="secret_baz_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
 

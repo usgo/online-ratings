@@ -53,17 +53,11 @@ def postresult():
     if b is None or b.user_id is None:
         raise ApiException('user access token unknown or expired: %s' % data['b_tok'],
                            status_code=404)
-    logging.info(str(b))
-    b = User.query.get(b.user_id)
-    logging.info(str(b))
 
     w = Player.query.filter_by(token=data['w_tok']).first()
     if w is None or w.user_id is None:
         raise ApiException('user access token unknown or expired: %s' % data['w_tok'],
                            status_code=404)
-    logging.info(str(w))
-    w = User.query.get(w.user_id)
-    logging.info(str(w))
 
     if data['rated'] not in ['True', 'False']:
         raise ApiException('rated must be set to True or False')
@@ -77,8 +71,11 @@ def postresult():
         raise ApiException(error='date must be in ISO 8601 format')
 
     rated = data['rated'] == 'True'
+    logging.info(" White: %s, Black: %s " % (w,b))
     game = Game(white=w,
+                white_id = w.id,
                 black=b,
+                black_id = b.id,
                 rated=rated,
                 date_played=date_played,
                 date_reported=datetime.now(),
