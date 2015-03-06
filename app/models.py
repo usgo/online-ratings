@@ -50,6 +50,7 @@ class GoServer(db.Model):
     name = db.Column(db.String(80), unique=True)
     url = db.Column(db.String(180))
     token = db.Column(db.Text, unique=True)
+    players = db.relationship('Player')
 
     def __str__(self):
         return self.name

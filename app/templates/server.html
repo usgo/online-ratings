@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Home{% endblock %}
+
+{% block page_content %}
+
+{% if servers %}
+<table border class="table">
+  <tr><th> Name </th> <th> URL </th> <th> Players </th> </tr>
+  {% for gs in servers %}
+    <tr><td>{{ gs.name }}</td>
+    <td>{{ gs.url }}</td>
+    <td>{{ gs.players|length }}</td></tr>
+    {%endfor%}
+</table>
+{% endif %}
+
+{% endblock %}

@@ -39,19 +39,12 @@ def latestgames():
         games.extend(Game.query.filter(Game.black_id == current_user.id).all())
     return render_template('latestgames.html', user=current_user, games=games)
 
-@ratings.route('/Servers')
+@ratings.route('/GoServers')
 @login_required
 @roles_required('ratings_admin')
 def servers():
-    if current_user.is_server_admin():
-        #TODO: fetch games for admins' server.
-        games = Game.query.filter(Game.server_id == current_user.server_id).all()
-    if current_user.is_ratings_admin():
-        games = Game.query.limit(30).all()
-    else: 
-        games = Game.query.filter(Game.white_id == current_user.id).all()
-        games.extend(Game.query.filter(Game.black_id == current_user.id).all())
-    return render_template('server.html', user=current_user, games=games)
+    servers = GoServer.query.limit(30).all()
+    return render_template('server.html', user=current_user, servers=servers)
 
 
 @ratings.route('/Users')
