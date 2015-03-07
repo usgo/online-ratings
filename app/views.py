@@ -44,7 +44,7 @@ def latestgames():
 @roles_required('ratings_admin')
 def servers():
     servers = GoServer.query.limit(30).all()
-    return render_template('server.html', user=current_user, servers=servers)
+    return render_template('servers.html', user=current_user, servers=servers)
 
 
 @ratings.route('/Users')
