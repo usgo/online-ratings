@@ -131,22 +131,22 @@ def create_test_data():
     u = user_datastore.create_user(email='foo@foo.com',
                                    password=encrypt_password('foo'),
                                    id=1)
-    db.session.add(Player(id=1,name="FooPlayer",server_id=1,user_id=1,token="secret_foo_KGS"))
-    db.session.add(Player(id=4,name="FooPlayer",server_id=2,user_id=1,token="secret_foo_IGS"))
+    db.session.add(Player(id=1,name="FooPlayerKGS",server_id=1,user_id=1,token="secret_foo_KGS"))
+    db.session.add(Player(id=4,name="FooPlayerIGS",server_id=2,user_id=1,token="secret_foo_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='bar@bar.com',
                                    password=encrypt_password('bar'),
                                    id=2)
-    db.session.add(Player(id=2,name="BarPlayer",server_id=1,user_id=2,token="secret_bar_KGS"))
-    db.session.add(Player(id=5,name="BarPlayer",server_id=2,user_id=2,token="secret_bar_IGS"))
+    db.session.add(Player(id=2,name="BarPlayerKGS",server_id=1,user_id=2,token="secret_bar_KGS"))
+    db.session.add(Player(id=5,name="BarPlayerIGS",server_id=2,user_id=2,token="secret_bar_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='baz@baz.com',
                                    password=encrypt_password('baz'),
                                    id=3)
-    db.session.add(Player(id=3,name="BazPlayer",server_id=1,user_id=3,token="secret_baz_KGS"))
-    db.session.add(Player(id=6,name="BazPlayer",server_id=2,user_id=3,token="secret_baz_IGS"))
+    db.session.add(Player(id=3,name="BazPlayerKGS",server_id=1,user_id=3,token="secret_baz_KGS"))
+    db.session.add(Player(id=6,name="BazPlayerIGS",server_id=2,user_id=3,token="secret_baz_IGS"))
     user_datastore.add_role_to_user(u, role_user)
 
 
@@ -159,11 +159,11 @@ def create_test_data():
 
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5"))
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="W+39.5"))
-    db.session.add(Game(server_id=2, white_id=3, black_id=2, rated=True, result="W+Resign"))
-    db.session.add(Game(server_id=2, white_id=3, black_id=1, rated=True, result="W+Resign"))
-    db.session.add(Game(server_id=2, white_id=2, black_id=1, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=2, white_id=5, black_id=4, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=2, white_id=5, black_id=4, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=2, white_id=6, black_id=5, rated=True, result="W+Resign"))
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5"))
     db.session.add(Game(server_id=1, white_id=3, black_id=2, rated=True, result="W+39.5"))
-    db.session.add(Game(server_id=2, white_id=1, black_id=3, rated=True, result="W+Resign"))
+    db.session.add(Game(server_id=2, white_id=5, black_id=6, rated=True, result="W+Resign"))
 
     db.session.commit()

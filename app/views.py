@@ -5,8 +5,9 @@ from flask.ext.security import roles_required
 from flask.ext.security import roles_accepted
 from .tokengen import UUIDTokenGenerator as TokenGenerator
 from .forms import AddGameServerForm
-from .models import GoServer, Game, User
+from .models import GoServer, Game, User, Player
 from . import db, user_datastore
+import logging
 
 ratings = Blueprint("ratings", __name__)
 
@@ -32,11 +33,8 @@ def viewprofile():
 def latestgames():
     if current_user.is_server_admin():
         games = Game.query.filter(Game.server_id == current_user.server_id).all()
-    if current_user.is_ratings_admin():
+    else:
         games = Game.query.limit(30).all()
-    else: 
-        games = Game.query.filter(Game.white_id == current_user.id).all()
-        games.extend(Game.query.filter(Game.black_id == current_user.id).all())
     return render_template('latestgames.html', user=current_user, games=games)
 
 @ratings.route('/GoServers')
@@ -45,6 +43,14 @@ def latestgames():
 def servers():
     servers = GoServer.query.limit(30).all()
     return render_template('servers.html', user=current_user, servers=servers)
+
+@ratings.route('/GoServer/<server_id>')
+@login_required
+@roles_required('ratings_admin')
+def server(server_id):
+    players = Player.query.filter(Player.server_id == server_id).limit(30).all()
+    logging.info(players)
+    return render_template('server.html', user=current_user, players=players) 
 
 
 @ratings.route('/Users')
@@ -61,10 +67,19 @@ def players():
      #TODO: make this use bootstrap-table and load from /api/player_info
     if current_user.is_server_admin():
         #TODO: make /api/player_info fetch players for admins' server.
-        users = [foo]
+        players = [foo]
     if current_user.is_ratings_admin():
-        users = User.query.limit(30).all()
-    return render_template('users.html', user=current_user, users=users)
+        players = Player.query.limit(30).all()
+    return render_template('players.html', user=current_user, players=players)
+
+@ratings.route('/Players/<player_id>')
+@login_required
+@roles_accepted('ratings_admin', 'server_admin')
+def player(player_id): 
+    player = Player.query.get(player_id)
+    games = Game.query.filter(Game.white_id == player.id).all()
+    games.extend(Game.query.filter(Game.black_id == player.id).all())
+    return render_template('player.html', user=current_user, player=player, games=games)
 
 
 
