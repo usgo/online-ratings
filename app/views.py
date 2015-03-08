@@ -26,7 +26,8 @@ def viewprofile():
     else: 
         games = Game.query.filter(Game.white_id == current_user.id).all()
         games.extend(Game.query.filter(Game.black_id == current_user.id).all())
-    return render_template('profile.html', user=current_user, games=games)
+        players = Player.query.filter(Player.user_id == current_user.id).all()
+    return render_template('profile.html', user=current_user, games=games, players=players)
 
 @ratings.route('/LatestGames')
 @login_required
@@ -74,14 +75,11 @@ def players():
 
 @ratings.route('/Players/<player_id>')
 @login_required
-@roles_accepted('ratings_admin', 'server_admin')
 def player(player_id): 
     player = Player.query.get(player_id)
     games = Game.query.filter(Game.white_id == player.id).all()
     games.extend(Game.query.filter(Game.black_id == player.id).all())
-    return render_template('player.html', user=current_user, player=player, games=games)
-
-
+    return render_template('player.html', user=current_user, player=player, games=games) 
 
 @ratings.route('/AddGameServer', methods=['GET', 'POST'])
 @login_required
@@ -97,7 +95,6 @@ def addgameserver():
         db.session.add(gs)
         db.session.commit()
     return render_template('gameserver.html', form=form, gs=gs)
-
 
 def user_registered_sighandler(app, user, confirm_token):
     '''

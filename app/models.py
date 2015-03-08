@@ -60,8 +60,11 @@ class Player(db.Model):
     name = db.Column(db.String(20))
     server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', foreign_keys=user_id)
-
+    user = db.relationship('User', foreign_keys=user_id) 
+    server = db.relationship('GoServer',
+                              foreign_keys=server_id,
+                              backref=db.backref('server_id',
+                                                 lazy='dynamic'))
     token = db.Column(db.Text, unique=True)
 
     def __str__(self):

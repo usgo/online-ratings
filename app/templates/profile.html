@@ -3,10 +3,29 @@
 {% block title %}My Profile{% endblock %}
 
 {% block page_content %}
-    <table border class="table">
+<h1> Your Profile </h1>
+    <table class="table">
       <tr><td>AGA ID</td><td>{{ user.aga_id }}</td></tr>
       <tr><td>Email</td><td>{{ user.email }}</td></tr>
       <tr><td>Token</td><td>{{ user.token }}</td></tr>
       <tr><td>ID</td><td>{{ user.id }}</td></tr>
     </table>
+
+    {% if players %}
+    <h2> Your linked players </h2>
+    <table border class="table">
+        <tr> <th> Server </th> <th> Name </th> </tr>
+        {% for p in players %}
+        <tr> 
+            <td> {{p.server.name}} </td> 
+            <td> 
+            <a href="{{ url_for('.player', player_id=p.id) }}">
+                {{p.name}} 
+
+            </a></td> 
+        </tr>
+        {% endfor %}
+
+    </table>
+    {% endif %}
 {% endblock %}
