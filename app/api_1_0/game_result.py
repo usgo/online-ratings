@@ -33,16 +33,23 @@ def postresult():
 
     TODO: Check for duplicates.
     """
+    #required
     data = {
         'server_tok': request.args.get('server_tok'),
         'b_tok': request.args.get('b_tok'),
         'w_tok': request.args.get('w_tok'),
         'rated': request.args.get('rated'),
         'result': request.args.get('result'),
-        'date': request.args.get('date')
+        'date': request.args.get('date'),
     }
     if None in data.values():
         raise ApiException('malformed request')
+
+    #optional 
+    data.update({ 
+        'sgf_data': request.args.get('sgf_data'),
+        'sgf_link': request.args.get('sgf_link')
+    })
 
     gs = GoServer.query.filter_by(token=data['server_tok']).first()
     if gs is None:
@@ -65,6 +72,15 @@ def postresult():
     if not _result_str_valid(data['result']):
         raise ApiException('format of result is incorrect')
 
+    if data['sgf_data'] is None and data['sgf_link'] is None:
+        raise ApiException('One of sgf_data or sgf_link must be present') 
+    elif data['sgf_data'] is not None:
+        #TODO: some kind of validation
+        pass
+    else: 
+        #TODO: enqueue the URL for later fetching and storage, e.g. Celery
+        pass 
+
     try:
         date_played = parse_iso8601(data['date'])
     except TypeError:
@@ -79,7 +95,9 @@ def postresult():
                 rated=rated,
                 date_played=date_played,
                 date_reported=datetime.now(),
-                result=data['result'])
+                result=data['result'],
+                game_record=data['sgf_data'].encode()
+                )
     logging.info("saving game: %s " % str(game))
     db.session.add(game)
     db.session.commit()

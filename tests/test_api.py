@@ -13,7 +13,8 @@ class TestCase_PostResult(BaseTestCase):
         'w_tok': 'secret_bar_KGS',
         'rated': 'True',
         'result': 'B+0.5',
-        'date': '2014-08-19T10:30:00Z'
+        'date': '2014-08-19T10:30:00Z',
+        'sgf_data': '\n'.join(open('tests/testsgf.sgf').readlines())
     }
 
     def test_PostResult_Success(self): 
@@ -28,7 +29,11 @@ class TestCase_PostResult(BaseTestCase):
             q = self.good_param_set.copy()
             q.pop(k, None)  # on each iteration, remove 1 param
             r = self.client.post(self.PostResult, query_string=q)
-            expected = dict(message='malformed request')
+            if k == 'sgf_data':
+                expected = dict(message='One of sgf_data or sgf_link must be present')
+            else:
+                expected = dict(message='malformed request')
+
             actual = r.json
             self.assertEqual(expected, actual)
             self.assertEqual(r.status_code, 400)

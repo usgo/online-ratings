@@ -97,6 +97,7 @@ class Game(db.Model):
     result = db.Column(db.String(10))
     rated = db.Column(db.Boolean)
     game_record = db.Column(db.LargeBinary)
+    game_link = db.Column(db.String(100))
 
     def __str__(self):
         return "Game on %s between %d (b) and %d (w), result %s" % (self.game_server, self.black_id, self.white_id, self.result)
