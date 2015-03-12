@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}some game{% endblock %}
+
+{% block page_content %}
+<h1> {{ game }} </h1>
+  {% if game %}
+    <script src="static/glift.js">
+
+      gliftWidget = glift.create({
+        sgfString: "{{game.sgf_data}}",
+        divId: "glift_display1",
+        display: {
+          theme: 'DEPTH',
+          goBoardBackground: 'images/purty_wood.png',
+          disableZoomForMobile: true
+        }
+      });
+    </script>
+  {% endif %}
+{% endblock %}
