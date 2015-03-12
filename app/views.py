@@ -38,6 +38,13 @@ def latestgames():
         games = Game.query.limit(30).all()
     return render_template('latestgames.html', user=current_user, games=games)
 
+@ratings.route('/GameDetail/<game_id>')
+@login_required
+def gamedetail(game_id):
+    game = Game.query.get(game_id)
+    return render_template('gamedetail.html', user=current_user, game=game)
+
+
 @ratings.route('/GoServers')
 @login_required
 @roles_required('ratings_admin')
@@ -68,7 +75,7 @@ def players():
      #TODO: make this use bootstrap-table and load from /api/player_info
     if current_user.is_server_admin():
         #TODO: make /api/player_info fetch players for admins' server.
-        players = [foo]
+        pass
     if current_user.is_ratings_admin():
         players = Player.query.limit(30).all()
     return render_template('players.html', user=current_user, players=players)

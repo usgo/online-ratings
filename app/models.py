@@ -161,13 +161,15 @@ def create_test_data():
                             url='http://pandanet.com',
                             token='secret_igs'))
 
-    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5"))
-    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="W+39.5"))
-    db.session.add(Game(server_id=2, white_id=5, black_id=4, rated=True, result="W+Resign"))
-    db.session.add(Game(server_id=2, white_id=5, black_id=4, rated=True, result="W+Resign"))
-    db.session.add(Game(server_id=2, white_id=6, black_id=5, rated=True, result="W+Resign"))
-    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5"))
-    db.session.add(Game(server_id=1, white_id=3, black_id=2, rated=True, result="W+39.5"))
-    db.session.add(Game(server_id=2, white_id=5, black_id=6, rated=True, result="W+Resign"))
+    sgf_data = "\n".join(open('tests/testsgf.sgf').readlines()).encode()
+
+    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5", game_record=sgf_data))
+    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="W+39.5", game_record=sgf_data))
+    db.session.add(Game(server_id=2, white_id=5, black_id=4, rated=True, result="W+Resign", game_record=sgf_data))
+    db.session.add(Game(server_id=2, white_id=5, black_id=4, rated=True, result="W+Resign", game_record=sgf_data))
+    db.session.add(Game(server_id=2, white_id=6, black_id=5, rated=True, result="W+Resign", game_record=sgf_data))
+    db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5", game_record=sgf_data))
+    db.session.add(Game(server_id=1, white_id=3, black_id=2, rated=True, result="W+39.5", game_record=sgf_data))
+    db.session.add(Game(server_id=2, white_id=5, black_id=6, rated=True, result="W+Resign", game_record=sgf_data))
 
     db.session.commit()

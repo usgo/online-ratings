@@ -4,18 +4,24 @@
 
 {% block page_content %}
 <h1> {{ game }} </h1>
-  {% if game %}
-    <script src="static/glift.js">
+  {% if game and game.game_record %}
+  <h2> Game record </h2>
 
-      gliftWidget = glift.create({
-        sgfString: "{{game.sgf_data}}",
-        divId: "glift_display1",
-        display: {
-          theme: 'DEPTH',
-          goBoardBackground: 'images/purty_wood.png',
-          disableZoomForMobile: true
-        }
-      });
-    </script>
+  <div id="glift" style="display:block; position:relative; width:100%; height:500px">
+  </div>
   {% endif %}
+
+    <script src="/static/glift.min.js"></script>
+      <script>
+
+  gliftWidget = glift.create({
+    sgfString: "{{game.game_record.decode()}}",
+    divId: "glift",
+    display: {
+      theme: 'DEPTH',
+      disableZoomForMobile: true
+    }
+  });
+    </script>
 {% endblock %}
+

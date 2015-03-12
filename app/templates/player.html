@@ -12,7 +12,7 @@
   <tr><th> Name </th> <th> AGA_ID </th> <th> Last Seen </th> </tr>
   {% for g in games %}
     <tr>
-      <td>{{g}}</td>
+        <td><a href="{{url_for('.gamedetail', game_id=g.id)}}"> {{g}} </a></td>
       <td></td><td></td>
     </tr>
   {%endfor%}

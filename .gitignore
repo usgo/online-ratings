@@ -57,3 +57,4 @@ docs/_build/
 
 # Files specific to this application
 app.db
+app/static/glift.min.js
