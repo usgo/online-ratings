@@ -7,7 +7,7 @@
   {% if game and game.game_record %}
   <h2> Game record </h2>
 
-  <div id="glift" style="display:block; position:relative; width:100%; height:500px">
+  <div id="glift" style="display:block; position:relative; width:70%; height:500px">
   </div>
   {% endif %}
 
@@ -15,7 +15,10 @@
       <script>
 
   gliftWidget = glift.create({
-    sgfString: "{{game.game_record.decode()}}",
+    sgf: {
+      sgfString: "{{game.game_record.decode()}}",
+      widgetType: "GAME_VIEWER"
+    },
     divId: "glift",
     display: {
       theme: 'DEPTH',
