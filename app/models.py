@@ -100,7 +100,7 @@ class Game(db.Model):
     game_link = db.Column(db.String(100))
 
     def __str__(self):
-        return "Game on %s between %d (b) and %d (w), result %s" % (self.game_server, self.black_id, self.white_id, self.result)
+        return "%s (w) vs %s (b), played on %s, result %s" % (self.white.name, self.black.name, self.game_server, self.result)
 
 
 # Setup Flask-Security

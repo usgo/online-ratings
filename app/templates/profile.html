@@ -7,14 +7,12 @@
     <table class="table">
       <tr><td>AGA ID</td><td>{{ user.aga_id }}</td></tr>
       <tr><td>Email</td><td>{{ user.email }}</td></tr>
-      <tr><td>Token</td><td>{{ user.token }}</td></tr>
-      <tr><td>ID</td><td>{{ user.id }}</td></tr>
     </table>
 
     {% if players %}
     <h2> Your linked players </h2>
     <table border class="table">
-        <tr> <th> Server </th> <th> Name </th> </tr>
+        <tr> <th> Server </th> <th> Name </th> <th> Token </th> </tr>
         {% for p in players %}
         <tr> 
             <td> {{p.server.name}} </td> 
@@ -23,6 +21,7 @@
                 {{p.name}} 
 
             </a></td> 
+            <td>{{ p.token }}</td>
         </tr>
         {% endfor %}
 
