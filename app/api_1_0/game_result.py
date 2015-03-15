@@ -2,6 +2,7 @@ from flask import jsonify, request
 from . import api
 from app.api_1_0.api_exception import ApiException
 from app.models import db, Game, GoServer, User, Player
+from app.decorators import async
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
 import logging
@@ -26,6 +27,10 @@ def _result_str_valid(result):
             return False
     return False
 
+# Fetches the sgf and updates the associated game.
+@async
+def fetch_sgf(game_id, url):
+    pass
 
 @api.route('/PostResult', methods=['POST'])
 def postresult():
