@@ -6,6 +6,13 @@
 
 {% block page_content %}
 
+<h1> Server info for {{server.name}} </h1>
+
+<table border class="table">
+    <tr><td>Name</td><td>{{ server.name }}</td></tr>
+    <tr><td>URL</td><td>{{ server.url }}</td></tr>
+    <tr><td>Token</td><td>{{ server.token }}</td></tr>
+</table>
 {% if players %}
 <table border class="table">
   <tr><th> Name </th> <th> AGA_ID </th> <th> Last Seen </th> </tr>

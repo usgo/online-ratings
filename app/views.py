@@ -34,8 +34,10 @@ def viewprofile():
 def latestgames():
     if current_user.is_server_admin():
         games = Game.query.filter(Game.server_id == current_user.server_id).all()
-    else:
+    elif current_user.is_ratings_admin():
         games = Game.query.limit(30).all()
+    else:
+        pass
     return render_template('latestgames.html', user=current_user, games=games)
 
 @ratings.route('/GameDetail/<game_id>')
@@ -56,10 +58,10 @@ def servers():
 @login_required
 @roles_required('ratings_admin')
 def server(server_id):
+    server = GoServer.query.get(server_id)
     players = Player.query.filter(Player.server_id == server_id).limit(30).all()
-    logging.info(players)
-    return render_template('server.html', user=current_user, players=players) 
-
+    logging.info("Found server %s" % server)
+    return render_template('server.html', user=current_user, server=server, players=players) 
 
 @ratings.route('/Users')
 @login_required
@@ -101,6 +103,7 @@ def addgameserver():
         gs.token = token.create()
         db.session.add(gs)
         db.session.commit()
+        return server(gs.id)
     return render_template('gameserver.html', form=form, gs=gs)
 
 def user_registered_sighandler(app, user, confirm_token):
