@@ -60,7 +60,7 @@ class Player(db.Model):
     name = db.Column(db.String(20))
     server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', foreign_keys=user_id) 
+    user = db.relationship('User', foreign_keys=user_id)
     server = db.relationship('GoServer',
                               foreign_keys=server_id,
                               backref=db.backref('server_id',
@@ -161,7 +161,8 @@ def create_test_data():
                             url='http://pandanet.com',
                             token='secret_igs'))
 
-    sgf_data = "\n".join(open('tests/testsgf.sgf').readlines()).encode()
+    with open('tests/testsgf.sgf') as sgf_file:
+        sgf_data = "\n".join(sgf_file.readlines()).encode()
 
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5", game_record=sgf_data))
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="W+39.5", game_record=sgf_data))
