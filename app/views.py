@@ -23,7 +23,8 @@ def home():
 def viewprofile():
     if current_user.is_ratings_admin():
         games = Game.query.limit(30).all()
-    else: 
+        players = None
+    else:
         games = Game.query.filter(Game.white_id == current_user.id).all()
         games.extend(Game.query.filter(Game.black_id == current_user.id).all())
         players = Player.query.filter(Player.user_id == current_user.id).all()
@@ -61,7 +62,7 @@ def server(server_id):
     server = GoServer.query.get(server_id)
     players = Player.query.filter(Player.server_id == server_id).limit(30).all()
     logging.info("Found server %s" % server)
-    return render_template('server.html', user=current_user, server=server, players=players) 
+    return render_template('server.html', user=current_user, server=server, players=players)
 
 @ratings.route('/Users')
 @login_required
@@ -84,11 +85,11 @@ def players():
 
 @ratings.route('/Players/<player_id>')
 @login_required
-def player(player_id): 
+def player(player_id):
     player = Player.query.get(player_id)
     games = Game.query.filter(Game.white_id == player.id).all()
     games.extend(Game.query.filter(Game.black_id == player.id).all())
-    return render_template('player.html', user=current_user, player=player, games=games) 
+    return render_template('player.html', user=current_user, player=player, games=games)
 
 @ratings.route('/AddGameServer', methods=['GET', 'POST'])
 @login_required
