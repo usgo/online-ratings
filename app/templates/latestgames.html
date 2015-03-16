@@ -6,7 +6,11 @@
     {% if games %}
         {% for game in games %}
         <br>
+            {% if game.game_record is not none %}
+            <a href="{{ url_for('.gamedetail', game_id=game.id) }}">{{ game }}</a>
+            {% else %}
             {{ game }}
+            {% endif %}
         {% endfor %}
     {% endif %}
 {% endblock %}
