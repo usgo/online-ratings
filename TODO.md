@@ -1,0 +1,2 @@
+- Create ways to revoke/create new tokens for users/server admins/ratings admins
+- create model for "bad results"/ probably request + error message, e.g. expired token, missing token, no sgf link, unparseable result, etc.  Make post_result create entries in table before throwing exception, make admin view summarizing bad posts.
