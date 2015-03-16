@@ -3,3 +3,8 @@
 - set up tasks.py for cron/celery/whatevs.
 - impl. sgf fetch
 - break admin/user views into separate blueprints OR unify similar "details" pages w/ switching based on role.
+- procedure for associating account with AGA ID:
+  - call membership db for json w/ account detail.
+  - send e-mail with verification link to e-mail in the usgo member profile
+  - create endpoint for verification links
+- edit profile page.
