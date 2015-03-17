@@ -1,27 +1,37 @@
 from flask import jsonify, request
 from flask.ext.security import roles_required, roles_accepted
 from app.api_1_0.api_exception import ApiException
-from app.models import GoServer, User
+from app.models import GoServer, Player, User
 from . import api
 
 
 @api.route('/Player', methods=['GET'])
 @roles_required('ratings_admin')
 def allplayers():
-    players = User.query.all()
+    users = User.query.all()
     data = {
-        "num_accounts": len(players),
-        "accounts": []
+        "num_accounts": len(users),
+        "aga_accounts": []
     }
-    for p in players:
-        account = {'id': p.id, 'AGA ID': p.aga_id, 'email': p.email}
-        data['accounts'].append(account)
+    for u in users:
+        person = {
+            'id': u.id,
+            'AGA ID': u.aga_id,
+            'email': u.email,
+            'game_server_accounts': []
+        }
+        gs_accounts = Player.query.filter_by(user_id=u.id)
+        if gs_accounts is not None:
+            for a in gs_accounts:
+                player_acct = {'server': a.server.name, 'player_name': a.name}
+                person['game_server_accounts'].append(player_acct)
+        data['aga_accounts'].append(person)
     return jsonify(data)
 
 
-@api.route('/Player/<string:player_id>', methods=['GET'])
+@api.route('/Player/<string:player_tok>', methods=['GET'])
 @roles_accepted('ratings_admin', 'server_admin')
-def player(player_id):
+def player(player_tok):
     """Verify that the specified user has a valid AGA account.
 
     This request takes the user and server access tokens as input.
@@ -31,7 +41,7 @@ def player(player_id):
         - TODO: confirm that the user's AGA account is active
     """
     server_tok = request.args.get('server_tok')
-    if player_id is None or server_tok is None:
+    if player_tok is None or server_tok is None:
         raise ApiException('malformed request')
 
     gs = GoServer.query.filter_by(token=server_tok).first()
@@ -39,14 +49,14 @@ def player(player_id):
         raise ApiException('server access token unknown or expired',
                            status_code=404)
 
-    user_acct = User.query.filter_by(token=player_id).first()
-    if user_acct is None:
+    player_acct = Player.query.filter_by(token=player_tok).first()
+    if player_acct is None:
         raise ApiException('user access token unknown or expired',
                            status_code=404)
 
     data = {
-        "aga_id": user_acct.aga_id,
-        "email": user_acct.email,
-        "roles": [role.name for role in user_acct.roles]
+        "aga_id": player_acct.user.aga_id,
+        "email": player_acct.user.email,
+        "roles": [role.name for role in player_acct.user.roles]
     }
     return jsonify(data)
