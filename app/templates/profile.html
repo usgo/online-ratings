@@ -10,21 +10,22 @@
     </table>
 
     {% if players %}
-    <h2> Your linked players </h2>
-    <table border class="table">
-        <tr> <th> Server </th> <th> Name </th> <th> Token </th> </tr>
-        {% for p in players %}
-        <tr> 
-            <td> {{p.server.name}} </td> 
-            <td> 
-            <a href="{{ url_for('.player', player_id=p.id) }}">
-                {{p.name}} 
+    <div class="panel panel-default">
+        <div class="panel-heading"> Your linked players </div>
+        <table class="table">
+            <tr> <th> Server </th> <th> Name </th> <th> Token </th> </tr>
+            {% for p in players %}
+            <tr> 
+                <td> {{p.server.name}} </td> 
+                <td> 
+                <a href="{{ url_for('.player', player_id=p.id) }}">
+                    {{p.name}} 
 
-            </a></td> 
-            <td>{{ p.token }}</td>
-        </tr>
-        {% endfor %}
-
-    </table>
+                </a></td> 
+                <td>{{ p.token }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
     {% endif %}
 {% endblock %}

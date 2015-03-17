@@ -6,7 +6,7 @@ from app.decorators import async
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
 import logging
-
+import requests
 
 def _result_str_valid(result):
     """Check the format of a result string per the SGF file format.
@@ -30,7 +30,15 @@ def _result_str_valid(result):
 # Fetches the sgf and updates the associated game.
 @async
 def fetch_sgf(game_id, url):
-    pass
+    r = requests.get(url)
+    if r.status_code != 200:
+        pass
+    else:
+        game_record = r.text
+        game = Game.query.get(game_id)
+        game.game_record = game_record.encode()
+        db.session.update(game)
+        db.session.commit()
 
 @api.route('/PostResult', methods=['POST'])
 def postresult():

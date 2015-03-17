@@ -97,7 +97,7 @@ class Game(db.Model):
     result = db.Column(db.String(10))
     rated = db.Column(db.Boolean)
     game_record = db.Column(db.LargeBinary)
-    game_link = db.Column(db.String(100))
+    game_url = db.Column(db.String(100))
 
     def __str__(self):
         return "%s (w) vs %s (b), played on %s, result %s" % (self.white.name, self.black.name, self.game_server, self.result)
