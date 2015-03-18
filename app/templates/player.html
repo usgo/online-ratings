@@ -9,11 +9,36 @@
 <h1> {{player.name}} </h1>
 {% if games %}
 <table border class="table">
-  <tr><th> Name </th> <th> AGA_ID </th> <th> Last Seen </th> </tr>
+  <tr>
+    <th>Game Server</th>
+    <th>White</th>
+    <th>Black</th>
+    <th>Result</th>
+    <th>Rated?</th>
+    <th>Date Played</th>
+    <th>Game Record</th>
+  </tr>
   {% for g in games %}
     <tr>
-        <td><a href="{{url_for('.gamedetail', game_id=g.id)}}"> {{g}} </a></td>
-      <td></td><td></td>
+      <td>{{g.game_server.name}}</td>
+      <td>
+        {% if g.result.upper().startswith('W') %}
+          <strong>{{g.white.name}}</strong>
+        {% else %}
+          {{g.white.name}}
+        {% endif %}
+      </td>
+      <td>
+        {% if g.result.upper().startswith('B') %}
+          <strong>{{g.black.name}}</strong>
+        {% else %}
+          {{g.black.name}}
+        {% endif %}
+      </td>
+      <td>{{g.result}}</td>
+      <td>{{g.rated}}</td>
+      <td>{{g.date_played}}</td>
+      <td><a href="{{url_for('.gamedetail', game_id=g.id)}}">link</a></td>
     </tr>
   {%endfor%}
 </table>
