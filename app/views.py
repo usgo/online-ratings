@@ -87,8 +87,10 @@ def players():
 @login_required
 def player(player_id):
     player = Player.query.get(player_id)
-    games = Game.query.filter(Game.white_id == player.id).all()
-    games.extend(Game.query.filter(Game.black_id == player.id).all())
+    games = []
+    for p in player.user.players:
+        games.extend(Game.query.filter(Game.white_id == p.id).all())
+        games.extend(Game.query.filter(Game.black_id == p.id).all())
     return render_template('player.html', user=current_user, player=player, games=games)
 
 @ratings.route('/AddGameServer', methods=['GET', 'POST'])

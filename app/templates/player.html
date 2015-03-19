@@ -6,7 +6,7 @@
 
 {% block page_content %}
 
-<h1> {{player.name}} </h1>
+<h1>AGA ID {{player.user.aga_id}}</h1>
 {% if games %}
 <table border class="table">
   <tr>
@@ -22,18 +22,22 @@
     <tr>
       <td>{{g.game_server.name}}</td>
       <td>
+        <a href="{{url_for('.players')}}/{{g.white.id}}">
         {% if g.result.upper().startswith('W') %}
-          <strong>{{g.white.name}}</strong>
+            <strong>AGA {{g.white.user.aga_id}} ({{g.white.name}})</strong>
         {% else %}
-          {{g.white.name}}
+            AGA {{g.white.user.aga_id}} ({{g.white.name}})
         {% endif %}
+        </a>
       </td>
       <td>
+        <a href="/Players/{{g.black.id}}">
         {% if g.result.upper().startswith('B') %}
-          <strong>{{g.black.name}}</strong>
+            <strong>AGA {{g.black.user.aga_id}} ({{g.black.name}})</strong>
         {% else %}
-          {{g.black.name}}
+            AGA {{g.black.user.aga_id}} ({{g.black.name}})
         {% endif %}
+        </a>
       </td>
       <td>{{g.result}}</td>
       <td>{{g.rated}}</td>
