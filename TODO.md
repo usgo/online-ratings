@@ -7,6 +7,7 @@
   - call membership db for json w/ account detail.
   - send e-mail with verification link to e-mail in the usgo member profile
   - create endpoint for verification links
+  - http://flask.pocoo.org/snippets/50/
 - edit profile page:
   - make list of games sortable by each column (via javascript?)
   - add interface for editing profile info
