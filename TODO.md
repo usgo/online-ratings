@@ -1,12 +1,14 @@
-- Create ways to revoke/create new tokens for users/server admins/ratings admins
+- create interface to allow ratings admins to revoke/create tokens for Players and Game Servers
 - create model for "bad results"/ probably request + error message, e.g. expired token, missing token, no sgf link, unparseable result, etc.  Make post_result create entries in table before throwing exception, make admin view summarizing bad posts.
 - set up tasks.py for cron/celery/whatevs.
 - impl. sgf fetch -- AMJ
   - needs test; almost better as integration test?
-- break admin/user views into separate blueprints OR unify similar "details" pages w/ switching based on role.
 - procedure for associating account with AGA ID:
   - call membership db for json w/ account detail.
   - send e-mail with verification link to e-mail in the usgo member profile
   - create endpoint for verification links
 - edit profile page:
-  * make list of games sortable by each column (via javascript?)
+  - make list of games sortable by each column (via javascript?)
+  - add interface for editing profile info
+  - add interface for revoking/renewing Player tokens
+  - add interface for revoking/renewing Game Server tokens

@@ -19,7 +19,6 @@ class Role(db.Model, RoleMixin):
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
-
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     aga_id = db.Column(db.String(25), unique=True)
@@ -45,12 +44,24 @@ class User(db.Model, UserMixin):
     def __str__(self):
         return "AGA %s, %s" % (self.aga_id, self.email)
 
+go_server_admins = db.Table(
+    'go_server_admin',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('server_id', db.Integer, db.ForeignKey('go_server.id'))
+)
+
 class GoServer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
     url = db.Column(db.String(180))
     token = db.Column(db.Text, unique=True)
     players = db.relationship('Player')
+    admins = db.relationship(
+        'User',
+        secondary=go_server_admins,
+        backref=db.backref('servers', lazy='dynamic'),
+        lazy='dynamic'
+    )
 
     def __str__(self):
         return self.name
@@ -127,10 +138,10 @@ def create_test_data():
                                    id=99)
     user_datastore.add_role_to_user(u, role_aga_admin)
 
-    u = user_datastore.create_user(email='admin@kgs.com',
-                                   password=encrypt_password('kgs'),
-                                   id=109)
-    user_datastore.add_role_to_user(u, role_gs_admin)
+    kgs_admin = user_datastore.create_user(email='admin@kgs.com',
+                                           password=encrypt_password('kgs'),
+                                           id=109)
+    user_datastore.add_role_to_user(kgs_admin, role_gs_admin)
 
     u = user_datastore.create_user(email='foo@foo.com',
                                    password=encrypt_password('foo'),
@@ -154,9 +165,9 @@ def create_test_data():
     user_datastore.add_role_to_user(u, role_user)
 
 
-    db.session.add(GoServer(id=1, name='KGS',
-                            url='http://gokgs.com',
-                            token='secret_kgs'))
+    gs = GoServer(id=1, name='KGS', url='http://gokgs.com', token='secret_kgs')
+    gs.admins.append(kgs_admin)
+    db.session.add(gs)
     db.session.add(GoServer(id=2, name='IGS',
                             url='http://pandanet.com',
                             token='secret_igs'))
