@@ -4,6 +4,7 @@ from flask.ext.security import Security, user_registered
 from .models import db, user_datastore
 from .views import ratings, user_registered_sighandler
 from .api_1_0 import api as api_1_0_blueprint
+from .verify import verify
 
 app = Flask(__name__)
 app.config.from_object('config.DebugConfiguration')
@@ -22,6 +23,7 @@ user_registered.connect(user_registered_sighandler)
 
 app.register_blueprint(ratings)
 app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
+app.register_blueprint(verify, url_prefix='/v/')
 
 
 #TODO: remove the following init function, which destroys any existing app
