@@ -1,12 +1,14 @@
 from . import verify
 
 from flask import abort, redirect, url_for
-from itsdangerous import URLSafeSerializer, BadSignature
+from itsdangerous import BadSignature, URLSafeSerializer
 from app.models import Player
+import app, logging
+
 
 def get_serializer(secret_key=None):
     if secret_key is None:
-        secret_key = verify.secret_key
+        secret_key = app.app.secret_key #why app.app?
     return URLSafeSerializer(secret_key)
 
 @verify.route('/verify/<payload>')
@@ -15,6 +17,7 @@ def verify_player(payload):
     try:
         player_id, aga_id = s.loads(payload)
     except BadSignature:
+        logging.info('Verify called with invalid paylod')
         abort(404)
 
     player = Player.query.get_or_404(player_id)

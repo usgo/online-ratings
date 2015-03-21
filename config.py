@@ -27,6 +27,8 @@ class BaseConfiguration(object):
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
 
+    MAIL_SUPPRESS_SEND = True
+
 
 class TestConfiguration(BaseConfiguration):
     TESTING = True
