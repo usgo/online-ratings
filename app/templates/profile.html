@@ -6,7 +6,12 @@
 
 <h1> Your Profile </h1>
 <table class="table">
-    <tr><td>AGA ID</td><td>{{ user.aga_id }}</td></tr>
+    <tr><td>AGA ID</td>
+        {% if user.aga_id is none %}
+        <td><a href="{{url_for('verify.verify_form')}}"> Link your AGA account </a></td></tr>
+        {% else %}
+        <td>{{ user.aga_id }}</td></tr>
+        {% endif%}
     <tr><td>Contact Email</td><td>{{ user.email }}</td></tr>
 </table>
 

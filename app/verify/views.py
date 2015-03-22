@@ -28,11 +28,13 @@ def verify_player(payload):
         abort(404)
 
     user = User.query.get_or_404(user_id)
+    #TODO: if user.id != current_user.id then abort abort abort
     user.aga_id = aga_id
+    app.db.session.add(user)
+    app.db.session.commit()
     #TODO: something like user.activate(), maybe generate initial token?
-    msg = 'Linked account with AGA #%d' %user.aga_id
-    #TODO: redirect to profile
-    return redirect('/')
+    msg = 'Linked account with AGA #%s' %user.aga_id
+    return redirect(url_for('ratings.viewprofile'))
 
 def get_verify_link(user, aga_id):
     s = get_serializer()
@@ -51,6 +53,6 @@ def verify_form():
     return render_template('verify/verifyform.html', form=form)
 
 class LinkUserWithAGANumberForm(Form):
-    aga_id = IntegerField('Aga #?',
+    aga_id = IntegerField('Aga number?',
                           validators=[Required()])
     submit = SubmitField()
