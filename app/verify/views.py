@@ -34,6 +34,7 @@ def verify_player(payload):
     app.db.session.commit()
     #TODO: something like user.activate(), maybe generate initial token?
     msg = 'Linked account with AGA #%s' %user.aga_id
+    logging.info(msg)
     return redirect(url_for('ratings.viewprofile'))
 
 def get_verify_link(user, aga_id):
