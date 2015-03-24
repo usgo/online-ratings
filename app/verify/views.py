@@ -27,8 +27,11 @@ def verify_player(payload):
         logging.info('Verify called with invalid paylod')
         abort(404)
 
+    if user_id != current_user.id:
+        logging.warn("Verify called for id %s, but wrong user answered, %s" % (user_id, current_user))
+        abort(404)
+
     user = User.query.get_or_404(user_id)
-    #TODO: if user.id != current_user.id then abort abort abort
     user.aga_id = aga_id
     app.db.session.add(user)
     app.db.session.commit()
