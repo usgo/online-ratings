@@ -144,6 +144,7 @@ def create_test_data():
     user_datastore.add_role_to_user(kgs_admin, role_gs_admin)
 
     u = user_datastore.create_user(email='foo@foo.com',
+                                   aga_id=10,
                                    password=encrypt_password('foo'),
                                    id=1)
     db.session.add(Player(id=1,name="FooPlayerKGS",server_id=1,user_id=1,token="secret_foo_KGS"))
@@ -151,6 +152,7 @@ def create_test_data():
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='bar@bar.com',
+                                   aga_id=20,
                                    password=encrypt_password('bar'),
                                    id=2)
     db.session.add(Player(id=2,name="BarPlayerKGS",server_id=1,user_id=2,token="secret_bar_KGS"))
@@ -158,6 +160,7 @@ def create_test_data():
     user_datastore.add_role_to_user(u, role_user)
 
     u = user_datastore.create_user(email='baz@baz.com',
+                                   aga_id=30,
                                    password=encrypt_password('baz'),
                                    id=3)
     db.session.add(Player(id=3,name="BazPlayerKGS",server_id=1,user_id=3,token="secret_baz_KGS"))
