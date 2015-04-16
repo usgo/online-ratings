@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask.ext.login import current_user
 from flask.ext.security import login_required
 from flask.ext.security import roles_required
@@ -30,16 +30,42 @@ def viewprofile():
         players = Player.query.filter(Player.user_id == current_user.id).all()
     return render_template('profile.html', user=current_user, games=games, players=players)
 
-@ratings.route('/LatestGames')
-@login_required
-def latestgames():
-    if current_user.is_server_admin():
-        games = Game.query.filter(Game.server_id == current_user.server_id).all()
-    elif current_user.is_ratings_admin():
-        games = Game.query.limit(30).all()
+@ratings.route('/Games', methods=['GET'])
+def listgames():
+    limit = 30
+    player_games = []
+    games = []
+
+    if request.args:
+        aga_id = request.args.get('aga_id')
+        player_id = request.args.get('player_id')
+        sid = request.args.get('server_id')
+        limit = request.args.get('limit')
+
+        if aga_id:
+            user = User.query.filter(User.aga_id == aga_id).first()
+            player_list = Player.query.filter(Player.user_id == user.id)
+            if user and player_list:
+                for p in player_list:
+                    if sid:
+                        pgames = Game.query.filter((Game.white_id==p.id) | (Game.black_id==p.id), Game.server_id==sid)
+                    else:
+                        pgames = Game.query.filter((Game.white_id==p.id) | (Game.black_id==p.id))
+                    player_games.append(pgames)
+        elif player_id:
+            player_games.append(Game.query.filter((Game.white_id==player_id) | (Game.black_id==player_id)))
+        elif sid:
+            player_games.append(Game.query.filter(Game.server_id==sid))
+        else:
+            games = Game.query.limit(limit)
     else:
-        pass
+        games = Game.query.limit(limit)
+
+    for p in player_games:
+        games.extend(p.all())
+
     return render_template('latestgames.html', user=current_user, games=games)
+
 
 @ratings.route('/GameDetail/<game_id>')
 @login_required
