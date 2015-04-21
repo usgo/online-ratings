@@ -41,7 +41,7 @@
                     </ul>
                 </li>
                 {% endif %}
-                {% if not current_user.is_anonymous() %}
+                {% if current_user.is_authenticated() %}
                 <li class="dropdown">
                     <a href="#" data-toggle="dropdown" class="dropdown-toggle">Account<b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -51,7 +51,7 @@
                 </li>
                 {% endif %}
             </ul>
-            {% if not current_user.is_anonymous() %}
+            {% if current_user.is_authenticated() %}
             <ul class="nav navbar-nav navbar-right">
                 <li class="navbar-text">Logged in as {{current_user.email}}</li>
                 <li><a href="/logout">Logout</a></li>
