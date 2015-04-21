@@ -47,11 +47,10 @@ def listgames():
             player_list = Player.query.filter(Player.user_id == user.id)
             if user and player_list:
                 for p in player_list:
+                    game_filter = ((Game.white_id==p.id) | (Game.black_id==p.id))
                     if sid:
-                        pgames = Game.query.filter((Game.white_id==p.id) | (Game.black_id==p.id), Game.server_id==sid)
-                    else:
-                        pgames = Game.query.filter((Game.white_id==p.id) | (Game.black_id==p.id))
-                    player_games.append(pgames)
+                        game_filter = game_filter & (Game.server_id==sid)
+                    player_games.append(Game.query.filter(game_filter))
         elif player_id:
             player_games.append(Game.query.filter((Game.white_id==player_id) | (Game.black_id==player_id)))
         elif sid:
