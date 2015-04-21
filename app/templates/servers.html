@@ -18,6 +18,8 @@
 </table>
 {% endif %}
 
+{% if current_user.has_role('ratings_admin') %}
 <h2><a href="{{ url_for('.addgameserver')}}"> Add Server </a> </h2>
+{% endif %}
 
 {% endblock %}
