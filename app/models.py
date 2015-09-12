@@ -81,6 +81,18 @@ class Player(db.Model):
     def __str__(self):
         return "Player %s on server %s, user %s" % (self.name, self.server_id, self.user_id)
 
+class Rating(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    player = db.relationship('Player',
+                             foreign_keys=white_id,
+                             backref=db.backref('player_rating', lazy='dynamic'))
+    sigma = db.Column(db.Float)
+    rating = db.Column(db.Float)
+    created = db.Column(db.DateTime)
+    def __str__(self):
+        return "(%f, sigma %f) for player %d" % (self.rating, self.sigma, self.player_id) 
+
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
