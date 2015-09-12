@@ -85,7 +85,7 @@ class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
     player = db.relationship('Player',
-                             foreign_keys=white_id,
+                             foreign_keys=player_id,
                              backref=db.backref('player_rating', lazy='dynamic'))
     sigma = db.Column(db.Float)
     rating = db.Column(db.Float)
