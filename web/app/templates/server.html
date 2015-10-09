@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Home{% endblock %}
+
+{% block page_content %}
+
+<h1> Server info for {{server.name}} </h1>
+
+<table border class="table">
+    <tr><td>Name</td><td>{{ server.name }}</td></tr>
+    <tr><td>URL</td><td>{{ server.url }}</td></tr>
+    <tr><td>Token</td><td>{{ server.token }}</td></tr>
+</table>
+{% if players %}
+<table border class="table">
+  <tr><th> Name </th> <th> AGA_ID </th> <th> Last Seen </th> </tr>
+  {% for p in players %}
+    <tr>
+      <td><a href="{{ url_for('.player', player_id=p.id) }}">{{p.name}}</a></td>
+      <td>{{p.user.aga_id}}</td>
+      <td></td>
+    </tr>
+  {%endfor%}
+</table>
+{% endif %}
+
+{% endblock %}

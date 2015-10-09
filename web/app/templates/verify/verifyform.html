@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Home{% endblock %}
+
+{% block page_content %}
+
+<div class="panel">
+    <div class="panel-heading">
+        <h3> Linking your AGA number to this account </h3>
+    </div>
+    <div class="panel-body">
+        <p>
+        To link your user with your AGA account, enter your AGA # in the form below and click "submit".
+        </p>
+        <p>
+        You will recieve an e-mail at the e-mail address registered with your AGA account; if you do not receive an e-mail address, check your account details at <a href="http://www.usgo.org/members">the AGA account management site</a> and ensure your e-mail address is correct.
+        </p>
+
+    {{ wtf.quick_form(form) }}
+    </div>
+</div>
+
+{% endblock %}

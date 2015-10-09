@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block page_content %}
+
+<h1> Your Profile </h1>
+<table class="table">
+    <tr><td>AGA ID</td>
+        {% if user.aga_id is none %}
+        <td><a href="{{url_for('verify.verify_form')}}"> Link your AGA account </a></td></tr>
+        {% else %}
+        <td>{{ user.aga_id }}</td></tr>
+        {% endif%}
+    <tr><td>Contact Email</td><td>{{ user.email }}</td></tr>
+</table>
+
+{% if user.is_server_admin() and user.servers %}
+<h1>Your Game Server(s)</h1>
+<table class="table">
+    <tr><th>Name</th><th>URL</th><th>Token</th></tr>
+    {% for s in user.servers %}
+    <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.url }}</td>
+        <td>{{ s.token }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if players %}
+<div class="panel panel-default">
+    <div class="panel-heading"> Your linked players </div>
+    <table class="table">
+        <tr> <th> Server </th> <th> Name </th> <th> Token </th> </tr>
+        {% for p in players %}
+        <tr>
+            <td>{{p.server.name}}</td>
+            <td>
+                <a href="{{ url_for('.player', player_id=p.id) }}">{{p.name}}</a>
+            </td>
+            <td>{{ p.token }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

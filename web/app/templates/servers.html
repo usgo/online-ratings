@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Home{% endblock %}
+
+{% block page_content %}
+
+{% if servers %}
+<table border class="table">
+  <tr><th> Name </th> <th> URL </th> <th> Players </th> </tr>
+  {% for gs in servers %}
+  <tr>
+    <td><a href="{{ url_for('.server', server_id=gs.id) }}"> {{ gs.name}} </a></td>
+    <td>{{ gs.url }}</td>
+    <td>{{ gs.players|length }}</td></tr>
+    {%endfor%}
+</table>
+{% endif %}
+
+{% if current_user.has_role('ratings_admin') %}
+<h2><a href="{{ url_for('.addgameserver')}}"> Add Server </a> </h2>
+{% endif %}
+
+{% endblock %}
