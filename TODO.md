@@ -1,4 +1,5 @@
 - create interface to allow ratings admins to revoke/create tokens for Players and Game Servers
+- allow users to expire/refresh their tokens.
 - create model for "bad results"/ probably request + error message, e.g. expired token, missing token, no sgf link, unparseable result, etc.  Make post_result create entries in table before throwing exception, make admin view summarizing bad posts.
 - set up tasks.py for cron/celery/whatevs.
 - impl. sgf fetch -- AMJ
@@ -9,7 +10,16 @@
   - create endpoint for verification links
   - http://flask.pocoo.org/snippets/50/
 - edit profile page:
-  - make list of games sortable by each column (via javascript?)
+  - make list of games sortable by each column (via javascript? React?)
   - add interface for editing profile info
   - add interface for revoking/renewing Player tokens
   - add interface for revoking/renewing Game Server tokens
+- clean up routes & menu items, they're a little strange
+- change the data model to two-rows-per-result
+  - instead of "white, black, result, ..."
+      - "white, result, ..."
+      - "black, result, ..."
+- add elo rating stube & worker queue
+- add membership-expiration date sync
+
+
