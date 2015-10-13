@@ -79,7 +79,8 @@ def create_test_data():
 if __name__ == '__main__': 
     app.config.from_object('config.DebugConfiguration')
     with app.app_context():
+        db.session.remove()
         db.drop_all()
-        db.session.commit()
+        db.get_engine(app).dispose()
         db.create_all()
         create_test_data()
