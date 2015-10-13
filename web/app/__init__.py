@@ -6,10 +6,13 @@ from .models import db, user_datastore
 from .views import ratings, user_registered_sighandler
 from .api_1_0 import api as api_1_0_blueprint
 from .verify import verify as verify_blueprint
+from flask.ext.rq import RQ
+
 
 app = Flask(__name__)
 app.config.from_object('config.BaseConfiguration')
 mail = Mail(app)
+RQ(app)
 
 if app.debug:
     import logging

@@ -40,6 +40,9 @@ class DockerConfig(BaseConfiguration):
         DB_USER, DB_PASS, DB_SERVICE, DB_PORT, DB_NAME
     )
 
+    RQ_DEFAULT_HOST="redis_1"
+    RQ_DEFAULT_PORT=6379
+
 class DebugConfiguration(DockerConfig):
     DEBUG = True
 

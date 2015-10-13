@@ -116,7 +116,7 @@ class Game(db.Model):
     date_reported = db.Column(db.DateTime)
 
     result = db.Column(db.String(10))
-    rated = db.Column(db.Boolean)
+    rated = db.Column(db.Boolean) #has the game been rated.
     game_record = db.Column(db.LargeBinary)
     game_url = db.Column(db.String(100))
 
