@@ -59,7 +59,9 @@ def create_test_data():
                             url='http://pandanet.com',
                             token='secret_igs'))
 
-    with open('../tests/testsgf.sgf') as sgf_file:
+    import os
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    with open(os.path.join(basedir, 'tests/testsgf.sgf')) as sgf_file:
         sgf_data = "\n".join(sgf_file.readlines()).encode()
 
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5", game_record=sgf_data))
@@ -75,6 +77,7 @@ def create_test_data():
 
 
 if __name__ == '__main__': 
+    app.config.from_object('config.DebugConfiguration')
     with app.app_context():
         db.drop_all()
         db.session.commit()

@@ -8,7 +8,7 @@ from .api_1_0 import api as api_1_0_blueprint
 from .verify import verify as verify_blueprint
 
 app = Flask(__name__)
-app.config.from_object('config.BaseConfig')
+app.config.from_object('config.BaseConfiguration')
 mail = Mail(app)
 
 if app.debug:

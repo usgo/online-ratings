@@ -27,10 +27,27 @@ Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper insta
   $ python run.py
 ```
 
+## Getting set up with Docker
+Once you've installed docker-compose and docker-machine (`brew install docker-compose docker-machine`) you can set up a test environment like so:
+```
+  $ docker-machine create -d virtualbox dev
+```
+The output of the above command will tell you how to set the local environment variables to connect to your shiny new docker host.  For me, using fish shell, it's something like `eval (docker-machine env dev)`
+Then:
+```
+  $ docker-compose build
+  $ docker-compose up -d
+  $ docker-compose logs
+```
+Should spin up the database and start tailing the logs.  If this is the first time you've set up the database, you'll need to create the initial tables with 
+```
+  $docker-compose run web /usr/local/bin/python ../create_db.py
+```
+
 ## Running the Tests
 The standard `unittest` module has a discovery feature that will automatically find and run tests.  The directions given below will search for tests in any file named `test_*.py`.
 ```
-  $ cd <repo root directory>
+  $ cd web
   $ python -m unittest
 ```
 To see other options for running tests, you may:
@@ -38,6 +55,8 @@ To see other options for running tests, you may:
   $ cd <repo root directory>
   $ python -m unittest --help
 ```
+
+The current test configuration will run against a sqlite database populated with some stub data.
 
 ## Questions?
 The developer mail list can be found here:
