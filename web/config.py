@@ -1,10 +1,11 @@
+#WOOOO
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class BaseConfig(object):
     SECRET_KEY = os.environ['SECRET_KEY']
-    DEBUG = os.environ['DEBUG']
+
     DB_NAME = os.environ['DB_NAME']
     DB_USER = os.environ['DB_USER']
     DB_PASS = os.environ['DB_PASS']
@@ -30,7 +31,8 @@ class BaseConfig(object):
 
     MAIL_SUPPRESS_SEND = True
 
-
+class DebugConfiguration(BaseConfig):
+    DEBUG = True
 
 class BaseConfiguration(object):
     DEBUG = False
@@ -67,5 +69,3 @@ class TestConfiguration(BaseConfiguration):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # + DATABASE_PATH
 
 
-class DebugConfiguration(BaseConfiguration):
-    DEBUG = True

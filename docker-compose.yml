@@ -2,13 +2,18 @@ web:
   restart: always
   build: ./web
   expose:
-    - "8000"
+    - "5000"
   links:
     - postgres:postgres
+    - redis:redis
+  environment:
+    - MODE=dev
   volumes:
     - /usr/src/app/static
+    - ./web:/usr/src:ro
   env_file: .env
-  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
+  command: /usr/local/bin/python /usr/src/run.py
+  #command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --reload
 
 nginx:
   restart: always
@@ -36,3 +41,9 @@ postgres:
     - data
   ports:
     - "5432:5432"
+
+redis:
+  restart: always
+  image: redis:latest
+  ports:
+    - "6379:6379"

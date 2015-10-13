@@ -8,7 +8,7 @@ from .api_1_0 import api as api_1_0_blueprint
 from .verify import verify as verify_blueprint
 
 app = Flask(__name__)
-app.config.from_object('config.DebugConfiguration')
+app.config.from_object('config.BaseConfig')
 mail = Mail(app)
 
 if app.debug:
@@ -28,11 +28,5 @@ app.register_blueprint(ratings)
 app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 app.register_blueprint(verify_blueprint, url_prefix='/v')
 
-#TODO: remove the following init function, which destroys any existing app
-#database and replaces it with default data
-@app.before_first_request
-def init_db():
-    from .models import create_test_data
-    db.drop_all()
-    db.create_all()
-    create_test_data()
+if __name__ == '__main__':
+    app.run()
