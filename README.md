@@ -14,7 +14,7 @@ Other goals of the project can be found on the [implementation plan here](https:
  - clone the repo
  - `pip install` the requirements
  - run the app.
- - log in using the fake login credentials "admin@usgo.org/usgo"
+ - log in using the fake login credentials found in web/app/models.py
 
 ### On a mac, with homebrew
 Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper installed on the system python.
