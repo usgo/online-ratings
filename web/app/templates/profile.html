@@ -38,7 +38,7 @@
         <tr>
             <td>{{p.server.name}}</td>
             <td>
-                <a href="{{ url_for('.player', player_id=p.id) }}">{{p.name}}</a>
+                <a href="{{ url_for('ratings.player', player_id=p.id) }}">{{p.name}}</a>
             </td>
             <td>{{ p.token }}</td>
         </tr>

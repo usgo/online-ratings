@@ -14,7 +14,7 @@ Other goals of the project can be found on the [implementation plan here](https:
  - clone the repo
  - `pip install` the requirements
  - run the app.
- - you'll need to create an account via `register` (this will do so in the local database)
+ - log in using the fake login credentials "admin@usgo.org/usgo"
 
 ### On a mac, with homebrew
 Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper installed on the system python.
