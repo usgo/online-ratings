@@ -22,7 +22,7 @@
     <tr>
       <td>{{g.game_server.name}}</td>
       <td>
-        <a href="{{url_for('.players')}}/{{g.white.id}}">
+        <a href="{{url_for('ratings.players')}}/{{g.white.id}}">
         {% if g.result.upper().startswith('W') %}
             <strong>AGA {{g.white.user.aga_id}} ({{g.white.name}})</strong>
         {% else %}
@@ -42,7 +42,7 @@
       <td>{{g.result}}</td>
       <td>{{g.rated}}</td>
       <td>{{g.date_played}}</td>
-      <td><a href="{{url_for('.gamedetail', game_id=g.id)}}">link</a></td>
+      <td><a href="{{url_for('ratings.gamedetail', game_id=g.id)}}">link</a></td>
     </tr>
   {%endfor%}
 </table>

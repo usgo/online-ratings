@@ -24,7 +24,7 @@
         <td>{{g.date_played}}</td>
         <td>
         {% if g.game_record is not none %}
-          <a href="{{ url_for('.gamedetail', game_id=g.id) }}">link</a>
+          <a href="{{ url_for('ratings.gamedetail', game_id=g.id) }}">link</a>
         {% endif %}
         </td>
     </tr>

@@ -11,7 +11,7 @@
   <tr><th> Name </th> <th> URL </th> <th> Players </th> </tr>
   {% for gs in servers %}
   <tr>
-    <td><a href="{{ url_for('.server', server_id=gs.id) }}"> {{ gs.name}} </a></td>
+    <td><a href="{{ url_for('ratings.server', server_id=gs.id) }}"> {{ gs.name}} </a></td>
     <td>{{ gs.url }}</td>
     <td>{{ gs.players|length }}</td></tr>
     {%endfor%}
@@ -19,7 +19,7 @@
 {% endif %}
 
 {% if current_user.has_role('ratings_admin') %}
-<h2><a href="{{ url_for('.addgameserver')}}"> Add Server </a> </h2>
+<h2><a href="{{ url_for('ratings.addgameserver')}}"> Add Server </a> </h2>
 {% endif %}
 
 {% endblock %}

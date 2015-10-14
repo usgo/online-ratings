@@ -26,9 +26,9 @@
                 <li class="dropdown">
                     <a href="#" data-toggle="dropdown" class="dropdown-toggle">Ratings Admin<b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li> <a href="{{url_for('.servers')}}">Game Servers</a></li> 
-                        <li> <a href="{{url_for('.listgames')}}">Latest Games</a></li>
-                        <li> <a href="{{url_for('.players')}}">Players</a></li>
+                        <li> <a href="{{url_for('ratings.servers')}}">Game Servers</a></li>
+                        <li> <a href="{{url_for('ratings.listgames')}}">Latest Games</a></li>
+                        <li> <a href="{{url_for('ratings.players')}}">Players</a></li>
                     </ul>
                 </li>
                 {% endif %}
@@ -36,8 +36,8 @@
                 <li class="dropdown">
                     <a href="#" data-toggle="dropdown" class="dropdown-toggle">Server Admin<b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li> <a href="{{url_for('.servers')}}">Game Servers</a></li> 
-                        <li> <a href="{{url_for('.listgames')}}">Latest Games</a></li>
+                        <li> <a href="{{url_for('ratings.servers')}}">Game Servers</a></li>
+                        <li> <a href="{{url_for('ratings.listgames')}}">Latest Games</a></li>
                     </ul>
                 </li>
                 {% endif %}
