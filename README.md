@@ -41,7 +41,7 @@ Then:
 ```
 Should spin up the database and start tailing the logs.  If this is the first time you've set up the database, you'll need to create the initial tables with 
 ```
-  $docker-compose run web /usr/local/bin/python ../create_db.py
+  $ docker-compose run web /usr/local/bin/python create_db.py
 ```
 
 ## Running the Tests
