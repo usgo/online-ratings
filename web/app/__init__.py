@@ -10,7 +10,7 @@ from flask.ext.rq import RQ
 
 
 app = Flask(__name__)
-app.config.from_object('config.BaseConfiguration')
+app.config.from_object('config.DockerConfig')
 mail = Mail(app)
 RQ(app)
 
