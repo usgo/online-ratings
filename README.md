@@ -14,7 +14,7 @@ Other goals of the project can be found on the [implementation plan here](https:
  - clone the repo
  - `pip install` the requirements
  - run the app.
- - log in using the fake login credentials "admin@usgo.org/usgo"
+ - log in using the fake login credentials found in web/create_db.py
 
 ### On a mac, with homebrew
 Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper installed on the system python.
@@ -41,7 +41,7 @@ Then:
 ```
 Should spin up the database and start tailing the logs.  If this is the first time you've set up the database, you'll need to create the initial tables with 
 ```
-  $docker-compose run web /usr/local/bin/python ../create_db.py
+  $ docker-compose run web /usr/local/bin/python create_db.py
 ```
 
 ## Running the Tests
