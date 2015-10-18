@@ -1,24 +1,32 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from sqlalchemy.orm import relationship
+import datetime
 
 db = SQLAlchemy()
 
-# Define models
+#used by ext.security
 roles_users = db.Table(
     'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('myuser.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 ) 
 
-#used by ext.security
+go_server_admins = db.Table(
+    'go_server_admin',
+    db.Column('user_id', db.Integer, db.ForeignKey('myuser.id')),
+    db.Column('server_id', db.Integer, db.ForeignKey('go_server.id'))
+)
+
+# Define models
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
 class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
+    __tablename__="myuser"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     aga_id = db.Column(db.String(25), unique=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
@@ -39,14 +47,11 @@ class User(db.Model, UserMixin):
     def is_ratings_admin(self):
         return self.has_role('ratings_admin')
 
+    def last_rating(self):
+        return Rating.query.filter(Rating.user_id == self.id).order_by(Rating.created.desc()).limit(1).first()
+
     def __str__(self):
         return "AGA %s, %s" % (self.aga_id, self.email)
-
-go_server_admins = db.Table(
-    'go_server_admin',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('server_id', db.Integer, db.ForeignKey('go_server.id'))
-)
 
 class GoServer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,7 +73,7 @@ class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
     server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('myuser.id'))
     user = db.relationship('User', foreign_keys=user_id)
     server = db.relationship('GoServer',
                               foreign_keys=server_id,
@@ -81,13 +86,13 @@ class Player(db.Model):
 
 class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
-    player = db.relationship('Player',
-                             foreign_keys=player_id,
-                             backref=db.backref('player_rating', lazy='dynamic'))
+    user_id = db.Column(db.Integer, db.ForeignKey('myuser.id'))
+    user = db.relationship('User',
+                             foreign_keys=user_id,
+                             backref=db.backref('user_rating', lazy='dynamic'))
     sigma = db.Column(db.Float)
     rating = db.Column(db.Float)
-    created = db.Column(db.DateTime)
+    created = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     def __str__(self):
         return "(%f, sigma %f) for player %d" % (self.rating, self.sigma, self.player_id) 
 
