@@ -3,9 +3,12 @@ Mostly in priority order.
 - create interface to allow ratings admins to revoke/create tokens for Players and Game Servers
 - allow users to expire/refresh their tokens.
 - add elo & elo++ rating stub.
-  - add more fixture data: fake users w/ fake players w/ fake games w/ priors, observe ratings.
+  - debug elo++ algorithm
+  - refactor the ratings_math funcs to not use Model objects, just vectors is fine & safer.
+  - refactor the create_db and rate_all scripts to not depend on the app...
 - set up rq worker as part of docker-compose.  Consider celery for easier integ.
   - not really happy with how many dependencies between rq worker and the flask context. 
+  - how to refactor flask app to use models properly outside of app context?
 - procedure for associating account with AGA ID:
   - call membership db for json w/ account detail.
   - send e-mail with verification link to e-mail in the usgo member profile
