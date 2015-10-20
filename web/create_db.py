@@ -108,10 +108,11 @@ def create_extra_data():
     users = User.query.all()
     players = Player.query.all()
     p_priors = {user.id: random.randint(0,40) for user in users}
-    for p, r in p_priors.items():
-        print(p,r)
+    with open('priors.txt', 'w') as f:
+        for p in sorted(p_priors, key=lambda k: p_priors[k]):
+            f.write("%d: %f\n" % (p,p_priors[p]))
 
-    from rating.math import expect
+    import rating.rating_math as rm
     def choose_pair():
         while True:
             pair = random.sample(users, 2)
@@ -123,7 +124,7 @@ def create_extra_data():
     def make_game():
         user_pair = choose_pair()
         ps = (random.choice(user_pair[0].players).id, random.choice(user_pair[1].players).id)
-        result = "B+5" if random.random() < expect(p_priors[user_pair[0].id], p_priors[user_pair[1].id]) else "W+5"
+        result = "B+5" if random.random() < rm.expect(p_priors[user_pair[0].id], p_priors[user_pair[1].id]) else "W+5"
         g = Game(server_id=1, white_id=ps[0], black_id=ps[1],
                 rated=False, result=result, game_record=sgf_data,
                 date_played=datetime.datetime.now() - datetime.timedelta(seconds=random.randint(0,10000000)))
@@ -135,6 +136,9 @@ def create_extra_data():
     for g in games:
         db.session.add(g)
     db.session.commit() 
+    strongest = max(p_priors, key = lambda k: p_priors[k])
+    strongest_games = [str(g) for g in games if g.white.user_id == strongest or g.black.user_id == strongest]
+    print("Strongest, %d (%f):\n%s"% (strongest, p_priors[strongest], strongest_games))
 
 
 if __name__ == '__main__': 
