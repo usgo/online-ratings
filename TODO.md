@@ -3,9 +3,8 @@ Mostly in priority order.
 - create interface to allow ratings admins to revoke/create tokens for Players and Game Servers
 - allow users to expire/refresh their tokens.
 - add elo & elo++ rating stub.
-  - debug elo++ algorithm
   - refactor the ratings_math funcs to not use Model objects, just vectors is fine & safer.
-  - refactor the create_db and rate_all scripts to not depend on the app...
+  - refactor the create_db and rate_all scripts to not depend on the app... but see below.  maybe it's fine.
 - set up rq worker as part of docker-compose.  Consider celery for easier integ.
   - not really happy with how many dependencies between rq worker and the flask context. 
   - how to refactor flask app to use models properly outside of app context?
@@ -19,7 +18,7 @@ Mostly in priority order.
   - add interface for editing profile info
   - add interface for revoking/renewing Player tokens
   - add interface for revoking/renewing Game Server tokens
-- impl. sgf fetch -- AMJ
+- impl. sgf fetch as rq task
   - needs test; almost better as integration test?
 - clean up routes & menu items, they're a little strange
 - change the data model to two-rows-per-result
