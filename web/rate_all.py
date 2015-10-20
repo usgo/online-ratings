@@ -13,8 +13,9 @@ def rate_all():
 
     for g in games:
         if g.white.user_id is None or g.black.user_id is None:
-            print(g)
+            print(g) #should probably strip them.
 
+    # Vector of result_tuples.  Just what we need to compute stuff...
     g_vec = [(g.white.user_id, 
              g.black.user_id,
              1.0 if g.result.startswith('W') else 0.0,
@@ -23,37 +24,51 @@ def rate_all():
     neighbors = rm.neighbors(games)
     neighbor_avgs = rm.compute_avgs(games, rating_prior) 
 
-    tmin = min(games, key=lambda g: g.date_played or datetime.datetime.now()).date_played
-    tmax = max(games, key=lambda g: g.date_played or datetime.datetime.now()).date_played
+    t_min = min(games, key=lambda g: g.date_played or datetime.datetime.now()).date_played
+    t_max = max(games, key=lambda g: g.date_played or datetime.datetime.now()).date_played
 
     iters = 100
-    lam = .27
-    lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.6
+    lam = .37 # Weight for controlling 'pull' of neighborhood weighted average. Higher = stays in the neighborhood.  
+    lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.6 #Control the learning rate over time.
+
     for i in range(iters):
-        random.shuffle(g_vec)
         loss = 0
+        # Accumulate the neighborhood loss prior to changing the ratings around
         for id, neighbor_wgt in neighbor_avgs.items():
             loss += lam * ((rating_prior[id] - neighbor_wgt) ** 2)
+
+        # Shuffle the vector of result-tuples
+        random.shuffle(g_vec)
         for g in g_vec:
             w, b, actual, t = g
             odds = rm.expect(rating_prior[b], rating_prior[w])
-            weight = rm.time_weight(t, tmin, tmax)
+            weight = rm.time_weight(t, t_min, t_max)
             rating_prior[w] -= lrn(i) * (weight*(odds - actual)*odds*(1-odds) + (lam/len(neighbors[w]) * (rating_prior[w] - neighbor_avgs[w])))
             rating_prior[b] -= lrn(i) * (-1.0 * weight*(odds - actual)*odds*(1-odds) + (lam/len(neighbors[b]) * (rating_prior[b] - neighbor_avgs[b])))
             loss += weight * ((odds - actual) ** 2)
 
-        min_r = min(rating_prior.values())
-        max_r = max(rating_prior.values())
-        if max_r != min_r:
+        # Scale the ratings
+        r_min = min(rating_prior.values())
+        r_max = max(rating_prior.values()) 
+        if r_max != r_min:
             for k,v in rating_prior.items():
-                rating_prior[k] = (rating_prior[k] - min_r) / (max_r - min_r) * 40.0
+                rating_prior[k] = (rating_prior[k] - r_min) / (r_max - r_min) * 40.0
 
         neighbor_avgs = rm.compute_avgs(games, rating_prior) 
         print('%d : %.4f' % (i, loss))
 
+    # Update the ratings and show how we did.
+    wins, losses = {}, {}
+    for g in g_vec:
+        wins[g[0]] = wins.get(g[0], 0) + g[2]
+        losses[g[0]] = losses.get(g[0], 0) + 1-g[2]
+        wins[g[1]] = wins.get(g[1], 0) + 1-g[2]
+        losses[g[1]] = losses.get(g[1], 0) + g[2]
+
+    
     for k in sorted(rating_prior, key=lambda k: rating_prior[k]): 
         db.session.add(Rating(user_id=k, rating=rating_prior[k]))
-        print(k,rating_prior[k])
+        print("%d: %f (%d - %d)" % (k,rating_prior[k], wins.get(k,0), losses.get(k,0)) )
     db.session.commit()
 
 if __name__ == '__main__': 
