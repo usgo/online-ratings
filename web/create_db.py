@@ -108,9 +108,9 @@ def create_extra_data():
     users = User.query.all()
     players = Player.query.all()
     p_priors = {user.id: random.randint(0,40) for user in users}
-    with open('priors.txt', 'w') as f:
-        for p in sorted(p_priors, key=lambda k: p_priors[k]):
-            f.write("%d: %f\n" % (p,p_priors[p]))
+    print("Prior ratings")
+    for p in sorted(p_priors, key=lambda k: p_priors[k]):
+        print("%d: %f\n" % (p,p_priors[p]))
 
     import rating.rating_math as rm
     def choose_pair():

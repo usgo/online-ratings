@@ -6,10 +6,7 @@ import rating.rating_math as rm
 
 def rate_all():
     users = User.query.all()
-    games = Game.query.all()
-
-    ratings = {u.id: u.last_rating() for u in users}
-    rating_prior = {u: v.rating if (v and v.rating) else 0 for u,v in ratings.items()}
+    games = Game.query.all() 
 
     for g in games:
         if g.white.user_id is None or g.black.user_id is None:
@@ -20,6 +17,16 @@ def rate_all():
              g.black.user_id,
              1.0 if g.result.startswith('W') else 0.0,
              g.date_played) for g in games]
+
+    users_with_games = set([g[1] for g in g_vec])
+    users_with_games.union(set([g[0] for g in g_vec]))
+    print('before:', len(users))
+    users = [u for u in users if u.id in users_with_games]
+    print('after:', len(users))
+
+    ratings = {u.id: u.last_rating() for u in users}
+    rating_prior = {u: v.rating if (v and v.rating) else 0 for u,v in ratings.items()}
+
 
     neighbors = rm.neighbors(games)
     neighbor_avgs = rm.compute_avgs(games, rating_prior) 
