@@ -1,10 +1,12 @@
 import datetime
 import collections
+import math
 
 def expect(r1, r2):
     # r1 and r2 are floats, black rating, white rating
-    # 2.0 is the 'width' of a rank.  ranks go 0-40, 3d beats 2d at 75%, 4d beats 2d at 90%
-    return (1.0 / (1.0 + pow(10, ((float(r1) - float(r2))/2.0)))) 
+    # a 'scales' the odds by rank.  i.e., a 7d is more likely to beat a 5d than a 8k is to beat a 10k.
+    a = 5 - ((r1 + r2) /20)
+    return (1.0 / (1.0 + pow(math.e, ( (float(r1) - float(r2))/a   )))) 
 
 def neighbors(games):
     """return a dict of neighborhoods keyed by id, where the neighborhood is defined as

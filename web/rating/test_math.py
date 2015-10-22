@@ -13,6 +13,7 @@ class RatingsMathTestCase(unittest.TestCase):
         self.assertEqual(rm.expect(0,0), 0.5)
         self.assertEqual(rm.expect(3,3), 0.5)
         self.assertGreater(rm.expect(0,3), 0.5)
+        self.assertGreater(rm.expect(3, 2), rm.expect(30,29))
 
     def test_time_weight(self):
         t1 = date(1999,1,1) 
