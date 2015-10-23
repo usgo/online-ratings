@@ -28,7 +28,12 @@ Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper insta
 ```
 
 ## Getting set up with Docker
-Once you've installed docker-compose and docker-machine (`brew install docker-compose docker-machine`) you can set up a test environment like so:
+You'll want to install docker-compose and docker-machine
+```
+  $ brew install docker-compose docker-machine
+```
+
+You'll also want to have a virtual machine installed, such as VirtualBox. You can then set up a docker host on VirtualBox.
 ```
   $ docker-machine create -d virtualbox dev
 ```
@@ -41,7 +46,11 @@ Then:
 ```
 Should spin up the database and start tailing the logs.  If this is the first time you've set up the database, you'll need to create the initial tables with 
 ```
-  $ docker-compose run web /usr/local/bin/python create_db.py
+  $ docker-compose run web /usr/local/bin/python ../create_db.py
+```
+The dockerfile configuration will then serve the app at [[virtual machine IP on localhost]], port 80. For example, http://192.168.99.100/ You can find your docker host's by running
+```
+  $ docker-machine ls
 ```
 
 ## Running the Tests
@@ -55,8 +64,6 @@ To see other options for running tests, you may:
   $ cd <repo root directory>
   $ python -m unittest --help
 ```
-
-The current test configuration will run against a sqlite database populated with some stub data.
 
 ## Questions?
 The developer mail list can be found here:
