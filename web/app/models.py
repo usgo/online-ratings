@@ -125,6 +125,9 @@ class Game(db.Model):
     game_record = db.Column(db.LargeBinary)
     game_url = db.Column(db.String(100))
 
+    handicap = db.Column(db.Integer, default=0)
+    komi = db.Column(db.Float, default=7.5)
+
     def __str__(self):
         return "%s (w) vs %s (b), played on %s, result %s" % (self.white.name, self.black.name, self.game_server, self.result)
 

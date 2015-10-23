@@ -94,23 +94,26 @@ def create_extra_data():
     with open(os.path.join(basedir, 'tests/testsgf.sgf')) as sgf_file:
         sgf_data = "\n".join(sgf_file.readlines()).encode()
     role_user = user_datastore.find_role('user')
+    users = []
     for i in range(60):
         u = User(email='bla%d@example.com'%i, aga_id = 100000+i, password=encrypt_password('test'))
         user_datastore.add_role_to_user(u,role_user)
         db.session.add(u)
-        db.session.commit()
+        users.append(u)
+    db.session.commit()
 
+    for u in users:
         for j in range(2):
-            db.session.add(Player(name="Player-%d-%d" % (i,j), server_id=1, user_id=u.id, token="Player-%d-%d" % (i,j)))
+            db.session.add(Player(name="Player-%d-%d" % (u.id,j), server_id=1, user_id=u.id, token="Player-%d-%d" % (u.id,j)))
 
-        db.session.commit()
+    db.session.commit()
 
     users = User.query.all()
     players = Player.query.all()
     p_priors = {user.id: random.randint(0,40) for user in users}
     print("Prior ratings")
     for p in sorted(p_priors, key=lambda k: p_priors[k]):
-        print("%d: %f\n" % (p,p_priors[p]))
+        print("%d: %f" % (p,p_priors[p]))
 
     import rating.rating_math as rm
     def choose_pair():
@@ -131,7 +134,7 @@ def create_extra_data():
         return g
 
     print("Games...")
-    games = [make_game() for i in range(1000)]
+    games = [make_game() for i in range(2000)]
     print("Saving games...")
     for g in games:
         db.session.add(g)
