@@ -51,4 +51,4 @@ class TestConfiguration(BaseConfiguration):
 
     DATABASE = 'tests.db'
     DATABASE_PATH = os.path.join(basedir, DATABASE)
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # + DATABASE_PATH
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
