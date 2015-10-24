@@ -1,9 +1,12 @@
-from flask import Blueprint, render_template, request
+import itertools
+
+from sqlalchemy import or_
+from flask import Blueprint, render_template, request, current_app
 from flask.ext.login import current_user
 from flask.ext.security import login_required
 from flask.ext.security import roles_required
 from flask.ext.security import roles_accepted
-from .tokengen import UUIDTokenGenerator as TokenGenerator
+from .tokengen import generate_token
 from .forms import AddGameServerForm
 from .models import GoServer, Game, User, Player
 from . import db, user_datastore
@@ -25,9 +28,8 @@ def viewprofile():
         games = Game.query.limit(30).all()
         players = None
     else:
-        games = Game.query.filter(Game.white_id == current_user.id).all()
-        games.extend(Game.query.filter(Game.black_id == current_user.id).all())
         players = Player.query.filter(Player.user_id == current_user.id).all()
+        games = itertools.chain(*(Game.query.filter(or_(Game.white_id == player.id, Game.black_id == player.id)) for player in players))
     return render_template('profile.html', user=current_user, games=games, players=players)
 
 @ratings.route('/Games', methods=['GET'])
@@ -87,6 +89,19 @@ def server(server_id):
     logging.info("Found server %s" % server)
     return render_template('server.html', user=current_user, server=server, players=players)
 
+@ratings.route('/GoServer/<server_id>/reset_token', methods=['POST'])
+@login_required
+@roles_required('server_admin')
+def reset_server_token(server_id):
+    server = GoServer.query.get(server_id)
+    if not server.admins.filter(User.id == current_user.id):
+        return current_app.login_manager.unauthorized()
+    server.token = generate_token()
+    db.session.add(server)
+    db.session.commit()
+    logging.info("Reset server token for {}".format(server_id))
+    return "Success"
+
 @ratings.route('/Users')
 @login_required
 @roles_required('ratings_admin')
@@ -123,10 +138,9 @@ def addgameserver():
     form = AddGameServerForm()
     gs = GoServer()
     if form.validate_on_submit():
-        token = TokenGenerator()
         gs.name = form.gs_name.data
         gs.url = form.gs_url.data
-        gs.token = token.create()
+        gs.token = generate_token()
         db.session.add(gs)
         db.session.commit()
         return server(gs.id)
@@ -137,8 +151,7 @@ def user_registered_sighandler(app, user, confirm_token):
     Generate a token for the newly registered user.
     This signal handler is called every time a new user is registered.
     '''
-    token = TokenGenerator()
-    user.token = token.create()
+    user.token = generate_token()
     default_role = user_datastore.find_role('user')
     user_datastore.add_role_to_user(user, default_role)
     db.session.add(user)

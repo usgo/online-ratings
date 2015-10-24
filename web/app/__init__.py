@@ -1,6 +1,7 @@
 from flask import Flask
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.security import Security, user_registered
+from flask_wtf.csrf import CsrfProtect
 from flask_mail import Mail
 from .models import db, user_datastore
 from .views import ratings, user_registered_sighandler
@@ -10,9 +11,11 @@ from flask.ext.rq import RQ
 
 
 app = Flask(__name__)
+
 app.config.from_object('config.DockerConfig')
 mail = Mail(app)
 RQ(app)
+CsrfProtect(app)
 
 if app.debug:
     import logging

@@ -18,12 +18,13 @@
 {% if user.is_server_admin() and user.servers %}
 <h1>Your Game Server(s)</h1>
 <table class="table">
-    <tr><th>Name</th><th>URL</th><th>Token</th></tr>
+    <tr><th>Name</th><th>URL</th><th>Token</th><th>Reset</th></tr>
     {% for s in user.servers %}
     <tr>
         <td>{{ s.name }}</td>
         <td>{{ s.url }}</td>
         <td>{{ s.token }}</td>
+        <td><input type="button" value="Reset this token" class="reset-token" for="{{ s.id }}"></td>
     </tr>
     {% endfor %}
 </table>
@@ -47,4 +48,38 @@
 </div>
 {% endif %}
 
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript">
+var csrftoken = "{{ csrf_token() }}";
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken)
+        }
+    }
+})
+
+function reset_server_token(server_id) {
+    var TOKEN_RESET_ENDPOINT = "{{ url_for('ratings.reset_server_token', server_id='replacethis') }}";
+    return $.ajax({
+        method: "POST",
+        url: TOKEN_RESET_ENDPOINT.replace("replacethis", server_id)
+    });
+}
+
+$("input.reset-token").click(function () {
+    if (window.confirm("Do you really want to reset your token?")) {
+        var server_id = $(this).attr("for");
+        reset_server_token(server_id)
+            .then(function(response) {
+                alert("Success!");
+                location.reload();
+            });
+    }
+})
+</script>
 {% endblock %}
