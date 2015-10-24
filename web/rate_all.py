@@ -4,29 +4,49 @@ from app.models import user_datastore, Player, Game, User, Rating
 from app import app, db
 import rating.rating_math as rm
 
-def rate_all():
-    users = User.query.all()
-    games = Game.query.all() 
-
-    for g in games:
-        if g.white.user_id is None or g.black.user_id is None:
-            print(g) #should probably strip them.
-
-    # Vector of result_tuples.  Just what we need to compute stuff...
-    g_vec = [(g.white.user_id, 
-             g.black.user_id,
-             1.0 if g.result.startswith('W') else 0.0,
-             g.date_played) for g in games]
-
+def sanitized_users(g_vec):
+    """ Strip out users with no games from our list """
+    users = User.query.all() 
     users_with_games = set([g[1] for g in g_vec])
     users_with_games.union(set([g[0] for g in g_vec]))
-    print('before:', len(users))
     users = [u for u in users if u.id in users_with_games]
-    print('after:', len(users))
+
+def sanitized_games(games):
+    """ Sanitizes a list of games into result tuples for rating.
+    A result tuple is the form (w, b, result, date, handicap, komi)
+    Where 'result' is 1 if w won and 0 otherwise.
+    """
+
+    g_vec = []
+    print("Cleaning games...")
+    for g in games:
+        if g.white.user_id is None or g.black.user_id is None:
+            print('  ', g) #should probably strip them.
+        elif g.handicap > 1 and (-1 > g.komi > 1):
+            print('  ', g)
+        elif g.handicap > 6:
+            continue
+        elif g.komi < 0 or g.komi > 8.6:
+            print('  ', g)
+        elif not (g.result.startswith('W+') or g.result.startswith('B+')):
+            print('  ', g)
+        else:
+            # Vector of result_tuples.  Just what we need to compute stuff...
+            g_vec.push( (g.white.user_id, 
+                         g.black.user_id,
+                         1.0 if g.result.startswith('W') else 0.0,
+                         g.date_played,
+                         g.handicap,
+                         g.komi)) 
+    return g_vec 
+
+def rate_all():
+    games = Game.query.all() 
+    users = sanitized_users(games)
+    g_vec = sanitized_games(games)
 
     ratings = {u.id: u.last_rating() for u in users}
-    rating_prior = {u: v.rating if (v and v.rating) else 0 for u,v in ratings.items()}
-
+    rating_prior = {u: v.rating if (v and v.rating) else 0 for u,v in ratings.items()} 
 
     neighbors = rm.neighbors(games)
     neighbor_avgs = rm.compute_avgs(games, rating_prior) 
@@ -47,8 +67,8 @@ def rate_all():
         # Shuffle the vector of result-tuples
         random.shuffle(g_vec)
         for g in g_vec:
-            w, b, actual, t = g
-            odds = rm.expect(rating_prior[b], rating_prior[w])
+            w, b, actual, t, handi, komi = g
+            odds = rm.expect(rating_prior[b], rating_prior[w], handi, komi)
             weight = rm.time_weight(t, t_min, t_max)
             rating_prior[w] -= lrn(i) * (weight*(odds - actual)*odds*(1-odds) + (lam/len(neighbors[w]) * (rating_prior[w] - neighbor_avgs[w])))
             rating_prior[b] -= lrn(i) * (-1.0 * weight*(odds - actual)*odds*(1-odds) + (lam/len(neighbors[b]) * (rating_prior[b] - neighbor_avgs[b])))
