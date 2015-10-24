@@ -2,11 +2,17 @@ import datetime
 import collections
 import math
 
-def expect(r1, r2):
+def expect(r1, r2, handi, komi):
     # r1 and r2 are floats, black rating, white rating
     # a 'scales' the odds by rank.  i.e., a 7d is more likely to beat a 5d than a 8k is to beat a 10k.
+    # it's expected that r1 < r2, but not enforced,
+    if 5 < komi < 9:
+        handi = 0
+    if (0 < komi < 2) and handi == 0:
+        handi = 1
+    d = float(r1) - float(r2) + handi
     a = 5 - ((r1 + r2) /20)
-    return (1.0 / (1.0 + pow(math.e, ( (float(r1) - float(r2))/a   )))) 
+    return (1.0 / (1.0 + pow(math.e, d/a ))) 
 
 def neighbors(games):
     """return a dict of neighborhoods keyed by id, where the neighborhood is defined as
