@@ -1,6 +1,6 @@
 Mostly in priority order.
 
-- create interface to allow ratings admins to revoke/create tokens for Players and Game Servers
+- create interface to allow ratings admins to revoke/create tokens for Players (e.g. for abuse)
 - allow users to expire/refresh their tokens.
 - add elo & elo++ rating stub.
   - refactor the ratings_math funcs to not use Model objects, just vectors is fine & safer.
