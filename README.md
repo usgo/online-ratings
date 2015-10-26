@@ -46,7 +46,7 @@ Then:
 ```
 Should spin up the database and start tailing the logs.  If this is the first time you've set up the database, you'll need to create the initial tables with 
 ```
-  $ docker-compose run web /usr/local/bin/python ../create_db.py
+  $ docker-compose run --rm web python ../create_db.py
 ```
 The dockerfile configuration will then serve the app at [[virtual machine IP on localhost]], port 80. For example, http://192.168.99.100/ You can find your docker host's by running
 ```
