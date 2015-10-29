@@ -16,7 +16,6 @@ ratings = Blueprint("ratings", __name__)
 
 
 @ratings.route('/')
-@login_required
 def home():
     return render_template('index.html')
 
@@ -69,7 +68,6 @@ def listgames():
 
 
 @ratings.route('/GameDetail/<game_id>')
-@login_required
 def gamedetail(game_id):
     game = Game.query.get(game_id)
     return render_template('gamedetail.html', user=current_user, game=game)
@@ -81,12 +79,8 @@ def servers():
     return render_template('servers.html', user=current_user, servers=servers)
 
 @ratings.route('/GoServer/<server_id>')
-@login_required
-@roles_required(SERVER_ADMIN_ROLE.name)
 def server(server_id):
     server = GoServer.query.get(server_id)
-    if not server.admins.filter(User.id == current_user.id):
-        return current_app.login_manager.unauthorized()
     players = Player.query.filter(Player.server_id == server_id).limit(30).all()
     logging.info("Found server %s" % server)
     return render_template('server.html', user=current_user, server=server, players=players)
@@ -124,7 +118,6 @@ def players():
     return render_template('players.html', user=current_user, players=players)
 
 @ratings.route('/Players/<player_id>')
-@login_required
 def player(player_id):
     player = Player.query.get(player_id)
     games = []
