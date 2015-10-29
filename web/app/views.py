@@ -126,6 +126,18 @@ def player(player_id):
         games.extend(Game.query.filter(Game.black_id == p.id).all())
     return render_template('player.html', user=current_user, player=player, games=games)
 
+@ratings.route('/Players/<player_id>/reset_token', methods=['POST'])
+@login_required
+def reset_player_token(player_id):
+    player = Player.query.get(player_id)
+    if not current_user.can_reset_player_token(player):
+        return current_app.login_manager.unauthorized()
+    player.token = generate_token()
+    db.session.add(player)
+    db.session.commit()
+    logging.info("Reset player token for {}".format(player_id))
+    return "Success"
+
 @ratings.route('/AddGameServer', methods=['GET', 'POST'])
 @login_required
 @roles_required(RATINGS_ADMIN_ROLE.name)

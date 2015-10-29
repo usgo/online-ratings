@@ -39,16 +39,6 @@
 {{super()}}
 {% if user.can_reset_server_token(server) %}
 <script type="text/javascript">
-var csrftoken = "{{ csrf_token() }}";
-
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken)
-        }
-    }
-})
-
 function reset_server_token(server_id) {
     var TOKEN_RESET_ENDPOINT = "{{ url_for('ratings.reset_server_token', server_id='replacethis') }}";
     return $.ajax({
