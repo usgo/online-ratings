@@ -54,6 +54,14 @@ class User(db.Model, UserMixin):
     def is_ratings_admin(self):
         return self.has_role(RATINGS_ADMIN_ROLE.name)
 
+    def can_reset_server_token(self, server):
+        return (self.is_ratings_admin() or
+            (self.is_server_admin() and server.admins.filter(User.id == self.id).count()))
+
+    def can_reset_player_token(self, player):
+        return (self.is_ratings_admin() or
+                self.id == player.user_id)
+
     def last_rating(self):
         return Rating.query.filter(Rating.user_id == self.id).order_by(Rating.created.desc()).limit(1).first()
 

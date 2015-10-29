@@ -15,8 +15,9 @@
     <tr><td>Token</td><td>{{ server.token }}</td></tr>
 </table>
 
+{% if user.can_reset_server_token(server) %}
 <input id="reset_token" type="button" value="Reset token for {{server.name}} server" for="{{server.id}}">
-
+{% endif %}
 
 {% if players %}
 <h1>Players</h1>

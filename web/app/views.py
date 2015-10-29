@@ -96,7 +96,7 @@ def server(server_id):
 @roles_required(SERVER_ADMIN_ROLE.name)
 def reset_server_token(server_id):
     server = GoServer.query.get(server_id)
-    if not server.admins.filter(User.id == current_user.id):
+    if not current_user.can_reset_server_token():
         return current_app.login_manager.unauthorized()
     server.token = generate_token()
     db.session.add(server)
