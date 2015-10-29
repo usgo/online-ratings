@@ -1,5 +1,5 @@
 import os
-from app.models import user_datastore, Player, GoServer, Game, User
+from app.models import user_datastore, Player, GoServer, Game, User, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE, USER_ROLE
 from app import app, db
 from flask.ext.security.utils import encrypt_password 
 import random
@@ -7,18 +7,9 @@ import datetime
 
 # Create data for testing
 def create_test_data():
-    role_user = user_datastore.create_role(
-        name='user',
-        description='default role'
-    )
-    role_gs_admin = user_datastore.create_role(
-        name='server_admin',
-        description='Admin of a Go Server'
-    )
-    role_aga_admin = user_datastore.create_role(
-        name='ratings_admin',
-        description='Admin of AGA-Online Ratings'
-    )
+    role_user = user_datastore.create_role(**USER_ROLE._asdict())
+    role_gs_admin = user_datastore.create_role(**SERVER_ADMIN_ROLE._asdict())
+    role_aga_admin = user_datastore.create_role(**RATINGS_ADMIN_ROLE._asdict())
 
     u = user_datastore.create_user(email='admin@usgo.org',
                                    password=encrypt_password('usgo'),

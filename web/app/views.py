@@ -8,7 +8,7 @@ from flask.ext.security import roles_required
 from flask.ext.security import roles_accepted
 from .tokengen import generate_token
 from .forms import AddGameServerForm
-from .models import GoServer, Game, User, Player
+from .models import GoServer, Game, User, Player, SERVER_ADMIN_ROLE, RATINGS_ADMIN_ROLE
 from . import db, user_datastore
 import logging
 
@@ -82,16 +82,18 @@ def servers():
 
 @ratings.route('/GoServer/<server_id>')
 @login_required
-@roles_required('ratings_admin')
+@roles_required(SERVER_ADMIN_ROLE.name)
 def server(server_id):
     server = GoServer.query.get(server_id)
+    if not server.admins.filter(User.id == current_user.id):
+        return current_app.login_manager.unauthorized()
     players = Player.query.filter(Player.server_id == server_id).limit(30).all()
     logging.info("Found server %s" % server)
     return render_template('server.html', user=current_user, server=server, players=players)
 
 @ratings.route('/GoServer/<server_id>/reset_token', methods=['POST'])
 @login_required
-@roles_required('server_admin')
+@roles_required(SERVER_ADMIN_ROLE.name)
 def reset_server_token(server_id):
     server = GoServer.query.get(server_id)
     if not server.admins.filter(User.id == current_user.id):
@@ -104,14 +106,14 @@ def reset_server_token(server_id):
 
 @ratings.route('/Users')
 @login_required
-@roles_required('ratings_admin')
+@roles_required(RATINGS_ADMIN_ROLE.name)
 def users():
     users = User.query.limit(30).all()
     return render_template('users.html', user=current_user, users=users)
 
 @ratings.route('/Players')
 @login_required
-@roles_accepted('ratings_admin', 'server_admin')
+@roles_accepted(RATINGS_ADMIN_ROLE.name, SERVER_ADMIN_ROLE.name)
 def players():
      #TODO: make this use bootstrap-table and load from /api/player_info
     if current_user.is_server_admin():
@@ -133,7 +135,7 @@ def player(player_id):
 
 @ratings.route('/AddGameServer', methods=['GET', 'POST'])
 @login_required
-@roles_required('ratings_admin')
+@roles_required(RATINGS_ADMIN_ROLE.name)
 def addgameserver():
     form = AddGameServerForm()
     gs = GoServer()

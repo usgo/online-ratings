@@ -1,12 +1,12 @@
 from flask import jsonify, request
 from flask.ext.security import roles_required, roles_accepted
 from app.api_1_0.api_exception import ApiException
-from app.models import GoServer, Player, User
+from app.models import GoServer, Player, User, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE
 from . import api
 
 
 @api.route('/Player', methods=['GET'])
-@roles_required('ratings_admin')
+@roles_required(RATINGS_ADMIN_ROLE.name)
 def allplayers():
     users = User.query.all()
     data = {
@@ -30,7 +30,7 @@ def allplayers():
 
 
 @api.route('/Player/<string:player_tok>', methods=['GET'])
-@roles_accepted('ratings_admin', 'server_admin')
+@roles_accepted(RATINGS_ADMIN_ROLE.name, SERVER_ADMIN_ROLE.name)
 def player(player_tok):
     """Verify that the specified user has a valid AGA account.
 

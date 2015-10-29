@@ -1,11 +1,11 @@
 from flask import jsonify
 from flask.ext.security import roles_required
-from app.models import GoServer
+from app.models import GoServer, RATINGS_ADMIN_ROLE
 from . import api
 
 
 @api.route('/GameServer', methods=['GET'])
-@roles_required('ratings_admin')
+@roles_required(RATINGS_ADMIN_ROLE.name)
 def allgameservers():
     game_servers = GoServer.query.all()
     data = {

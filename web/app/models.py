@@ -2,6 +2,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from sqlalchemy.orm import relationship
 import datetime
+from collections import namedtuple
 
 db = SQLAlchemy()
 
@@ -17,6 +18,12 @@ go_server_admins = db.Table(
     db.Column('user_id', db.Integer, db.ForeignKey('myuser.id')),
     db.Column('server_id', db.Integer, db.ForeignKey('go_server.id'))
 )
+
+_Role = namedtuple("_Role", "name description")
+RATINGS_ADMIN_ROLE = _Role("ratings_admin", "Admin of AGA-Online Ratings")
+SERVER_ADMIN_ROLE = _Role("server_admin", "Admin of a Go Server")
+USER_ROLE = _Role("user", "Default role")
+
 
 # Define models
 class Role(db.Model, RoleMixin):
@@ -42,10 +49,10 @@ class User(db.Model, UserMixin):
     players = relationship("Player")
 
     def is_server_admin(self):
-        return self.has_role('server_admin')
+        return self.has_role(SERVER_ADMIN_ROLE.name)
 
     def is_ratings_admin(self):
-        return self.has_role('ratings_admin')
+        return self.has_role(RATINGS_ADMIN_ROLE.name)
 
     def last_rating(self):
         return Rating.query.filter(Rating.user_id == self.id).order_by(Rating.created.desc()).limit(1).first()
