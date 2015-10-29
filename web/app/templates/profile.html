@@ -18,7 +18,7 @@
 {% if user.is_server_admin() and user.servers %}
 <h1>Your Game Server(s)</h1>
 <table class="table">
-    <tr><th>Name</th><th>URL</th><th>Token</th><th>Reset</th></tr>
+    <tr><th>Name</th><th>URL</th><th>Token</th></tr>
     {% for s in user.servers %}
     <tr>
         <td>{{ s.name }}</td>

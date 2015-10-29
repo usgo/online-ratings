@@ -12,11 +12,11 @@
     <tr><td>Name</td><td>{{ server.name }}</td></tr>
     <tr><td>URL</td><td>{{ server.url }}</td></tr>
     <tr><td>Players</td><td>{{ server.players|length }}</td></tr>
-    <tr><td>Token</td><td>{{ server.token }}</td></tr>
+    {% if user.can_reset_server_token(server) %}<tr><td>Token</td><td>{{ server.token }}</td></tr>{% endif %}
 </table>
 
 {% if user.can_reset_server_token(server) %}
-<input id="reset_token" type="button" value="Reset token for {{server.name}} server" for="{{server.id}}">
+<input id="reset_token" type="button" value="Reset token for {{server.name}} server">
 {% endif %}
 
 {% if players %}
@@ -37,6 +37,7 @@
 
 {% block scripts %}
 {{super()}}
+{% if user.can_reset_server_token(server) %}
 <script type="text/javascript">
 var csrftoken = "{{ csrf_token() }}";
 
@@ -58,8 +59,7 @@ function reset_server_token(server_id) {
 
 $("input#reset_token").click(function () {
     if (window.confirm("Do you really want to reset your token?")) {
-        var server_id = $(this).attr("for");
-        reset_server_token(server_id)
+        reset_server_token({{server.id}})
             .then(function(response) {
                 alert("Success!");
                 location.reload();
@@ -67,4 +67,5 @@ $("input#reset_token").click(function () {
     }
 })
 </script>
+{% endif %}
 {% endblock %}
