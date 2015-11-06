@@ -11,9 +11,16 @@
 <table border class="table">
     <tr><td>Name</td><td>{{ server.name }}</td></tr>
     <tr><td>URL</td><td>{{ server.url }}</td></tr>
-    <tr><td>Token</td><td>{{ server.token }}</td></tr>
+    <tr><td>Players</td><td>{{ server.players|length }}</td></tr>
+    {% if user.can_reset_server_token(server) %}<tr><td>Token</td><td>{{ server.token }}</td></tr>{% endif %}
 </table>
+
+{% if user.can_reset_server_token(server) %}
+<input id="reset_token" type="button" value="Reset token for {{server.name}} server">
+{% endif %}
+
 {% if players %}
+<h1>Players</h1>
 <table border class="table">
   <tr><th> Name </th> <th> AGA_ID </th> <th> Last Seen </th> </tr>
   {% for p in players %}
@@ -26,4 +33,29 @@
 </table>
 {% endif %}
 
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+{% if user.can_reset_server_token(server) %}
+<script type="text/javascript">
+function reset_server_token(server_id) {
+    var TOKEN_RESET_ENDPOINT = "{{ url_for('ratings.reset_server_token', server_id='replacethis') }}";
+    return $.ajax({
+        method: "POST",
+        url: TOKEN_RESET_ENDPOINT.replace("replacethis", server_id)
+    });
+}
+
+$("input#reset_token").click(function () {
+    if (window.confirm("Do you really want to reset your token?")) {
+        reset_server_token({{server.id}})
+            .then(function(response) {
+                alert("Success!");
+                location.reload();
+            });
+    }
+})
+</script>
+{% endif %}
 {% endblock %}
