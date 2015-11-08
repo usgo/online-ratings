@@ -5,7 +5,6 @@ from flask import Blueprint, render_template, request, current_app
 from flask.ext.login import current_user
 from flask.ext.security import login_required
 from flask.ext.security import roles_required
-from flask.ext.security import roles_accepted
 from .tokengen import generate_token
 from .forms import AddGameServerForm
 from .models import GoServer, Game, User, Player, SERVER_ADMIN_ROLE, RATINGS_ADMIN_ROLE
@@ -107,14 +106,8 @@ def users():
 
 @ratings.route('/Players')
 @login_required
-@roles_accepted(RATINGS_ADMIN_ROLE.name, SERVER_ADMIN_ROLE.name)
 def players():
-     #TODO: make this use bootstrap-table and load from /api/player_info
-    if current_user.is_server_admin():
-        #TODO: make /api/player_info fetch players for admins' server.
-        pass
-    if current_user.is_ratings_admin():
-        players = Player.query.limit(30).all()
+    players = Player.query.limit(30).all()
     return render_template('players.html', user=current_user, players=players)
 
 @ratings.route('/Players/<player_id>')
