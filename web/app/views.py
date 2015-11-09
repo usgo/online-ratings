@@ -6,7 +6,7 @@ from flask.ext.login import current_user
 from flask.ext.security import login_required
 from flask.ext.security import roles_required
 from .tokengen import generate_token
-from .forms import AddGameServerForm
+from .forms import AddGameServerForm, SearchPlayerForm
 from .models import GoServer, Game, User, Player, SERVER_ADMIN_ROLE, RATINGS_ADMIN_ROLE
 from . import db, user_datastore
 import logging
@@ -104,11 +104,20 @@ def users():
     users = User.query.limit(30).all()
     return render_template('users.html', user=current_user, users=users)
 
-@ratings.route('/Players')
-@login_required
+@ratings.route('/Players', methods=['GET', 'POST'])
 def players():
-    players = Player.query.limit(30).all()
-    return render_template('players.html', user=current_user, players=players)
+    form = SearchPlayerForm()
+    player_query = Player.query
+
+    if form.validate_on_submit():
+        if form.player_name.data:
+            player_query = player_query.filter(Player.name.contains(form.player_name.data))
+        if form.aga_id.data:
+            player_query = player_query.join(User).filter(User.aga_id == form.aga_id.data)
+
+    players = player_query.limit(30).all()
+
+    return render_template('players.html', user=current_user, players=players, form=form)
 
 @ratings.route('/Players/<player_id>')
 def player(player_id):
