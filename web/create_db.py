@@ -122,7 +122,7 @@ def create_extra_data():
     def make_game():
         user_pair = choose_pair()
         ps = (random.choice(user_pair[0].players).id, random.choice(user_pair[1].players).id)
-        result = "B+5" if random.random() < rm.expect(p_priors[user_pair[0].id], p_priors[user_pair[1].id]) else "W+5"
+        result = "B+5" if random.random() < rm.expect(p_priors[user_pair[0].id], p_priors[user_pair[1].id], 0, 6.5) else "W+5"
         g = Game(server_id=1, white_id=ps[0], black_id=ps[1],
                 rated=False, result=result, game_record=sgf_data,
                 date_played=datetime.datetime.now() - datetime.timedelta(seconds=random.randint(0,10000000)))
