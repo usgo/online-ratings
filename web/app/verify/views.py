@@ -50,6 +50,8 @@ def get_verify_link(user, aga_id):
 
 def send_verify_email(user, aga_id):
     email_address = get_email_address(aga_id)
+    if email_address is None:
+        return False
     email_subject = "Confirm AGA ID for Online Ratings"
     email_body = render_template('verify/verification_email.html', 
         user=user, aga_id=aga_id, verify_link=get_verify_link(user, aga_id))
@@ -59,6 +61,7 @@ def send_verify_email(user, aga_id):
         html=email_body,
     )
     app.mail.send(email)
+    return True
 
 @verify.route('/verify', methods=['GET', 'POST'])
 @login_required
@@ -66,8 +69,11 @@ def verify_form():
     form = LinkUserWithAGANumberForm()
     if form.validate_on_submit():
         aga_id = form.aga_id.data
-        send_verify_email(current_user, aga_id)
-        return render_template('verify/verify_form_post_submit.html')
+        success = send_verify_email(current_user, aga_id)
+        if success:
+            return render_template('verify/verify_form_post_submit.html')
+        else:
+            return render_template('verify/verify_form_post_submit_error.html', aga_id=aga_id)
     return render_template('verify/verifyform.html', form=form)
 
 class LinkUserWithAGANumberForm(Form):

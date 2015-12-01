@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Could not send email{% endblock %}
+
+{% block page_content %}
+
+<div class="panel">
+    <div class="panel-heading">
+        <h3> Oops, we couldn't find your email address.</h3>
+    </div>
+    <div class="panel-body">
+        <p> We had trouble sending a confirmation email for AGA id {{aga_id}}. Check your account details at <a href="http://www.usgo.org/members">the AGA account management site</a> to ensure that the AGA id is correct and that you have an e-mail address on file. 
+        </p>
+    </div>
+</div>
+
+{% endblock %}
