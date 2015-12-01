@@ -49,8 +49,7 @@ def get_verify_link(user, aga_id):
                    _external=True)
 
 def send_verify_email(user, aga_id):
-    email_address = "brian.kihoon.lee@gmail.com"
-    #email_address = get_email_address(aga_id)
+    email_address = get_email_address(aga_id)
     email_subject = "Confirm AGA ID for Online Ratings"
     email_body = render_template('verify/verification_email.html', 
         user=user, aga_id=aga_id, verify_link=get_verify_link(user, aga_id))
