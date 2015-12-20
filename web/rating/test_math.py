@@ -1,10 +1,10 @@
-import unittest, collections, datetime
+import unittest, collections
 from datetime import date as date
-
-import rating_math as rm
+import rating.rating_math as rm
 
 Player = collections.namedtuple('Player', ['user_id'])
 Game = collections.namedtuple('Game', ['white', 'black', 'result', 'date_played'])
+
 class RatingsMathTestCase(unittest.TestCase): 
     def setUp(self):
         pass
@@ -53,7 +53,3 @@ class RatingsMathTestCase(unittest.TestCase):
         averages = rm.compute_avgs(games, ratings)
 
         self.assertEqual(averages, {1: 3.0, 2: 2.0, 3: 3.0, 4: 2.0})
-
-
-
-

@@ -1,0 +1,47 @@
+web:
+  extends:
+    file: docker-compose.base.yml
+    service: web
+  # reference static files so that nginx can serve them directly
+  volumes:
+    - /src/app/static/
+  # blank environment values are taken from the docker host's env
+  environment:
+    - DEBUG=False
+    - SECRET_KEY
+    - DB_NAME
+    - DB_USER
+    - DB_PASS
+    - DB_SERVICE=postgres
+    - DB_PORT=5432
+  command: /usr/local/bin/python /src/run.py
+  links:
+    - postgres:postgres
+    - redis:redis
+
+nginx:
+  extends:
+    file: docker-compose.base.yml
+    service: nginx
+  # references static assets from web
+  volumes_from:
+    - web
+  links:
+    - web:web
+
+data:
+  extends:
+    file: docker-compose.base.yml
+    service: data
+
+postgres:
+  extends:
+    file: docker-compose.base.yml
+    service: postgres
+  volumes_from:
+    - data
+
+redis:
+  extends:
+    file: docker-compose.base.yml
+    service: redis
