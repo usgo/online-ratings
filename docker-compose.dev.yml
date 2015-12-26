@@ -6,15 +6,7 @@ web:
   # are reflected immediately, without requiring rebuilding containers
   volumes:
     - ./web:/src
-  environment:
-    - MODE=dev
-    - DEBUG=False
-    - SECRET_KEY=lol-change-me-plz
-    - DB_NAME=postgres
-    - DB_USER=postgres
-    - DB_PASS=postgres
-    - DB_SERVICE=postgres
-    - DB_PORT=5432
+  env_file: .env
   # use built-in flask server for dev. automatically handles code reloading
   command: /usr/local/bin/python /src/run.py
   #command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app --reload
@@ -40,6 +32,9 @@ postgres:
   extends:
     file: docker-compose.base.yml
     service: postgres
+  # the same env file defines both the postgres user/password
+  # so that postgres creates the user, and the app uses those creds
+  env_file: .env
   volumes_from:
     - data
 

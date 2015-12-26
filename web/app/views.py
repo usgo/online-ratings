@@ -13,11 +13,9 @@ import logging
 
 ratings = Blueprint("ratings", __name__)
 
-
 @ratings.route('/')
 def home():
     return render_template('index.html')
-
 
 @ratings.route('/ViewProfile')
 @login_required

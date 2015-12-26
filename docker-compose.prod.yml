@@ -5,15 +5,10 @@ web:
   # reference static files so that nginx can serve them directly
   volumes:
     - /src/app/static/
-  # blank environment values are taken from the docker host's env
+  env_file: .env
+  # just to be sure that debug is off.
   environment:
     - DEBUG=False
-    - SECRET_KEY
-    - DB_NAME
-    - DB_USER
-    - DB_PASS
-    - DB_SERVICE=postgres
-    - DB_PORT=5432
   command: /usr/local/bin/python /src/run.py
   links:
     - postgres:postgres
@@ -38,6 +33,9 @@ postgres:
   extends:
     file: docker-compose.base.yml
     service: postgres
+  # the same env file defines both the postgres user/password
+  # so that postgres creates the user, and the app uses those creds
+  env_file: .env
   volumes_from:
     - data
 
