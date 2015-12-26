@@ -7,13 +7,9 @@ class BaseConfiguration(object):
     TESTING = False
 
     ADMINS = frozenset(['youremail@yourdomain.com'])
-    SECRET_KEY = 'SecretKeyForSessionSigning'
+    SECRET_KEY = None
 
     THREADS_PER_PAGE = 8
-
-    DATABASE = 'app.db'
-    DATABASE_PATH = os.path.join(basedir, DATABASE)
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
 
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
     SECURITY_PASSWORD_SALT = 'SuPeRsEcReTsAlT'
@@ -26,9 +22,11 @@ class BaseConfiguration(object):
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
 
+    MAIL_DEBUG = 0
     MAIL_SUPPRESS_SEND = True 
 
-class DockerConfig(BaseConfiguration):
+class DockerConfiguration(BaseConfiguration):
+    DEBUG = os.environ.get('DEBUG', False)
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
     DB_NAME = os.environ.get('DB_NAME')
@@ -40,15 +38,6 @@ class DockerConfig(BaseConfiguration):
         DB_USER, DB_PASS, DB_SERVICE, DB_PORT, DB_NAME
     )
 
-    RQ_DEFAULT_HOST="redis_1"
-    RQ_DEFAULT_PORT=6379
-
-class DebugConfiguration(DockerConfig):
-    DEBUG = True
-
 class TestConfiguration(BaseConfiguration):
     TESTING = True
-
-    DATABASE = 'tests.db'
-    DATABASE_PATH = os.path.join(basedir, DATABASE)
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'

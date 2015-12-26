@@ -11,7 +11,6 @@ nginx:
     - "80:80"
 
 data:
-  restart: always
   image: postgres:latest
   volumes:
     - /var/lib/postgresql
