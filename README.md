@@ -70,8 +70,9 @@ To see other options for running tests, you may:
 
 Deploying should be the same as testing, except that the docker machine you use is on AWS, etc. Additionally, you should run docker-compose with the prod overrides:
 ```
-  $ docker-compose -f docker-compose.yml -f prod.yml build
-  $ docker-compose -f docker-compose.yml -f prod.yml up -d
+  $ vim .env (change passwords, secret_key to production values)
+  $ docker-compose -f docker-compose.prod.yml build
+  $ docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ## Questions?
