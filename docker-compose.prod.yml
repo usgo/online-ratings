@@ -4,7 +4,7 @@ web:
     service: web
   # reference static files so that nginx can serve them directly
   volumes:
-    - /src/app/static/
+    - /usr/src/app/app/static/
   env_file: .env
   # just to be sure that debug is off.
   environment:
