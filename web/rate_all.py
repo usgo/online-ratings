@@ -104,16 +104,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--service", help="The DB service")
     args = parser.parse_args()
-    app.config.from_object('config.DebugConfiguration')
-    DB_NAME = os.environ.get('DB_NAME')
-    DB_USER = os.environ.get('DB_USER')
-    DB_PASS = os.environ.get('DB_PASS')
-    DB_SERVICE = args.service or os.environ.get('DB_SERVICE')
-    DB_PORT = os.environ.get('DB_PORT')
-    SQLALCHEMY_DATABASE_URI = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
-        DB_USER, DB_PASS, DB_SERVICE, DB_PORT, DB_NAME
-    )
-    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI 
+    app.config.from_object('config.DockerConfiguration')
     with app.app_context():
         #db.session.remove()
         #Rating.__table__.drop(db.engine)

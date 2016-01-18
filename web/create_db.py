@@ -139,11 +139,8 @@ def create_extra_data():
     print("Strongest, %d (%f):\n%s"% (strongest, p_priors[strongest], strongest_games))
 
 
-if __name__ == '__main__': 
-    import argparse
-    random.seed(datetime.datetime.now().timestamp())
-
-    app.config.from_object('config.DebugConfiguration')
+if __name__ == '__main__':
+    app.config.from_object('config.DockerConfiguration')
     with app.app_context():
         db.session.remove()
         db.drop_all()

@@ -19,7 +19,7 @@ def fetch_sgf(url, game_id):
     pass
 
 if __name__ == '__main__':
-    redis = Redis('redis', os.environ['REDIS_PORT'])
+    redis = Redis('redis', 6379)
     q = Queue('default', connection=redis)
     with Connection(redis):
         worker = Worker(map(Queue, ['default']))

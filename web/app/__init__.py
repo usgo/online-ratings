@@ -12,7 +12,7 @@ from flask.ext.rq import RQ
 
 app = Flask(__name__)
 
-app.config.from_object('config.DockerConfig')
+app.config.from_object('config.DockerConfiguration')
 mail = Mail(app)
 RQ(app)
 CsrfProtect(app)

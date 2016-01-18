@@ -10,22 +10,9 @@ Other goals of the project can be found on the [implementation plan here](https:
 
 ## Getting Started (Developers)
 ### Overview:
- - Set up a virtualenv with python 3.4
- - clone the repo
- - `pip install` the requirements
- - run the app.
+ - Get set up with a VM to use with Docker
+ - Build and run the app on the VM with Docker
  - log in using the fake login credentials found in web/create_db.py
-
-### On a mac, with homebrew
-Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper installed on the system python.
-```
-  $ brew install python3
-  $ mkvirtualenv --python=/usr/local/bin/python3 <env name here>
-  $ git clone https://github.com/usgo/online-ratings.git
-  $ cd online-ratings
-  $ pip install -r requirements.txt
-  $ python run.py
-```
 
 ## Getting set up with Docker
 You'll want to install docker-compose and docker-machine
@@ -38,20 +25,34 @@ You'll also want to have a virtual machine installed, such as VirtualBox. You ca
   $ docker-machine create -d virtualbox dev
 ```
 The output of the above command will tell you how to set the local environment variables to connect to your shiny new docker host.  For me, using fish shell, it's something like `eval (docker-machine env dev)`
-Then:
+Then the following commands should start the app running and start tailing the logs.
 ```
-  $ docker-compose build
-  $ docker-compose up -d
-  $ docker-compose logs
+  $ docker-compose -f docker-compose.dev.yml build
+  $ docker-compose -f docker-compose.dev.yml up -d
+  $ docker-compose -f docker-compose.dev.yml logs
 ```
-Should spin up the database and start tailing the logs.  If this is the first time you've set up the database, you'll need to create the initial tables with 
+The `build` step will create docker containers for each part of the app (nginx, flask, etc.). The `up -d` step will coordinate the running of all the containers as specified in the docker-compose yaml file.
+
+If this is the first time you've set up the database, you'll need to create the initial tables with 
 ```
-  $ docker-compose run --rm web python ../create_db.py
+  $ docker-compose -f docker-compose.dev.yml run --rm web python /src/create_db.py
 ```
 The dockerfile configuration will then serve the app at [[virtual machine IP on localhost]], port 80. For example, http://192.168.99.100/ You can find your docker host's by running
 ```
   $ docker-machine ls
 ```
+
+## Running locally, without Docker
+Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper installed on the system python. 
+```
+  $ brew install python3
+  $ mkvirtualenv --python=/usr/local/bin/python3 <env name here>
+  $ git clone https://github.com/usgo/online-ratings.git
+  $ cd online-ratings
+  $ pip install -r requirements.txt
+  $ python run.py
+```
+
 
 ## Running the Tests
 The standard `unittest` module has a discovery feature that will automatically find and run tests.  The directions given below will search for tests in any file named `test_*.py`.
@@ -63,6 +64,15 @@ To see other options for running tests, you may:
 ```
   $ cd <repo root directory>
   $ python -m unittest --help
+```
+
+## Deploying
+
+Deploying should be the same as testing, except that the docker machine you use is on AWS, etc. Additionally, you should run docker-compose with the prod overrides:
+```
+  $ vim .env (change passwords, secret_key to production values)
+  $ docker-compose -f docker-compose.prod.yml build
+  $ docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ## Questions?
