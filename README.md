@@ -35,7 +35,7 @@ The `build` step will create docker containers for each part of the app (nginx, 
 
 If this is the first time you've set up the database, you'll need to create the initial tables with 
 ```
-  $ docker-compose -f docker-compose.dev.yml run --rm web python /src/create_db.py
+  $ docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/create_db.py
 ```
 The dockerfile configuration will then serve the app at [[virtual machine IP on localhost]], port 80. For example, http://192.168.99.100/ You can find your docker host's by running
 ```
