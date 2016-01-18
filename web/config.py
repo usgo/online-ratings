@@ -43,6 +43,13 @@ class DockerConfig(BaseConfiguration):
     RQ_DEFAULT_HOST="redis_1"
     RQ_DEFAULT_PORT=6379
 
+    MAIL_SERVER = "smtp_server.usgo.org"
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = "noreply@usgo.org"
+    MAIL_PASSWORD = "password"
+    MAIL_DEFAULT_SENDER = "noreply@usgo.org"
+
 class DebugConfiguration(DockerConfig):
     DEBUG = True
 
