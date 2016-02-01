@@ -27,6 +27,7 @@ You'll also want to have a virtual machine installed, such as VirtualBox. You ca
 The output of the above command will tell you how to set the local environment variables to connect to your shiny new docker host.  For me, using fish shell, it's something like `eval (docker-machine env dev)`
 Then the following commands should start the app running and start tailing the logs.
 ```
+  $ mv .env_example .env
   $ docker-compose -f docker-compose.dev.yml build
   $ docker-compose -f docker-compose.dev.yml up -d
   $ docker-compose -f docker-compose.dev.yml logs
@@ -57,6 +58,7 @@ Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper insta
 ## Running the Tests
 The standard `unittest` module has a discovery feature that will automatically find and run tests.  The directions given below will search for tests in any file named `test_*.py`.
 ```
+  $ source bin/activate
   $ cd web
   $ python -m unittest
 ```

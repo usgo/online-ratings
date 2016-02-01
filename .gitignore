@@ -56,5 +56,6 @@ coverage.xml
 docs/_build/
 
 # Files specific to this application
+.env
 app.db
 app/static/glift.min.js
