@@ -48,3 +48,4 @@ class DockerConfiguration(BaseConfiguration):
 class TestConfiguration(BaseConfiguration):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SECRET_KEY = "justfortesting"

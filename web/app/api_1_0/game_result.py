@@ -40,7 +40,7 @@ def fetch_sgf(game_id, url):
             game_record = r.text
             game = Game.query.get(game_id)
             game.game_record = game_record.encode()
-            db.session.update(game)
+            db.session.add(game)
             db.session.commit()
 
 @api.route('/PostResult', methods=['POST'])

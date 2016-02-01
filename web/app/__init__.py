@@ -15,7 +15,8 @@ app = Flask(__name__)
 app.config.from_object('config.DockerConfiguration')
 mail = Mail(app)
 RQ(app)
-CsrfProtect(app)
+csrf = CsrfProtect(app)
+csrf.exempt(api_1_0_blueprint)
 
 if app.debug:
     import logging
@@ -29,6 +30,7 @@ bootstrap = Bootstrap(app)
 
 security = Security(app, user_datastore)
 user_registered.connect(user_registered_sighandler)
+
 
 app.register_blueprint(ratings)
 app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')

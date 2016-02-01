@@ -144,7 +144,7 @@ class Game(db.Model):
     komi = db.Column(db.Float, default=7.5)
 
     def __str__(self):
-        return "%s (w) vs %s (b) %dH (%f), played on %s, result %s" % (self.white.name, self.black.name, self.handicap, self.komi, self.game_server, self.result)
+        return "%s (w) vs %s (b) %s handicap, %s komi, played on %s, result %s" % (self.white.name, self.black.name, self.handicap, self.komi, self.game_server, self.result)
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
