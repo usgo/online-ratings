@@ -33,5 +33,5 @@ user_registered.connect(user_registered_sighandler)
 
 
 app.register_blueprint(ratings)
-app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
+app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
 app.register_blueprint(verify_blueprint, url_prefix='/v')

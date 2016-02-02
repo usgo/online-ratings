@@ -43,7 +43,7 @@ def fetch_sgf(game_id, url):
             db.session.add(game)
             db.session.commit()
 
-@api.route('/PostResult', methods=['POST'])
+@api.route('/results', methods=['POST'])
 def postresult():
     """Post a new game result to the database.
 
@@ -61,8 +61,8 @@ def postresult():
     if None in data.values():
         raise ApiException('malformed request')
 
-    #optional 
-    data.update({ 
+    #optional
+    data.update({
         'sgf_data': request.args.get('sgf_data'),
         'sgf_link': request.args.get('sgf_link')
     })
@@ -91,11 +91,11 @@ def postresult():
     enqueue_fetch = False
     game_data = None
     if data['sgf_data'] is None and data['sgf_link'] is None:
-        raise ApiException('One of sgf_data or sgf_link must be present') 
+        raise ApiException('One of sgf_data or sgf_link must be present')
     elif data['sgf_data'] is not None:
         #TODO: some kind of validation
         game_data = data['sgf_data'].encode()
-    else: 
+    else:
         enqueue_fetch = True
 
     try:
