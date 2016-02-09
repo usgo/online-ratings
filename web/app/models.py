@@ -146,5 +146,16 @@ class Game(db.Model):
     def __str__(self):
         return "%s (w) vs %s (b) %s handicap, %s komi, played on %s, result %s" % (self.white.name, self.black.name, self.handicap, self.komi, self.game_server, self.result)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "white_id": self.white_id,
+            "black_id": self.black_id,
+            "game_server": self.game_server.name,
+            "date_played": self.date_played.isoformat(),
+            "date_reported": self.date_reported.isoformat(),
+            "result": self.result,
+        }
+
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)

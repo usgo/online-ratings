@@ -27,7 +27,7 @@ def _result_str_valid(result):
     return False
 
 @api.route('/results', methods=['POST'])
-def postresult():
+def create_result():
     """Post a new game result to the database.
 
     TODO: Check for duplicates.
@@ -39,7 +39,7 @@ def postresult():
         'w_tok': request.args.get('w_tok'),
         'rated': request.args.get('rated'),
         'result': request.args.get('result'),
-        'date': request.args.get('date'),
+        'date_played': request.args.get('date_played'),
     }
     if None in data.values():
         raise ApiException('malformed request')
@@ -86,13 +86,14 @@ def postresult():
             raise ApiException('sgf_link provided (%s) was invalid!' % data.get('sgf_link', '<None>'))
 
     try:
-        date_played = parse_iso8601(data['date'])
+        date_played = parse_iso8601(data['date_played'])
     except TypeError:
-        raise ApiException(error='date must be in ISO 8601 format')
+        raise ApiException(error='date_played must be in ISO 8601 format')
 
     rated = data['rated'] == 'True'
     logging.info(" White: %s, Black: %s " % (w,b))
-    game = Game(white=w,
+    game = Game(server_id=gs.id,
+                white=w,
                 white_id = w.id,
                 black=b,
                 black_id = b.id,
@@ -106,4 +107,4 @@ def postresult():
     print("saving game: %s " % str(game))
     db.session.add(game)
     db.session.commit()
-    return jsonify(message='OK')
+    return jsonify(game.to_dict())

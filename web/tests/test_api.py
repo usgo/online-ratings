@@ -13,16 +13,24 @@ class TestResultsEndpoint(BaseTestCase):
         'w_tok': 'secret_bar_KGS',
         'rated': 'True',
         'result': 'B+0.5',
-        'date': '2014-08-19T10:30:00Z',
+        'date_played': '2014-08-19T10:30:00',
         'sgf_data': '\n'.join(open('tests/testsgf.sgf').readlines())
+    }
+
+    expected_return = {
+        "black_id": 1,
+        "white_id": 2,
+        "game_server": "KGS",
+        "result": "B+0.5",
+        "date_played": good_param_set['date_played'],
     }
 
     def test_results_endpoint_success(self):
         r = self.client.post(self.results_endpoint, query_string=self.good_param_set)
-        expected = dict(message='OK')
-        actual = r.json
-        self.assertEqual(expected, actual)
         self.assertEqual(r.status_code, 200)
+        actual = r.json
+        for key, value in self.expected_return.items():
+            self.assertEqual(value, actual[key])
 
     def test_results_endpoint_sgf_link(self):
         sgf_link = "http://files.gokgs.com/games/2015/3/3/Clutter-underkey.sgf"
@@ -30,9 +38,9 @@ class TestResultsEndpoint(BaseTestCase):
         params.pop("sgf_data")
         params['sgf_link'] = sgf_link
         r = self.client.post(self.results_endpoint, query_string=params)
-        expected = dict(message='OK')
         actual = r.json
-        self.assertEqual(expected, actual)
+        for key, value in self.expected_return.items():
+            self.assertEqual(value, actual[key])
         self.assertEqual(r.status_code, 200)
 
 
@@ -75,9 +83,9 @@ class TestResultsEndpoint(BaseTestCase):
         for value in ['True', 'False']:
             q['rated'] = value
             r = self.client.post(self.results_endpoint, query_string=q)
-            expected = dict(message='OK')
             actual = r.json
-            self.assertEqual(expected, actual)
+            for key, value in self.expected_return.items():
+                self.assertEqual(value, actual[key])
             self.assertEqual(r.status_code, 200)
 
         q['rated'] = '0'
@@ -99,9 +107,8 @@ class TestResultsEndpoint(BaseTestCase):
         for result in good_results:
             q['result'] = result
             r = self.client.post(self.results_endpoint, query_string=q)
-            expected = dict(message='OK')
             actual = r.json
-            self.assertEqual(expected, actual, msg=result)
+            self.assertEqual(result, actual['result'], msg=result)
             self.assertEqual(r.status_code, 200)
 
         q['result'] = 'B+W'
