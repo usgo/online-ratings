@@ -68,7 +68,7 @@ def create_result():
         raise ApiException('user access token unknown or expired: %s' % data['w_tok'],
                            status_code=404)
 
-    if data['rated'] not in ['True', 'False']:
+    if type(data['rated']) != bool:
         raise ApiException('rated must be set to True or False')
 
     if not _result_str_valid(data['result']):
@@ -93,7 +93,7 @@ def create_result():
     except TypeError:
         raise ApiException(error='date_played must be in ISO 8601 format')
 
-    rated = data['rated'] == 'True'
+    rated = data['rated']
     logging.info(" White: %s, Black: %s " % (w,b))
     game = Game(server_id=gs.id,
                 white_id=w.id,

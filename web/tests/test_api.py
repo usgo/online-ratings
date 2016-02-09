@@ -14,7 +14,7 @@ class TestResultsEndpoint(BaseTestCase):
         "black_id": 1,
         "white_id": 2,
         "game_server": "KGS",
-        'rated': 'True',
+        'rated': True,
         'result': 'B+0.5',
         'date_played': '2014-08-19T10:30:00',
         'sgf_data': '\n'.join(open('tests/testsgf.sgf').readlines())
@@ -24,6 +24,7 @@ class TestResultsEndpoint(BaseTestCase):
         "black_id": 1,
         "white_id": 2,
         "game_server": "KGS",
+        "rated": True,
         "result": "B+0.5",
         "date_played": good_param_set['date_played'],
     }
@@ -83,12 +84,15 @@ class TestResultsEndpoint(BaseTestCase):
 
     def test_results_endpoint_rated(self):
         q = self.good_param_set.copy()
-        for value in ['True', 'False']:
-            q['rated'] = value
+        for is_rated in [True, False]:
+            q['rated'] = is_rated
             r = self.client.post(self.results_endpoint, query_string=q)
             actual = r.json
             for key, value in self.expected_return.items():
-                self.assertEqual(value, actual[key])
+                if key == "rated":
+                    self.assertEqual(is_rated, actual[key])
+                else:
+                    self.assertEqual(value, actual[key])
             self.assertEqual(r.status_code, 200)
 
         q['rated'] = '0'

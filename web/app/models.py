@@ -155,6 +155,7 @@ class Game(db.Model):
             "date_played": self.date_played.isoformat(),
             "date_reported": self.date_reported.isoformat(),
             "result": self.result,
+            "rated": self.rated,
         }
 
 # Setup Flask-Security
