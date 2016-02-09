@@ -1,11 +1,13 @@
-from flask import jsonify, request
-from . import api
-from app.api_1_0.api_exception import ApiException
-from app.models import db, Game, GoServer, Player
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
 import logging
 import requests
+
+from flask import jsonify, request
+from . import api
+from app.api_1_0.api_exception import ApiException
+from app.api_1_0.api_utils import requires_json
+from app.models import db, Game, GoServer, Player
 
 def _result_str_valid(result):
     """Check the format of a result string per the SGF file format.
@@ -27,26 +29,26 @@ def _result_str_valid(result):
     return False
 
 
-def validate_game_submission(request_body):
+def validate_game_submission(queryparams, body_json):
     #required
     data = {
-        'server_tok': request_body.get('server_tok'),
-        'b_tok': request_body.get('b_tok'),
-        'w_tok': request_body.get('w_tok'),
-        'game_server': request_body.get('game_server'),
-        'black_id': request_body.get('black_id'),
-        'white_id': request_body.get('white_id'),
-        'rated': request_body.get('rated'),
-        'result': request_body.get('result'),
-        'date_played': request_body.get('date_played'),
+        'server_tok': queryparams.get('server_tok'),
+        'b_tok': queryparams.get('b_tok'),
+        'w_tok': queryparams.get('w_tok'),
+        'game_server': body_json.get('game_server'),
+        'black_id': body_json.get('black_id'),
+        'white_id': body_json.get('white_id'),
+        'rated': body_json.get('rated'),
+        'result': body_json.get('result'),
+        'date_played': body_json.get('date_played'),
     }
     if None in data.values():
         raise ApiException('malformed request')
 
     #optional
     data.update({
-        'sgf_data': request_body.get('sgf_data'),
-        'sgf_link': request_body.get('sgf_link')
+        'game_record': body_json.get('game_record'),
+        'game_url': body_json.get('game_url')
     })
 
     gs = GoServer.query.filter_by(name=data['game_server'], token=data['server_tok']).first()
@@ -70,19 +72,19 @@ def validate_game_submission(request_body):
     if not _result_str_valid(data['result']):
         raise ApiException('format of result is incorrect')
 
-    if data['sgf_data'] is None and data['sgf_link'] is None:
-        raise ApiException('One of sgf_data or sgf_link must be present')
+    if data['game_record'] is None and data['game_url'] is None:
+        raise ApiException('One of game_record or game_url must be present')
 
-    if data['sgf_data'] is not None:
-        game_data = data['sgf_data'].encode()
+    if data['game_record'] is not None:
+        game_record = data['game_record'].encode()
     else:
         try:
-            response = requests.get(data['sgf_link'])
-            game_data = response.content
+            response = requests.get(data['game_url'])
+            game_record = response.content
         except Exception as e:
-            logging.info("Got invalid sgf_link %s" % data.get("sgf_link", ""))
+            logging.info("Got invalid game_url %s" % data.get("game_url", ""))
             logging.info(e)
-            raise ApiException('sgf_link provided (%s) was invalid!' % data.get('sgf_link', '<None>'))
+            raise ApiException('game_url provided (%s) was invalid!' % data.get('game_url', '<None>'))
 
     try:
         date_played = parse_iso8601(data['date_played'])
@@ -98,14 +100,15 @@ def validate_game_submission(request_body):
                 date_played=date_played,
                 date_reported=datetime.now(),
                 result=data['result'],
-                game_record=game_data
+                game_record=game_record
                 )
     return game
 
 @api.route('/results', methods=['POST'])
+@requires_json
 def create_result():
     """Post a new game result to the database."""
-    game = validate_game_submission(request.args, request.body)
+    game = validate_game_submission(request.args, request.json)
     db.session.add(game)
     db.session.commit()
     print("New game: %s " % str(game))

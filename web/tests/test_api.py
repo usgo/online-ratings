@@ -1,3 +1,5 @@
+import json
+
 from tests import BaseTestCase
 from app.api_1_0.game_result import _result_str_valid, validate_game_submission
 from app.api_1_0.api_exception import ApiException
@@ -8,89 +10,88 @@ from app.api_1_0.api_exception import ApiException
 
 class TestResultsEndpoint(BaseTestCase):
 
-    results_endpoint = 'http://localhost:5000/api/v1/results'
-    good_param_set = {
+    results_endpoint = '/api/v1/results'
+    good_queryparams = {
         'server_tok': 'secret_kgs',
         'b_tok': 'secret_foo_KGS',
         'w_tok': 'secret_bar_KGS',
+    }
+    good_bodyparams = {
         "black_id": 1,
         "white_id": 2,
         "game_server": "KGS",
         'rated': True,
         'result': 'B+0.5',
         'date_played': '2014-08-19T10:30:00',
-        'sgf_data': '\n'.join(open('tests/testsgf.sgf').readlines())
+        'game_record': '\n'.join(open('tests/testsgf.sgf').readlines())
     }
 
-    expected_return = {
-        "black_id": 1,
-        "white_id": 2,
-        "game_server": "KGS",
-        "rated": True,
-        "result": "B+0.5",
-        "date_played": good_param_set['date_played'],
-    }
+    expected_return = dict((k,v) for (k,v) in good_bodyparams.items() if k != 'game_record')
 
     def test_results_endpoint_success(self):
-        response = self.client.post(self.results_endpoint, query_string=self.good_param_set)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(self.results_endpoint, query_string=self.good_queryparams, data=json.dumps(self.good_bodyparams), headers={"Content-Type": "application/json"})
         actual = response.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, actual[key])
+        self.assertEqual(response.status_code, 200)
 
-    def test_results_endpoint_sgf_link(self):
-        sgf_link = "http://files.gokgs.com/games/2015/3/3/Clutter-underkey.sgf"
-        params = self.good_param_set.copy()
-        params.pop("sgf_data")
-        params['sgf_link'] = sgf_link
-        r = self.client.post(self.results_endpoint, query_string=params)
+    def test_results_endpoint_game_url(self):
+        game_url = "http://files.gokgs.com/games/2015/3/3/Clutter-underkey.sgf"
+        bodyparams = self.good_bodyparams.copy()
+        bodyparams.pop("game_record")
+        bodyparams['game_url'] = game_url
+        r = self.client.post(self.results_endpoint, query_string=self.good_queryparams, data=json.dumps(bodyparams), headers={"Content-Type": "application/json"})
         actual = r.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, actual[key])
         self.assertEqual(r.status_code, 200)
 
 
-    def test_results_endpoint_missing_param(self):
-        for k in self.good_param_set.keys():
-            q = self.good_param_set.copy()
+    def test_results_endpoint_missing_auth(self):
+        for k in self.good_queryparams.keys():
+            q = self.good_queryparams.copy()
             q.pop(k, None)  # on each iteration, remove 1 param
             with self.assertRaises(ApiException) as exception_context:
-                validate_game_submission(q)
-            if k == 'sgf_data':
-                expected = 'One of sgf_data or sgf_link must be present'
+                validate_game_submission(q, self.good_bodyparams)
+            expected = 'malformed request'
+            self.assertEqual(expected, exception_context.exception.message)
+
+    def test_results_endpoint_missing_params(self):
+        for k in self.good_bodyparams.keys():
+            q = self.good_bodyparams.copy()
+            q.pop(k, None)  # on each iteration, remove 1 param
+            with self.assertRaises(ApiException) as exception_context:
+                validate_game_submission(self.good_queryparams, q)
+            if k == 'game_record':
+                expected = 'One of game_record or game_url must be present'
             else:
                 expected = 'malformed request'
             self.assertEqual(expected, exception_context.exception.message)
 
-    def test_results_endpoint_bad_server_token(self):
-        q = self.good_param_set.copy()
-        q['server_tok'] = 'bad_tok'
-        with self.assertRaises(ApiException) as exception_context:
-            validate_game_submission(q)
-
-        expected = 'server access token unknown or expired: bad_tok'
-        self.assertEqual(expected, exception_context.exception.message)
-
     def test_results_endpoint_bad_user_token(self):
-        for param in ['w_tok', 'b_tok']:
+        for param in ['w_tok', 'b_tok', 'server_tok']:
             # User token is bad
-            q = self.good_param_set.copy()
-            q[param] = 'bad_user_tok'
+            q = self.good_queryparams.copy()
+            q[param] = 'bad_tok'
             with self.assertRaises(ApiException) as exception_context:
-                validate_game_submission(q)
-            expected = 'user access token unknown or expired: bad_user_tok'
+                validate_game_submission(q, self.good_bodyparams)
+
+            if param == 'server_tok':
+                expected = 'server access token unknown or expired: bad_tok'
+            else:
+                expected = 'user access token unknown or expired: bad_tok'
             self.assertEqual(expected, exception_context.exception.message)
 
     def test_results_endpoint_rated(self):
-        q = self.good_param_set.copy()
+        bodyparams = self.good_bodyparams.copy()
         for is_rated in [True, False]:
-            q['rated'] = is_rated
-            game = validate_game_submission(q)
+            bodyparams['rated'] = is_rated
+            game = validate_game_submission(self.good_queryparams, bodyparams)
             self.assertEqual(game.rated, is_rated)
 
-        q['rated'] = '0'
+        bodyparams['rated'] = '0'
         with self.assertRaises(ApiException) as exception_context:
-            validate_game_submission(q)
+            validate_game_submission(self.good_queryparams, bodyparams)
 
         expected = 'rated must be set to True or False'
         self.assertEqual(expected, exception_context.exception.message)
