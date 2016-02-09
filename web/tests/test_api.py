@@ -1,5 +1,6 @@
 from tests import BaseTestCase
-from app.api_1_0.game_result import _result_str_valid
+from app.api_1_0.game_result import _result_str_valid, validate_game_submission
+from app.api_1_0.api_exception import ApiException
 
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vii-unit-testing
 # http://flask.pocoo.org/docs/testing/#testing
@@ -31,9 +32,9 @@ class TestResultsEndpoint(BaseTestCase):
     }
 
     def test_results_endpoint_success(self):
-        r = self.client.post(self.results_endpoint, query_string=self.good_param_set)
-        self.assertEqual(r.status_code, 200)
-        actual = r.json
+        response = self.client.post(self.results_endpoint, query_string=self.good_param_set)
+        self.assertEqual(response.status_code, 200)
+        actual = response.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, actual[key])
 
@@ -53,55 +54,46 @@ class TestResultsEndpoint(BaseTestCase):
         for k in self.good_param_set.keys():
             q = self.good_param_set.copy()
             q.pop(k, None)  # on each iteration, remove 1 param
-            r = self.client.post(self.results_endpoint, query_string=q)
+            with self.assertRaises(ApiException) as exception_context:
+                validate_game_submission(q)
             if k == 'sgf_data':
-                expected = dict(message='One of sgf_data or sgf_link must be present')
+                expected = 'One of sgf_data or sgf_link must be present'
             else:
-                expected = dict(message='malformed request')
-
-            actual = r.json
-            self.assertEqual(expected, actual)
-            self.assertEqual(r.status_code, 400)
+                expected = 'malformed request'
+            self.assertEqual(expected, exception_context.exception.message)
 
     def test_results_endpoint_bad_server_token(self):
         q = self.good_param_set.copy()
         q['server_tok'] = 'bad_tok'
-        r = self.client.post(self.results_endpoint, query_string=q)
-        expected = dict(message='server access token unknown or expired: bad_tok')
-        actual = r.json
-        self.assertEqual(expected, actual)
-        self.assertEqual(r.status_code, 404)
+        with self.assertRaises(ApiException) as exception_context:
+            validate_game_submission(q)
+
+        expected = 'server access token unknown or expired: bad_tok'
+        self.assertEqual(expected, exception_context.exception.message)
 
     def test_results_endpoint_bad_user_token(self):
         for param in ['w_tok', 'b_tok']:
             # User token is bad
             q = self.good_param_set.copy()
             q[param] = 'bad_user_tok'
-            r = self.client.post(self.results_endpoint, query_string=q)
-            expected = dict(message='user access token unknown or expired: bad_user_tok')
-            actual = r.json
-            self.assertEqual(expected, actual)
-            self.assertEqual(r.status_code, 404)
+            with self.assertRaises(ApiException) as exception_context:
+                validate_game_submission(q)
+            expected = 'user access token unknown or expired: bad_user_tok'
+            self.assertEqual(expected, exception_context.exception.message)
 
     def test_results_endpoint_rated(self):
         q = self.good_param_set.copy()
         for is_rated in [True, False]:
             q['rated'] = is_rated
-            r = self.client.post(self.results_endpoint, query_string=q)
-            actual = r.json
-            for key, value in self.expected_return.items():
-                if key == "rated":
-                    self.assertEqual(is_rated, actual[key])
-                else:
-                    self.assertEqual(value, actual[key])
-            self.assertEqual(r.status_code, 200)
+            game = validate_game_submission(q)
+            self.assertEqual(game.rated, is_rated)
 
         q['rated'] = '0'
-        r = self.client.post(self.results_endpoint, query_string=q)
-        expected = dict(message='rated must be set to True or False')
-        actual = r.json
-        self.assertEqual(expected, actual)
-        self.assertEqual(r.status_code, 400)
+        with self.assertRaises(ApiException) as exception_context:
+            validate_game_submission(q)
+
+        expected = 'rated must be set to True or False'
+        self.assertEqual(expected, exception_context.exception.message)
 
     def test_result_verification(self):
         good_results = [

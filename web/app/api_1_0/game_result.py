@@ -26,31 +26,27 @@ def _result_str_valid(result):
             return False
     return False
 
-@api.route('/results', methods=['POST'])
-def create_result():
-    """Post a new game result to the database.
 
-    TODO: Check for duplicates.
-    """
+def validate_game_submission(request_body):
     #required
     data = {
-        'server_tok': request.args.get('server_tok'),
-        'b_tok': request.args.get('b_tok'),
-        'w_tok': request.args.get('w_tok'),
-        'game_server': request.args.get('game_server'),
-        'black_id': request.args.get('black_id'),
-        'white_id': request.args.get('white_id'),
-        'rated': request.args.get('rated'),
-        'result': request.args.get('result'),
-        'date_played': request.args.get('date_played'),
+        'server_tok': request_body.get('server_tok'),
+        'b_tok': request_body.get('b_tok'),
+        'w_tok': request_body.get('w_tok'),
+        'game_server': request_body.get('game_server'),
+        'black_id': request_body.get('black_id'),
+        'white_id': request_body.get('white_id'),
+        'rated': request_body.get('rated'),
+        'result': request_body.get('result'),
+        'date_played': request_body.get('date_played'),
     }
     if None in data.values():
         raise ApiException('malformed request')
 
     #optional
     data.update({
-        'sgf_data': request.args.get('sgf_data'),
-        'sgf_link': request.args.get('sgf_link')
+        'sgf_data': request_body.get('sgf_data'),
+        'sgf_link': request_body.get('sgf_link')
     })
 
     gs = GoServer.query.filter_by(name=data['game_server'], token=data['server_tok']).first()
@@ -104,7 +100,13 @@ def create_result():
                 result=data['result'],
                 game_record=game_data
                 )
+    return game
+
+@api.route('/results', methods=['POST'])
+def create_result():
+    """Post a new game result to the database."""
+    game = validate_game_submission(request.args, request.body)
     db.session.add(game)
     db.session.commit()
-    print("saving game: %s " % str(game))
+    print("New game: %s " % str(game))
     return jsonify(game.to_dict())
