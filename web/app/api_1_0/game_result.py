@@ -1,13 +1,13 @@
-from flask import jsonify, request
-from . import api
-from app.api_1_0.api_exception import ApiException
-from app.models import db, Game, GoServer, Player
-import app
-from flask.ext.rq import job
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
 import logging
 import requests
+
+from flask import jsonify, request
+from . import api
+from app.api_1_0.api_exception import ApiException
+from app.api_1_0.api_utils import requires_json
+from app.models import db, Game, GoServer, Player
 
 def _result_str_valid(result):
     """Check the format of a result string per the SGF file format.
@@ -28,100 +28,88 @@ def _result_str_valid(result):
             return False
     return False
 
-# Fetches the sgf and updates the associated game.
-#@async
-@job
-def fetch_sgf(game_id, url):
-    with app.app.app_context():
-        r = requests.get(url)
-        if r.status_code != 200:
-            raise
-        else:
-            game_record = r.text
-            game = Game.query.get(game_id)
-            game.game_record = game_record.encode()
-            db.session.add(game)
-            db.session.commit()
 
-@api.route('/results', methods=['POST'])
-def postresult():
-    """Post a new game result to the database.
-
-    TODO: Check for duplicates.
-    """
+def validate_game_submission(queryparams, body_json):
     #required
     data = {
-        'server_tok': request.args.get('server_tok'),
-        'b_tok': request.args.get('b_tok'),
-        'w_tok': request.args.get('w_tok'),
-        'rated': request.args.get('rated'),
-        'result': request.args.get('result'),
-        'date': request.args.get('date'),
+        'server_tok': queryparams.get('server_tok'),
+        'b_tok': queryparams.get('b_tok'),
+        'w_tok': queryparams.get('w_tok'),
+        'game_server': body_json.get('game_server'),
+        'black_id': body_json.get('black_id'),
+        'white_id': body_json.get('white_id'),
+        'rated': body_json.get('rated'),
+        'result': body_json.get('result'),
+        'date_played': body_json.get('date_played'),
     }
     if None in data.values():
         raise ApiException('malformed request')
 
     #optional
     data.update({
-        'sgf_data': request.args.get('sgf_data'),
-        'sgf_link': request.args.get('sgf_link')
+        'game_record': body_json.get('game_record'),
+        'game_url': body_json.get('game_url')
     })
 
-    gs = GoServer.query.filter_by(token=data['server_tok']).first()
+    gs = GoServer.query.filter_by(name=data['game_server'], token=data['server_tok']).first()
     if gs is None:
         raise ApiException('server access token unknown or expired: %s' % data['server_tok'],
                            status_code=404)
 
-    b = Player.query.filter_by(token=data['b_tok']).first()
+    b = Player.query.filter_by(id=data['black_id'], token=data['b_tok']).first()
     if b is None or b.user_id is None:
         raise ApiException('user access token unknown or expired: %s' % data['b_tok'],
                            status_code=404)
 
-    w = Player.query.filter_by(token=data['w_tok']).first()
+    w = Player.query.filter_by(id=data['white_id'], token=data['w_tok']).first()
     if w is None or w.user_id is None:
         raise ApiException('user access token unknown or expired: %s' % data['w_tok'],
                            status_code=404)
 
-    if data['rated'] not in ['True', 'False']:
+    if type(data['rated']) != bool:
         raise ApiException('rated must be set to True or False')
 
     if not _result_str_valid(data['result']):
         raise ApiException('format of result is incorrect')
 
-    enqueue_fetch = False
-    game_data = None
-    if data['sgf_data'] is None and data['sgf_link'] is None:
-        raise ApiException('One of sgf_data or sgf_link must be present')
-    elif data['sgf_data'] is not None:
-        #TODO: some kind of validation
-        game_data = data['sgf_data'].encode()
+    if data['game_record'] is None and data['game_url'] is None:
+        raise ApiException('One of game_record or game_url must be present')
+
+    if data['game_record'] is not None:
+        game_record = data['game_record'].encode()
     else:
-        enqueue_fetch = True
+        try:
+            response = requests.get(data['game_url'])
+            game_record = response.content
+        except Exception as e:
+            logging.info("Got invalid game_url %s" % data.get("game_url", ""))
+            logging.info(e)
+            raise ApiException('game_url provided (%s) was invalid!' % data.get('game_url', '<None>'))
 
     try:
-        date_played = parse_iso8601(data['date'])
+        date_played = parse_iso8601(data['date_played'])
     except TypeError:
-        raise ApiException(error='date must be in ISO 8601 format')
+        raise ApiException(error='date_played must be in ISO 8601 format')
 
-    rated = data['rated'] == 'True'
+    rated = data['rated']
     logging.info(" White: %s, Black: %s " % (w,b))
-    game = Game(white=w,
-                white_id = w.id,
-                black=b,
-                black_id = b.id,
+    game = Game(server_id=gs.id,
+                white_id=w.id,
+                black_id=b.id,
                 rated=rated,
                 date_played=date_played,
                 date_reported=datetime.now(),
                 result=data['result'],
-                game_record=game_data
+                game_record=game_record
                 )
-    logging.info("saving game: %s " % str(game))
-    print("saving game: %s " % str(game))
+    return game
+
+@api.route('/results', methods=['POST'])
+@requires_json
+def create_result():
+    """Post a new game result to the database."""
+    game = validate_game_submission(request.args, request.json)
     db.session.add(game)
     db.session.commit()
-    if game.id is None:
-        print("The game had no id after committing.  Will need to be picked up...")
-    elif enqueue_fetch:
-        fetch_sgf.delay(game.id, data['sgf_link'])
-
-    return jsonify(message='OK')
+    print("New game: %s " % str(game))
+    return jsonify(game.to_dict())
