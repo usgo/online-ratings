@@ -37,6 +37,9 @@ def create_result():
         'server_tok': request.args.get('server_tok'),
         'b_tok': request.args.get('b_tok'),
         'w_tok': request.args.get('w_tok'),
+        'game_server': request.args.get('game_server'),
+        'black_id': request.args.get('black_id'),
+        'white_id': request.args.get('white_id'),
         'rated': request.args.get('rated'),
         'result': request.args.get('result'),
         'date_played': request.args.get('date_played'),
@@ -50,17 +53,17 @@ def create_result():
         'sgf_link': request.args.get('sgf_link')
     })
 
-    gs = GoServer.query.filter_by(token=data['server_tok']).first()
+    gs = GoServer.query.filter_by(name=data['game_server'], token=data['server_tok']).first()
     if gs is None:
         raise ApiException('server access token unknown or expired: %s' % data['server_tok'],
                            status_code=404)
 
-    b = Player.query.filter_by(token=data['b_tok']).first()
+    b = Player.query.filter_by(id=data['black_id'], token=data['b_tok']).first()
     if b is None or b.user_id is None:
         raise ApiException('user access token unknown or expired: %s' % data['b_tok'],
                            status_code=404)
 
-    w = Player.query.filter_by(token=data['w_tok']).first()
+    w = Player.query.filter_by(id=data['white_id'], token=data['w_tok']).first()
     if w is None or w.user_id is None:
         raise ApiException('user access token unknown or expired: %s' % data['w_tok'],
                            status_code=404)
@@ -93,18 +96,15 @@ def create_result():
     rated = data['rated'] == 'True'
     logging.info(" White: %s, Black: %s " % (w,b))
     game = Game(server_id=gs.id,
-                white=w,
-                white_id = w.id,
-                black=b,
-                black_id = b.id,
+                white_id=w.id,
+                black_id=b.id,
                 rated=rated,
                 date_played=date_played,
                 date_reported=datetime.now(),
                 result=data['result'],
                 game_record=game_data
                 )
-    logging.info("saving game: %s " % str(game))
-    print("saving game: %s " % str(game))
     db.session.add(game)
     db.session.commit()
+    print("saving game: %s " % str(game))
     return jsonify(game.to_dict())
