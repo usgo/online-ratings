@@ -1,5 +1,8 @@
 from flask.ext.testing import TestCase
+from flask.ext.security import utils
+
 from app import app, db
+from create_db import create_test_data
 
 # The test strategy is based on the tutorial found here:
 # https://realpython.com/blog/python/python-web-applications-with-flask-part-iii/
@@ -14,8 +17,9 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         db.create_all()
-        from create_db import create_test_data
-        create_test_data()
+        with app.app_context():
+            utils._security.password_hash = 'plaintext'
+            create_test_data()
 
     def tearDown(self):
         db.session.remove()

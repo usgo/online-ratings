@@ -24,6 +24,18 @@ class TestResultsEndpoint(BaseTestCase):
         self.assertEqual(expected, actual)
         self.assertEqual(r.status_code, 200)
 
+    def test_results_endpoint_sgf_link(self):
+        sgf_link = "http://files.gokgs.com/games/2015/3/3/Clutter-underkey.sgf"
+        params = self.good_param_set.copy()
+        params.pop("sgf_data")
+        params['sgf_link'] = sgf_link
+        r = self.client.post(self.results_endpoint, query_string=params)
+        expected = dict(message='OK')
+        actual = r.json
+        self.assertEqual(expected, actual)
+        self.assertEqual(r.status_code, 200)
+
+
     def test_results_endpoint_missing_param(self):
         for k in self.good_param_set.keys():
             q = self.good_param_set.copy()

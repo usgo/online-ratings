@@ -2,8 +2,6 @@ from flask import jsonify, request
 from . import api
 from app.api_1_0.api_exception import ApiException
 from app.models import db, Game, GoServer, Player
-import app
-from flask.ext.rq import job
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
 import logging
@@ -27,21 +25,6 @@ def _result_str_valid(result):
         except ValueError:
             return False
     return False
-
-# Fetches the sgf and updates the associated game.
-#@async
-@job
-def fetch_sgf(game_id, url):
-    with app.app.app_context():
-        r = requests.get(url)
-        if r.status_code != 200:
-            raise
-        else:
-            game_record = r.text
-            game = Game.query.get(game_id)
-            game.game_record = game_record.encode()
-            db.session.add(game)
-            db.session.commit()
 
 @api.route('/results', methods=['POST'])
 def postresult():
@@ -88,15 +71,19 @@ def postresult():
     if not _result_str_valid(data['result']):
         raise ApiException('format of result is incorrect')
 
-    enqueue_fetch = False
-    game_data = None
     if data['sgf_data'] is None and data['sgf_link'] is None:
         raise ApiException('One of sgf_data or sgf_link must be present')
-    elif data['sgf_data'] is not None:
-        #TODO: some kind of validation
+
+    if data['sgf_data'] is not None:
         game_data = data['sgf_data'].encode()
     else:
-        enqueue_fetch = True
+        try:
+            response = requests.get(data['sgf_link'])
+            game_data = response.content
+        except Exception as e:
+            logging.info("Got invalid sgf_link %s" % data.get("sgf_link", ""))
+            logging.info(e)
+            raise ApiException('sgf_link provided (%s) was invalid!' % data.get('sgf_link', '<None>'))
 
     try:
         date_played = parse_iso8601(data['date'])
@@ -119,9 +106,4 @@ def postresult():
     print("saving game: %s " % str(game))
     db.session.add(game)
     db.session.commit()
-    if game.id is None:
-        print("The game had no id after committing.  Will need to be picked up...")
-    elif enqueue_fetch:
-        fetch_sgf.delay(game.id, data['sgf_link'])
-
     return jsonify(message='OK')
