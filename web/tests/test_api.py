@@ -1,4 +1,5 @@
 from tests import BaseTestCase
+from app.api_1_0.game_result import _result_str_valid
 
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vii-unit-testing
 # http://flask.pocoo.org/docs/testing/#testing
@@ -102,8 +103,7 @@ class TestResultsEndpoint(BaseTestCase):
         self.assertEqual(expected, actual)
         self.assertEqual(r.status_code, 400)
 
-    def test_results_endpoint_result(self):
-        q = self.good_param_set.copy()
+    def test_result_verification(self):
         good_results = [
             'W+0.5', 'B+100',
             'B+0.5', 'B+42',
@@ -111,16 +111,7 @@ class TestResultsEndpoint(BaseTestCase):
             'B+R', 'B+Resign', 'B+T', 'B+Time', 'B+F', 'B+Forfeit',
             'Void', '?', '0', 'Draw'
         ]
+        bad_result = 'B+W'
         for result in good_results:
-            q['result'] = result
-            r = self.client.post(self.results_endpoint, query_string=q)
-            actual = r.json
-            self.assertEqual(result, actual['result'], msg=result)
-            self.assertEqual(r.status_code, 200)
-
-        q['result'] = 'B+W'
-        r = self.client.post(self.results_endpoint, query_string=q)
-        expected = dict(message='format of result is incorrect')
-        actual = r.json
-        self.assertEqual(expected, actual)
-        self.assertEqual(r.status_code, 400)
+            self.assertTrue(_result_str_valid(result))
+        self.assertFalse(_result_str_valid(bad_result))
