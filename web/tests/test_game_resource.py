@@ -1,3 +1,4 @@
+import os
 import json
 
 from tests import BaseTestCase
@@ -29,11 +30,16 @@ class TestGameResource(BaseTestCase):
     expected_return = dict((k,v) for (k,v) in good_bodyparams.items() if k != 'game_record')
 
     def test_games_endpoint_success(self):
-        response = self.client.post(self.games_endpoint, query_string=self.good_queryparams, data=json.dumps(self.good_bodyparams), headers={"Content-Type": "application/json"})
-        actual = response.json
+        create_response = self.client.post(self.games_endpoint, query_string=self.good_queryparams, data=json.dumps(self.good_bodyparams), headers={"Content-Type": "application/json"})
+        created_game = create_response.json
         for key, value in self.expected_return.items():
-            self.assertEqual(value, actual[key])
-        self.assertEqual(response.status_code, 200)
+            self.assertEqual(value, created_game[key])
+        self.assertEqual(create_response.status_code, 200)
+
+        get_response = self.client.get(os.path.join(self.games_endpoint, str(created_game['id'])))
+        fetched_game = get_response.json
+        self.assertEqual(fetched_game, created_game)
+        self.assertEqual(get_response.status_code, 200)
 
     def test_games_endpoint_game_url(self):
         game_url = "http://files.gokgs.com/games/2015/3/3/Clutter-underkey.sgf"
@@ -45,7 +51,6 @@ class TestGameResource(BaseTestCase):
         for key, value in self.expected_return.items():
             self.assertEqual(value, actual[key])
         self.assertEqual(r.status_code, 200)
-
 
     def test_validate_missing_auth(self):
         for k in self.good_queryparams.keys():
