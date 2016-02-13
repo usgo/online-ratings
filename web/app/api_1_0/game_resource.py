@@ -6,7 +6,7 @@ import requests
 from flask import jsonify, request
 from . import api
 from app.api_1_0.api_exception import ApiException
-from app.api_1_0.api_utils import requires_json
+from app.api_1_0.utils import requires_json
 from app.models import db, Game, GoServer, Player
 
 def _result_str_valid(result):

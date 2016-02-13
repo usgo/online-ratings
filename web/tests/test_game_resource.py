@@ -1,7 +1,7 @@
 import json
 
 from tests import BaseTestCase
-from app.api_1_0.game_result import _result_str_valid, validate_game_submission
+from app.api_1_0.game_resource import _result_str_valid, validate_game_submission
 from app.api_1_0.api_exception import ApiException
 
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vii-unit-testing
