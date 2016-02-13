@@ -17,9 +17,9 @@ ratings = Blueprint("ratings", __name__)
 def home():
     return render_template('index.html')
 
-@ratings.route('/ViewProfile')
+@ratings.route('/profile')
 @login_required
-def viewprofile():
+def profile():
     if current_user.is_ratings_admin():
         games = Game.query.limit(30).all()
         players = None
@@ -28,7 +28,7 @@ def viewprofile():
         games = itertools.chain(*(Game.query.filter(or_(Game.white_id == player.id, Game.black_id == player.id)) for player in players))
     return render_template('profile.html', user=current_user, games=games, players=players)
 
-@ratings.route('/Games', methods=['GET'])
+@ratings.route('/games', methods=['GET'])
 def listgames():
     limit = 30
     player_games = []
@@ -64,25 +64,25 @@ def listgames():
     return render_template('latestgames.html', user=current_user, games=games)
 
 
-@ratings.route('/GameDetail/<game_id>')
+@ratings.route('/games/<game_id>')
 def gamedetail(game_id):
     game = Game.query.get(game_id)
     return render_template('gamedetail.html', user=current_user, game=game)
 
 
-@ratings.route('/GoServers')
+@ratings.route('/game_servers', methods=['GET'])
 def servers():
     servers = GoServer.query.limit(30).all()
     return render_template('servers.html', user=current_user, servers=servers)
 
-@ratings.route('/GoServer/<server_id>')
+@ratings.route('/game_servers/<server_id>', methods=['GET'])
 def server(server_id):
     server = GoServer.query.get(server_id)
     players = Player.query.filter(Player.server_id == server_id).limit(30).all()
     logging.info("Found server %s" % server)
     return render_template('server.html', user=current_user, server=server, players=players)
 
-@ratings.route('/GoServer/<server_id>/reset_token', methods=['POST'])
+@ratings.route('/game_servers/<server_id>/reset_token', methods=['POST'])
 @login_required
 @roles_required(SERVER_ADMIN_ROLE.name)
 def reset_server_token(server_id):
@@ -95,14 +95,14 @@ def reset_server_token(server_id):
     logging.info("Reset server token for {}".format(server_id))
     return "Success"
 
-@ratings.route('/Users')
+@ratings.route('/users')
 @login_required
 @roles_required(RATINGS_ADMIN_ROLE.name)
 def users():
     users = User.query.limit(30).all()
     return render_template('users.html', user=current_user, users=users)
 
-@ratings.route('/Players', methods=['GET', 'POST'])
+@ratings.route('/players', methods=['GET', 'POST'])
 def players():
     form = SearchPlayerForm()
     player_query = Player.query
@@ -117,7 +117,7 @@ def players():
 
     return render_template('players.html', user=current_user, players=players, form=form)
 
-@ratings.route('/Players/<player_id>')
+@ratings.route('/players/<player_id>')
 def player(player_id):
     player = Player.query.get(player_id)
     games = []
@@ -126,7 +126,7 @@ def player(player_id):
         games.extend(Game.query.filter(Game.black_id == p.id).all())
     return render_template('player.html', user=current_user, player=player, games=games)
 
-@ratings.route('/Players/<player_id>/reset_token', methods=['POST'])
+@ratings.route('/players/<player_id>/reset_token', methods=['POST'])
 @login_required
 def reset_player_token(player_id):
     player = Player.query.get(player_id)
@@ -138,10 +138,10 @@ def reset_player_token(player_id):
     logging.info("Reset player token for {}".format(player_id))
     return "Success"
 
-@ratings.route('/AddGameServer', methods=['GET', 'POST'])
+@ratings.route('/game_servers/new', methods=['GET', 'POST'])
 @login_required
 @roles_required(RATINGS_ADMIN_ROLE.name)
-def addgameserver():
+def create_game_server():
     form = AddGameServerForm()
     gs = GoServer()
     if form.validate_on_submit():

@@ -9,7 +9,7 @@ def get_player(player_id):
     return jsonify(player.to_dict())
 
 @api.route('/players', methods=['GET'])
-def get_player_by_token():  
+def get_player_by_token():
     player_token = request.args.get('player_token')
     if player_token is None:
         raise ApiException("Must provide ?player_token=[player's token] to search for a player")
