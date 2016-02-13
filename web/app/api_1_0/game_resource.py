@@ -104,9 +104,9 @@ def validate_game_submission(queryparams, body_json):
                 )
     return game
 
-@api.route('/results', methods=['POST'])
+@api.route('/games', methods=['POST'])
 @requires_json
-def create_result():
+def create_game():
     """Post a new game result to the database."""
     game = validate_game_submission(request.args, request.json)
     db.session.add(game)
