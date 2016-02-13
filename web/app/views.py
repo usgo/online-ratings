@@ -66,7 +66,7 @@ def listgames():
 
 @ratings.route('/games/<game_id>')
 def gamedetail(game_id):
-    game = Game.query.get(game_id)
+    game = Game.query.get_or_404(game_id)
     return render_template('gamedetail.html', user=current_user, game=game)
 
 
@@ -77,7 +77,7 @@ def servers():
 
 @ratings.route('/game_servers/<server_id>', methods=['GET'])
 def server(server_id):
-    server = GoServer.query.get(server_id)
+    server = GoServer.query.get_or_404(server_id)
     players = Player.query.filter(Player.server_id == server_id).limit(30).all()
     logging.info("Found server %s" % server)
     return render_template('server.html', user=current_user, server=server, players=players)
@@ -86,7 +86,7 @@ def server(server_id):
 @login_required
 @roles_required(SERVER_ADMIN_ROLE.name)
 def reset_server_token(server_id):
-    server = GoServer.query.get(server_id)
+    server = GoServer.query.get_or_404(server_id)
     if not current_user.can_reset_server_token(server):
         return current_app.login_manager.unauthorized()
     server.token = generate_token()
@@ -119,7 +119,7 @@ def players():
 
 @ratings.route('/players/<player_id>')
 def player(player_id):
-    player = Player.query.get(player_id)
+    player = Player.query.get_or_404(player_id)
     games = []
     for p in player.user.players:
         games.extend(Game.query.filter(Game.white_id == p.id).all())
@@ -129,7 +129,7 @@ def player(player_id):
 @ratings.route('/players/<player_id>/reset_token', methods=['POST'])
 @login_required
 def reset_player_token(player_id):
-    player = Player.query.get(player_id)
+    player = Player.query.get_or_404(player_id)
     if not current_user.can_reset_player_token(player):
         return current_app.login_manager.unauthorized()
     player.token = generate_token()
