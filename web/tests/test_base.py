@@ -9,10 +9,8 @@ from create_db import create_test_data
 
 
 class BaseTestCase(TestCase):
-
     def create_app(self):
         app.config.from_object('config.TestConfiguration')
-        self.client = app.test_client()
         return app
 
     def setUp(self):

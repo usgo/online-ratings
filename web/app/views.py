@@ -79,7 +79,6 @@ def servers():
 def server(server_id):
     server = GoServer.query.get_or_404(server_id)
     players = Player.query.filter(Player.server_id == server_id).limit(30).all()
-    logging.info("Found server %s" % server)
     return render_template('server.html', user=current_user, server=server, players=players)
 
 @ratings.route('/game_servers/<server_id>/reset_token', methods=['POST'])
@@ -158,7 +157,6 @@ def user_registered_sighandler(app, user, confirm_token):
     Generate a token for the newly registered user.
     This signal handler is called every time a new user is registered.
     '''
-    user.token = generate_token()
     default_role = user_datastore.find_role('user')
     user_datastore.add_role_to_user(user, default_role)
     db.session.add(user)
