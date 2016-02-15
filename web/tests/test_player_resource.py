@@ -1,17 +1,16 @@
 import os
 
+from app.models import Player
 from tests import BaseTestCase
 
-class TestGameResource(BaseTestCase):
+class TestPlayerResource(BaseTestCase):
 
     players_endpoint = '/api/v1/players'
-    example_player = {
-        "id": 1,
-        "name": "FooPlayerKGS",
-        "game_server": "KGS",
-    }
 
-    example_player_secret_token = "secret_foo_KGS"
+    def setUp(self):
+        super().setUp()
+        self.example_player = Player.query.get(1).to_dict()
+        self.example_player_secret_token = Player.query.get(1).token
 
     def test_players_endpoint(self):
         player_by_id_response = self.client.get(
