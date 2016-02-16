@@ -6,7 +6,7 @@ import requests
 from flask import jsonify, request
 from . import api
 from app.api_1_0.api_exception import ApiException
-from app.api_1_0.api_utils import requires_json
+from app.api_1_0.utils import requires_json
 from app.models import db, Game, GoServer, Player
 
 def _result_str_valid(result):
@@ -104,12 +104,17 @@ def validate_game_submission(queryparams, body_json):
                 )
     return game
 
-@api.route('/results', methods=['POST'])
+@api.route('/games', methods=['POST'])
 @requires_json
-def create_result():
+def create_game():
     """Post a new game result to the database."""
     game = validate_game_submission(request.args, request.json)
     db.session.add(game)
     db.session.commit()
     print("New game: %s " % str(game))
+    return jsonify(game.to_dict())
+
+@api.route('/games/<int:game_id>', methods=['GET'])
+def get_game(game_id):
+    game = Game.query.get_or_404(game_id)
     return jsonify(game.to_dict())

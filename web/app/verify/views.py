@@ -40,7 +40,7 @@ def verify_player(payload):
     #TODO: something like user.activate(), maybe generate initial token?
     msg = 'Linked account with AGA #%s' %user.aga_id
     logging.info(msg)
-    return redirect(url_for('ratings.viewprofile'))
+    return redirect(url_for('ratings.profile'))
 
 def get_verify_link(user, aga_id):
     s = get_serializer()

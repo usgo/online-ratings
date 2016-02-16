@@ -99,6 +99,14 @@ class Player(db.Model):
     def __str__(self):
         return "Player %s on server %s, user %s" % (self.name, self.server_id, self.user_id)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "game_server": self.server.name,
+            # TODO: "rating", "sigma": select rating, sigma from ratings where user_id=:user_id order by created desc LIMIT 1
+        }
+
 class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('myuser.id'))
