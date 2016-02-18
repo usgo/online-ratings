@@ -1,7 +1,7 @@
 from flask.ext.testing import TestCase
-from flask.ext.security import utils
 
-from app import app, db
+from app import get_app
+from app.models import db
 from create_db import create_test_data
 
 # The test strategy is based on the tutorial found here:
@@ -10,15 +10,16 @@ from create_db import create_test_data
 
 class BaseTestCase(TestCase):
     def create_app(self):
-        app.config.from_object('config.TestConfiguration')
+        app = get_app('config.TestConfiguration')
+        db.init_app(app)
         return app
 
     def setUp(self):
-        db.create_all()
-        with app.app_context():
-            utils._security.password_hash = 'plaintext'
+        with self.app.app_context():
+            db.create_all()
             create_test_data()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()

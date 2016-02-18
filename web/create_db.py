@@ -1,9 +1,11 @@
-import os
-from app.models import user_datastore, Player, GoServer, Game, User, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE, USER_ROLE
-from app import app, db
-from flask.ext.security.utils import encrypt_password 
-import random
 import datetime
+import os
+import random
+
+from flask.ext.security.utils import encrypt_password 
+
+from app import get_app
+from app.models import user_datastore, Player, GoServer, Game, User, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE, USER_ROLE, db
 
 # Create data for testing
 def create_test_data():
@@ -138,9 +140,9 @@ def create_extra_data():
     strongest_games = [str(g) for g in games if g.white.user_id == strongest or g.black.user_id == strongest]
     print("Strongest, %d (%f):\n%s"% (strongest, p_priors[strongest], strongest_games))
 
-
 if __name__ == '__main__':
-    app.config.from_object('config.DockerConfiguration')
+    app = get_app('config.DockerConfiguration')
+    db.init_app(app)
     with app.app_context():
         db.session.remove()
         db.drop_all()

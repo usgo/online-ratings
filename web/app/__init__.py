@@ -9,28 +9,30 @@ from .api_1_0 import api as api_1_0_blueprint
 from .verify import verify as verify_blueprint
 from flask.ext.rq import RQ
 
+def get_app(config):
+    app = Flask(__name__)
 
-app = Flask(__name__)
+    app.config.from_object(config)
+    mail = Mail(app)
+    RQ(app)
+    csrf = CsrfProtect(app)
+    csrf.exempt(api_1_0_blueprint)
 
-app.config.from_object('config.DockerConfiguration')
-mail = Mail(app)
-RQ(app)
-csrf = CsrfProtect(app)
-csrf.exempt(api_1_0_blueprint)
+    if app.debug:
+        import logging
+        import sys
+        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO,stream=sys.stderr) 
+        app.logger.addHandler(logging.StreamHandler())
+        logging.info("set up logging")
 
-if app.debug:
-    import logging
-    import sys
-    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO,stream=sys.stderr) 
-    app.logger.addHandler(logging.StreamHandler())
-    logging.info("set up logging")
-
-db.init_app(app)
-bootstrap = Bootstrap(app)
-security = Security(app, user_datastore)
-user_registered.connect(user_registered_sighandler)
+    db.init_app(app)
+    bootstrap = Bootstrap(app)
+    security = Security(app, user_datastore)
+    user_registered.connect(user_registered_sighandler)
 
 
-app.register_blueprint(ratings_blueprint)
-app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
-app.register_blueprint(verify_blueprint, url_prefix='/v')
+    app.register_blueprint(ratings_blueprint)
+    app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
+    app.register_blueprint(verify_blueprint, url_prefix='/v')
+
+    return app

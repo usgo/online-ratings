@@ -1,7 +1,7 @@
-import os, random, datetime
+import random, datetime
 
-from app.models import user_datastore, Player, Game, User, Rating
-from app import app, db
+from app.models import Game, User, Rating, db
+from app import get_app
 import rating.rating_math as rm
 
 def sanitized_users(g_vec):
@@ -104,7 +104,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--service", help="The DB service")
     args = parser.parse_args()
-    app.config.from_object('config.DockerConfiguration')
+    app = get_app('config.DockerConfiguration')
+    db.init_app(app)
     with app.app_context():
         #db.session.remove()
         #Rating.__table__.drop(db.engine)
