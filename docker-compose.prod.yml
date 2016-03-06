@@ -9,10 +9,9 @@ web:
   # just to be sure that debug is off.
   environment:
     - DEBUG=False
-  command: /usr/local/bin/gunicorn -w 2 -b :5000 app:app
+  command: /usr/local/bin/gunicorn -w 2 -b :5000 run:app
   links:
     - postgres:postgres
-    - redis:redis
 
 nginx:
   extends:
@@ -38,8 +37,3 @@ postgres:
   env_file: .env
   volumes_from:
     - data
-
-redis:
-  extends:
-    file: docker-compose.base.yml
-    service: redis
