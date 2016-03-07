@@ -19,10 +19,7 @@
   <script>
 
   gliftWidget = glift.create({
-    sgf: {
-      sgfString: "{{game.game_record.decode()}}",
-      widgetType: "GAME_VIEWER"
-    },
+    sgf: "{{url_for('api.get_game_sgf', game_id=game.id)}}",
     divId: "glift",
     display: {
       theme: 'DEPTH',
