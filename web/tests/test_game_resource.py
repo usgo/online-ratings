@@ -49,6 +49,18 @@ class TestGameResource(BaseTestCase):
         self.assertEqual(fetched_game, created_game)
         self.assertEqual(get_response.status_code, 200)
 
+        sgf_fetch_response = self.client.get(os.path.join(
+            self.games_endpoint,
+            str(created_game['id']),
+            "sgf"
+        ))
+
+        self.assertEqual(
+            sgf_fetch_response.headers['Content-Type'],
+            'application/x-go-sgf'
+        )
+        self.assertEqual(sgf_fetch_response.data.decode('utf8'), self.good_bodyparams['game_record'])
+
     def test_games_endpoint_game_url(self):
         game_url = "http://files.gokgs.com/games/2015/3/3/Clutter-underkey.sgf"
         bodyparams = self.good_bodyparams.copy()
