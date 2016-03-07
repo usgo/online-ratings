@@ -30,13 +30,21 @@ class TestGameResource(BaseTestCase):
     expected_return = dict((k,v) for (k,v) in good_bodyparams.items() if k != 'game_record')
 
     def test_games_endpoint_success(self):
-        create_response = self.client.post(self.games_endpoint, query_string=self.good_queryparams, data=json.dumps(self.good_bodyparams), headers={"Content-Type": "application/json"})
+        create_response = self.client.post(
+            self.games_endpoint,
+            query_string=self.good_queryparams,
+            data=json.dumps(self.good_bodyparams),
+            headers={"Content-Type": "application/json"}
+        )
         created_game = create_response.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, created_game[key])
         self.assertEqual(create_response.status_code, 200)
 
-        get_response = self.client.get(os.path.join(self.games_endpoint, str(created_game['id'])))
+        get_response = self.client.get(os.path.join(
+            self.games_endpoint,
+            str(created_game['id'])
+        ))
         fetched_game = get_response.json
         self.assertEqual(fetched_game, created_game)
         self.assertEqual(get_response.status_code, 200)
@@ -58,8 +66,7 @@ class TestGameResource(BaseTestCase):
             q.pop(k, None)  # on each iteration, remove 1 param
             with self.assertRaises(ApiException) as exception_context:
                 validate_game_submission(q, self.good_bodyparams)
-            expected = 'malformed request'
-            self.assertEqual(expected, exception_context.exception.message)
+            self.assertIn(k, exception_context.exception.message)
 
     def test_validate_missing_params(self):
         for k in self.good_bodyparams.keys():
@@ -69,9 +76,9 @@ class TestGameResource(BaseTestCase):
                 validate_game_submission(self.good_queryparams, q)
             if k == 'game_record':
                 expected = 'One of game_record or game_url must be present'
+                self.assertEqual(expected, exception_context.exception.message)
             else:
-                expected = 'malformed request'
-            self.assertEqual(expected, exception_context.exception.message)
+                self.assertIn(k, exception_context.exception.message)
 
     def test_validate_bad_user_token(self):
         for param in ['w_tok', 'b_tok', 'server_tok']:

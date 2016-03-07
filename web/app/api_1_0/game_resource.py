@@ -42,8 +42,10 @@ def validate_game_submission(queryparams, body_json):
         'result': body_json.get('result'),
         'date_played': body_json.get('date_played'),
     }
+
     if None in data.values():
-        raise ApiException('malformed request')
+        missing_fields = ", ".join(k for k,v in data.items() if v is None)
+        raise ApiException('Missing required parameters: %s' % missing_fields)
 
     #optional
     data.update({
