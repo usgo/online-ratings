@@ -10,8 +10,8 @@ def get_player(player_id):
 
 @api.route('/players', methods=['GET'])
 def get_player_by_token():
-    player_token = request.args.get('player_token')
-    if player_token is None:
-        raise ApiException("Must provide ?player_token=[player's token] to search for a player")
-    player = Player.query.filter_by(token=player_token).first_or_404()
+    token = request.args.get('token')
+    if token is None:
+        raise ApiException("Must provide ?token=[player's token] to search for a player")
+    player = Player.query.filter_by(token=token).first_or_404()
     return jsonify(player.to_dict())
