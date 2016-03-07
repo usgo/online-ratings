@@ -5,10 +5,10 @@ web:
   # mount your working directory to the container, so that code changes
   # are reflected immediately, without requiring rebuilding containers
   volumes:
-    - ./web:/src
+    - ./web:/usr/src/app
   env_file: .env
   # use built-in flask server for dev. automatically handles code reloading
-  command: /usr/local/bin/python /src/run.py
+  command: /usr/local/bin/python /usr/src/app/run.py
   #command: /usr/local/bin/gunicorn -w 2 -b :8000 run:app --reload
   links:
     - postgres:postgres
