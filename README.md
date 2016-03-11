@@ -73,12 +73,8 @@ The dockerfile configuration will then serve the app at [[virtual machine IP on 
 ## Development
 You might find it useful to have a python shell in Docker. This lets you interactively play with database queries and such.
 ```
-  $ docker-compose -f docker-compose.dev.yml run --rm web python
-  >>> from app import get_app
-  >>> from app.models import db, Player
-  >>> app = get_app('config.DockerConfiguration')
-  >>> db.init_app(app)
-  >>> app.app_context().__enter__()
+  $ docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/shell.py
+  >>> from app.models import Player
   >>> print(Player.query.filter(Player.id==1).first())
   Player FooPlayerKGS, id 1
 ```
