@@ -104,7 +104,7 @@ class Player(db.Model):
             "id": self.id,
             "name": self.name,
             "game_server": self.server.name,
-            # TODO: "rating", "sigma": select rating, sigma from ratings where user_id=:user_id order by created desc LIMIT 1
+            "rating": self.user.last_rating().rating,
         }
 
 class Rating(db.Model):
@@ -117,7 +117,7 @@ class Rating(db.Model):
     rating = db.Column(db.Float)
     created = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     def __str__(self):
-        return "(%f, sigma %f) for player %d" % (self.rating, self.sigma, self.player_id) 
+        return "(%f, sigma %f) for user %d" % (self.rating, self.sigma, self.user_id) 
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
