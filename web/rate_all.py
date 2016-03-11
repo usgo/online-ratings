@@ -4,12 +4,13 @@ from app.models import Game, User, Rating, db
 from app import get_app
 import rating.rating_math as rm
 
-def sanitized_users(g_vec):
+def sanitized_users(games):
     """ Strip out users with no games from our list """
     users = User.query.all() 
-    users_with_games = set([g[1] for g in g_vec])
-    users_with_games.union(set([g[0] for g in g_vec]))
+    users_with_games = set([g.white_id for g in games])
+    users_with_games.union(set([g.black_id for g in games]))
     users = [u for u in users if u.id in users_with_games]
+    return users
 
 def sanitized_games(games):
     """ Sanitizes a list of games into result tuples for rating.
@@ -32,7 +33,7 @@ def sanitized_games(games):
             print('  ', g)
         else:
             # Vector of result_tuples.  Just what we need to compute stuff...
-            g_vec.push( (g.white.user_id, 
+            g_vec.append( (g.white.user_id, 
                          g.black.user_id,
                          1.0 if g.result.startswith('W') else 0.0,
                          g.date_played,
@@ -99,11 +100,6 @@ def rate_all():
     db.session.commit()
 
 if __name__ == '__main__': 
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--service", help="The DB service")
-    args = parser.parse_args()
     app = get_app('config.DockerConfiguration')
     db.init_app(app)
     with app.app_context():
