@@ -1,3 +1,5 @@
+import logging
+
 from flask import Flask
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.security import Security, user_registered
@@ -18,12 +20,12 @@ def get_app(config):
     csrf = CsrfProtect(app)
     csrf.exempt(api_1_0_blueprint)
 
+    stream_handler = logging.StreamHandler()
     if app.debug:
-        import logging
-        import sys
-        logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO,stream=sys.stderr) 
-        app.logger.addHandler(logging.StreamHandler())
-        logging.info("set up logging")
+        stream_handler.setLevel(logging.INFO)
+    else:
+        stream_handler.setLevel(logging.WARN)
+    app.logger.addHandler(stream_handler)
 
     db.init_app(app)
     bootstrap = Bootstrap(app)
