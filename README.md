@@ -42,6 +42,7 @@ You can also submit a `game_url` in lieu of the `game_record` field. `server_tok
  - log in using the fake login credentials found in web/create_db.py
 
 ## Getting set up with Docker
+### Mac
 You'll want to install docker-compose and docker-machine
 ```
   $ brew install docker-compose docker-machine
@@ -52,6 +53,11 @@ You'll also want to have a virtual machine installed, such as VirtualBox. You ca
   $ docker-machine create -d virtualbox dev
 ```
 The output of the above command will tell you how to set the local environment variables to connect to your shiny new docker host.  For me, using fish shell, it's something like `eval (docker-machine env dev)`
+
+### Linux
+Install [docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/)
+
+### [All]
 Then the following commands should start the app running and start tailing the logs.
 ```
   $ mv .env_example .env
@@ -65,10 +71,12 @@ If this is the first time you've set up the database, you'll need to create the 
 ```
   $ docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/create_db.py
 ```
-The dockerfile configuration will then serve the app at [[virtual machine IP on localhost]], port 80. For example, http://192.168.99.100/ You can find your docker host's by running
+The dockerfile configuration will then serve the app at [[virtual machine IP on localhost]], port 80. For example, http://192.168.99.100:80 You can find your docker hosts by running
 ```
   $ docker-machine ls
 ```
+
+You can remap the ports that the app listens on by editing `docker-compose.base.yml` and changing the nginx ports mapping to something like `"8080:80"`
 
 ## Development
 You might find it useful to have a python shell in Docker. This lets you interactively play with database queries and such.
