@@ -60,7 +60,7 @@ Install [docker](https://docs.docker.com/engine/installation/) and [docker-compo
 ### [All]
 Then the following commands should start the app running and start tailing the logs.
 ```
-  $ mv .env_example .env
+  $ cp .env_example .env
   $ docker-compose -f docker-compose.dev.yml build
   $ docker-compose -f docker-compose.dev.yml up -d
   $ docker-compose -f docker-compose.dev.yml logs

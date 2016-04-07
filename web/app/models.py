@@ -100,11 +100,12 @@ class Player(db.Model):
         return "Player %s on server %s, user %s" % (self.name, self.server_id, self.user_id)
 
     def to_dict(self):
+        last_rating = self.user.last_rating()
         return {
             "id": self.id,
             "name": self.name,
             "game_server": self.server.name,
-            "rating": self.user.last_rating().rating,
+            "rating": None if not last_rating else last_rating.rating
         }
 
 class Rating(db.Model):
