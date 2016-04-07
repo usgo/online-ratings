@@ -11,11 +11,11 @@ Other goals of the project can be found on the [implementation plan here](https:
 
 All api endpoints accept and return JSON.
 Available endpoints:
-  - `POST /api/v1/games` Create a game.
-  - `GET /api/v1/games/<game_id>` Get a game by ID
+  - `POST /api/v1/games` Report a game result.
+  - `GET /api/v1/games/<game_id>` Get a game result by ID
   - `GET /api/v1/games/<game_id>/sgf` Get a game's SGF file by ID
   - `GET /api/v1/players/<player_id>` Get a player by ID
-  - `GET /api/v1/players?token=<token>` Get a player by his secret token.
+  - `GET /api/v1/players?token=<token>` Get a player by their secret token.
 
 Here's an example request to create a game:
 POST /api/v1/games
