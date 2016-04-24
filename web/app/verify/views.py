@@ -1,14 +1,15 @@
 from . import verify
 from .aga_membership import get_email_address
 
-from flask import abort, redirect, url_for, render_template
+from flask import abort, redirect, url_for, render_template, current_app
 from flask.ext.security import login_required
 from flask.ext.login import current_user
 from flask.ext.wtf import Form
 from flask.ext.mail import Message
 from itsdangerous import BadSignature, URLSafeSerializer
-from app.models import User
-import app, logging
+import app
+from app.models import User, db
+import logging
 
 from wtforms import IntegerField, SubmitField
 from wtforms.validators import Required
@@ -16,7 +17,7 @@ from wtforms.validators import Required
 
 def get_serializer(secret_key=None):
     if secret_key is None:
-        secret_key = app.app.secret_key #why app.app?
+        secret_key = current_app.config['SECRET_KEY']
     return URLSafeSerializer(secret_key)
 
 @verify.route('/verify/<payload>')
@@ -35,8 +36,8 @@ def verify_player(payload):
 
     user = User.query.get_or_404(user_id)
     user.aga_id = aga_id
-    app.db.session.add(user)
-    app.db.session.commit()
+    db.session.add(user)
+    db.session.commit()
     #TODO: something like user.activate(), maybe generate initial token?
     msg = 'Linked account with AGA #%s' %user.aga_id
     logging.info(msg)

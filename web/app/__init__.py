@@ -11,11 +11,13 @@ from .api_1_0 import api as api_1_0_blueprint
 from .verify import verify as verify_blueprint
 from flask.ext.rq import RQ
 
+mail = Mail()
+
 def get_app(config):
     app = Flask(__name__)
 
     app.config.from_object(config)
-    mail = Mail(app)
+    mail.init_app(app)
     RQ(app)
     csrf = CsrfProtect(app)
     csrf.exempt(api_1_0_blueprint)

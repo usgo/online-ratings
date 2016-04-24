@@ -16,7 +16,8 @@ def get_email_address(aga_id):
         return response.json()['payload']['row']['email']
     except ValueError:
         LOG.exception("Couldn't interpret response as json: %s", response.content)
-        return None
     except KeyError:
         LOG.exception("Got unexpected json format %s", response.json())
-        return None
+    except Exception:
+        LOG.exception("Unknown error")
+    return None

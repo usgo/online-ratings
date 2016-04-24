@@ -23,7 +23,6 @@ class BaseConfiguration(object):
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
 
     MAIL_DEBUG = 0
-    MAIL_SUPPRESS_SEND = True 
 
 class DockerConfiguration(BaseConfiguration):
     DEBUG = str(os.environ.get('DEBUG')).lower() == "true"
@@ -51,3 +50,4 @@ class TestConfiguration(BaseConfiguration):
     SECURITY_PASSWORD_HASH = 'plaintext'
     WTF_CSRF_ENABLED = False
     SECRET_KEY = "justfortesting"
+    MAIL_SUPPRESS_SEND = True
