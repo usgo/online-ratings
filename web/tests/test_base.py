@@ -11,7 +11,6 @@ from create_db import create_test_data
 class BaseTestCase(TestCase):
     def create_app(self):
         app = get_app('config.TestConfiguration')
-        db.init_app(app)
         return app
 
     def setUp(self):

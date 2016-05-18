@@ -101,7 +101,6 @@ def rate_all():
 
 if __name__ == '__main__': 
     app = get_app('config.DockerConfiguration')
-    db.init_app(app)
     with app.app_context():
         #db.session.remove()
         #Rating.__table__.drop(db.engine)
