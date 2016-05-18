@@ -6,13 +6,13 @@ class BaseConfiguration(object):
     DEBUG = False
     TESTING = False
 
-    ADMINS = frozenset(['youremail@yourdomain.com'])
+    ADMINS = os.environ.get('ADMINS', '').split(',')
     SECRET_KEY = None
 
     THREADS_PER_PAGE = 8
 
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
-    SECURITY_PASSWORD_SALT = 'SuPeRsEcReTsAlT'
+    SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'defaultsalt')
     SECURITY_POST_LOGIN_VIEW = '/profile'
     SECURITY_CHANGEABLE = True
     SECURITY_REGISTERABLE = True
