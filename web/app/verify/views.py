@@ -1,5 +1,5 @@
 from . import verify
-from .aga_membership import get_email_address
+from .aga_membership import get_aga_info
 
 from flask import abort, redirect, url_for, render_template, current_app
 from flask.ext.security import login_required
@@ -50,9 +50,10 @@ def get_verify_link(user, aga_id):
                    _external=True)
 
 def send_verify_email(user, aga_id):
-    email_address = get_email_address(aga_id)
-    if email_address is None:
+    aga_info = get_aga_info(aga_id)
+    if aga_info is None:
         return False
+    email_address = aga_info['email']
     email_subject = "Confirm AGA ID for Online Ratings"
     email_body = render_template('verify/verification_email.html', 
         user=user, aga_id=aga_id, verify_link=get_verify_link(user, aga_id))
