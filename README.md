@@ -2,7 +2,9 @@
 
 AGA Online Ratings protocol and implementation
 
-The goal of the AGA Online Ratings Protocol is to provide Go Servers with a standard way to report results between AGA members that happen on their servers to us for computing a cross-server rating.
+The goal of the AGA Online Ratings Protocol is to provide Go Servers with a
+standard way to report results between AGA members that happen on their servers
+to us for computing a cross-server rating.
 
 Other goals of the project can be found on the [implementation plan here](https://docs.google.com/document/d/1XOcpprw0Y8xhHTroYnUU7tt0rN6F3-T4_9sgOeifqwI)
 
@@ -34,17 +36,64 @@ POST /api/v1/games
 }
 ```
 
-You can also submit a `game_url` in lieu of the `game_record` field. `server_tok` is the game server's secret token, and `b_tok`, `w_tok` are the player's secret tokens. 
+You can also submit a `game_url` in lieu of the `game_record` field.
+`server_tok` is the game server's secret token, and `b_tok`, `w_tok` are the
+player's secret tokens. 
 
 ## Getting Started (Online Ratings backend developers)
-### Overview:
- - Get set up with a VM to use with Docker
- - Build and run the app on the VM with Docker
- - log in using the fake login credentials found in `web/create_db.py`
+
+### Overview
+
+Before you get started working on Online Ratings, you'll need to do some setup:
+
+* Choose your package manager
+* Install Python3 and the relevant dependencies
+* Install the Docker command line tools.
+* Get set up with a VM to use with Docker
+* Build and run the app on the VM with Docker
+* log in using the fake login credentials found in `web/create_db.py`
+
+## Package Managers
+
+This dev guide assumes a POSIX tool chain. Most developers on this project use OSX.
+
+* OSX: Install [homebrew](http://brew.sh/)
+* Linux/Ubuntu: You should already apt-get installed
+
+## Python and Dependencies
+
+1.  Install Python3
+    * OSX: `brew install python3`
+    * Linux: You probably already have Python3 installed. If not: `sudo apt-get
+      install python3`
+4.  Install [pip](https://en.wikipedia.org/wiki/Pip_(package_manager))
+    * `curl https://bootstrap.pypa.io/get-pip.py | python3`
+5.  Install postgres
+    * OSX: `brew install postgresql`
+    * Linux: [See here](https://www.postgresql.org/download/linux/ubuntu/)
+6.  Install the python dependencies with pip.
+    * cd to `online-ratings/web` directory and run: `pip install -r requirements.txt`
+7.  Run the tests!
+    * cd to `online-ratings/web` directory and run: `python3 -m unittest
+      discover`
+
+**[Optional]**
+
+Optionally, you can install VirtualEnv, which makes working with python versions
+a little easier.
+
+1.  Install Virtual Environment: mkvirtualenv
+    * `pip install virtualenvwrapper`
+    * Add `source /usr/local/bin/virtualenvwrapper.sh` to your `.bash_profile`
+      or `.bashrc`. Alternatively, just run `source
+      /usr/local/bin/virtualenvwrapper.sh` when you need it.
+2.  Use VirtualWrapper to make a new virtual env:;
+    * `mkvirtualenv --python=/usr/local/bin/python3 online-ratings-env`
 
 ## Getting set up with Docker
+
 ### Mac
-You'll want to install docker-compose and docker-machine
+You'll want to install `docker-compose` and `docker-machine`
 ```
   $ brew install docker-compose docker-machine
 ```
