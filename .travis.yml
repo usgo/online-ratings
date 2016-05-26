@@ -1,5 +1,6 @@
 language: python
-python: python3.4
+python:
+  - 3.5
 services:
   - postgresql
 install:
