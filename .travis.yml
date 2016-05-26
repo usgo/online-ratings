@@ -1,0 +1,10 @@
+language: python
+python: python3.4
+services:
+  - postgresql
+install:
+  - cd web
+  - pip install -r requirements.txt
+script:
+  - cd web
+  - python3 -m unittest discover
