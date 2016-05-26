@@ -1,6 +1,9 @@
 language: python
 python:
   - 3.5
+# For running installing packages via pip, there is a dependency on Postgres,
+# However, this appears not to be a problem for Travis. Moreore, the service
+# declaration below actually starts Postgres, which isn't necessary for tests.
 # services:
   # - postgresql
 install:
