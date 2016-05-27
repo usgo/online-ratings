@@ -1,0 +1,6 @@
+site_name: Online Ratings
+pages:
+- Home: index.md
+- Documentation: documentation.md
+- API: api.md
+theme: readthedocs

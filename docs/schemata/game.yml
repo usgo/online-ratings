@@ -1,0 +1,25 @@
+---
+$schema: http://json-schema.org/draft-04/hyper-schema
+
+id: schemata/game
+title: Game
+description: |-
+  Loosely based off the example in the README
+
+type: object
+properties:
+  black_id:
+    $ref: /schemata/player#/properties/id
+  white_id:
+    $ref: /schemata/player#/properties/id
+  game_server:
+    type: string
+    example: KGS
+  rated:
+    type: boolean
+  date_played:
+    type: string
+    format: date-time
+  game_record:
+    type: string
+    example: <raw sgf string>
