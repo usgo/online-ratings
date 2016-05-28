@@ -1,0 +1,27 @@
+---
+$schema: http://json-schema.org/draft-04/hyper-schema
+
+id: schemata/player
+title: Player
+description: |-
+  I copied the database table here, didn't document any endpoints here.
+
+type: object
+properties:
+  id:
+    type: number
+    description: |-
+      this could be a uuid to make it db agnostic
+  name:
+    type: string
+    description: |-
+      should this be expanded to first_name, last_name?
+  server_id:
+    type: number
+    description: |-
+      not sure if this should be exposed, im just copying the table definition
+  token:
+    type: string
+    format: uuid
+    description:
+      im totally guessing that this is a uuid
