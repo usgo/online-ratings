@@ -1,0 +1,96 @@
+{
+  "$schema": "http://interagent.github.io/interagent-hyper-schema",
+  "type": [
+    "object"
+  ],
+  "definitions": {
+    "game": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "title": "Game",
+      "description": "Loosely based off the example in the README",
+      "type": [
+        "object"
+      ],
+      "properties": {
+        "black_id": {
+          "$ref": "#/definitions/player/properties/id"
+        },
+        "white_id": {
+          "$ref": "#/definitions/player/properties/id"
+        },
+        "game_server": {
+          "type": [
+            "string"
+          ],
+          "example": "KGS"
+        },
+        "rated": {
+          "type": [
+            "boolean"
+          ]
+        },
+        "date_played": {
+          "type": [
+            "string"
+          ],
+          "format": "date-time"
+        },
+        "game_record": {
+          "type": [
+            "string"
+          ],
+          "example": "<raw sgf string>"
+        }
+      }
+    },
+    "player": {
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "title": "Player",
+      "description": "I copied the database table here, didn't document any endpoints here.",
+      "type": [
+        "object"
+      ],
+      "properties": {
+        "id": {
+          "type": [
+            "number"
+          ],
+          "description": "this could be a uuid to make it db agnostic"
+        },
+        "name": {
+          "type": [
+            "string"
+          ],
+          "description": "should this be expanded to first_name, last_name?"
+        },
+        "server_id": {
+          "type": [
+            "number"
+          ],
+          "description": "not sure if this should be exposed, im just copying the table definition"
+        },
+        "token": {
+          "type": [
+            "string"
+          ],
+          "format": "uuid",
+          "description": "im totally guessing that this is a uuid"
+        }
+      }
+    }
+  },
+  "properties": {
+    "game": {
+      "$ref": "#/definitions/game"
+    },
+    "player": {
+      "$ref": "#/definitions/player"
+    }
+  },
+  "links": [
+    {
+      "href": "http://dev.usgo.org:8080",
+      "rel": "self"
+    }
+  ]
+}
