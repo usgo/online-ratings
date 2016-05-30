@@ -113,7 +113,7 @@ I copied the database table here.
 | ------- | ------- | ------- | ------- |
 | **id** | *integer* | this could be a uuid to make it db agnostic | `42` |
 | **name** | *string* | should this be expanded to first_name, last_name? | `"example"` |
-| **server_id** | *number* | not sure if this should be exposed, im just copying the table definition | `42.0` |
+| **server_id** | *integer* | not sure if this should be exposed, im just copying the table definition | `42` |
 | **token** | *uuid* | im totally guessing that this is a uuid | `"01234567-89ab-cdef-0123-456789abcdef"` |
 
 ### Player Read
@@ -142,7 +142,7 @@ HTTP/1.1 200 OK
 {
   "id": 42,
   "name": "example",
-  "server_id": 42.0,
+  "server_id": 42,
   "token": "01234567-89ab-cdef-0123-456789abcdef"
 }
 ```

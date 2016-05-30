@@ -19,7 +19,7 @@ definitions:
     description: |-
       should this be expanded to first_name, last_name?
   server_id:
-    type: number
+    type: integer
     description: |-
       not sure if this should be exposed, im just copying the table definition
   token:
