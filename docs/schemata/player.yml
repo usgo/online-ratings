@@ -11,7 +11,7 @@ definitions:
     anyOf:
       - $ref: /schemata/player#/definitions/id
   id:
-    type: number
+    type: integer
     description: |-
       this could be a uuid to make it db agnostic
   name:

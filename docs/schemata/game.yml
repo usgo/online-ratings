@@ -11,7 +11,7 @@ definitions:
     anyOf:
       - $ref: /schemata/game#/definitions/id
   id:
-    type: number
+    type: integer
     description: |-
       this could be a uuid to make it db agnostic
   black_id:
@@ -45,44 +45,34 @@ links:
   schema:
     type: object
     required:
-      - game
-      - auth
+      - black_id
+      - white_id
+      - game_server
+      - rated
+      - date_played
+      - game_record
     properties:
-      game:
-        type: object
-        properties:
-          black_id:
-            $ref: /schemata/game#/definitions/black_id
-          white_id:
-            $ref: /schemata/game#/definitions/white_id
-          game_server:
-            $ref: /schemata/game#/definitions/game_server
-          rated:
-            $ref: /schemata/game#/definitions/rated
-          date_played:
-            $ref: /schemata/game#/definitions/date_played
-          game_record:
-            $ref: /schemata/game#/definitions/game_record
-      auth:
-        type: object
-        properties:
-          server_token:
-            type: string
-            format: uuid
-            description: secret server token
-          black_token:
-            type: string
-            format: uuid
-            description: secret token for black player
-          white_token:
-            type: string
-            format: uuid
-            description: secret token for white player
+      black_id:
+        $ref: /schemata/game#/definitions/black_id
+      white_id:
+        $ref: /schemata/game#/definitions/white_id
+      game_server:
+        $ref: /schemata/game#/definitions/game_server
+      rated:
+        $ref: /schemata/game#/definitions/rated
+      date_played:
+        $ref: /schemata/game#/definitions/date_played
+      game_record:
+        $ref: /schemata/game#/definitions/game_record
   targetSchema:
     type: object
     properties:
       id:
         $ref: /schemata/game#/definitions/id
+  http_header:
+    X-Auth-Server-Token: <secret server token>
+    X-Auth-Black-Player-Token: <secret token for black player>
+    X-Auth-White-Player-Token: <secret token for white player>
 
 - href: /api/v1/games/{game_id}
   method: GET
