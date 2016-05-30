@@ -95,16 +95,27 @@ a little easier.
 ## Getting set up with Docker
 
 ### Mac
-You'll want to install `docker-compose` and `docker-machine`
-```
-  $ brew install docker-compose docker-machine
+You'll want to install `docker`, `docker-compose`, and `docker-machine`
+
+```shell
+$ brew install docker docker-compose docker-machine
 ```
 
-You'll also want to have a virtual machine installed, such as VirtualBox. You can then set up a docker host on VirtualBox.
+You'll also want to have a virtual machine installed, such as VirtualBox. 
+
+```shell
+$ brew cask install virtualbox
 ```
-  $ docker-machine create -d virtualbox dev
+
+You can then set up a docker host on VirtualBox.
+
+```shell
+$ docker-machine create -d virtualbox dev
 ```
-The output of the above command will tell you how to set the local environment variables to connect to your shiny new docker host.  For me, using fish shell, it's something like `eval (docker-machine env dev)`
+
+The output of the above command will tell you how to set the local environment
+variables to connect to your shiny new docker host.  For me, using fish shell,
+it's something like `eval (docker-machine env dev)`
 
 ### Linux
 Install [docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/)
@@ -119,13 +130,19 @@ Then the following commands should start the app running and start tailing the l
   $ docker-compose -f docker-compose.dev.yml logs
 ```
 
-The `build` step will create docker containers for each part of the app (nginx, flask, etc.). The `up -d` step will coordinate the running of all the containers as specified in the docker-compose yaml file.
+The `build` step will create docker containers for each part of the app (nginx,
+flask, etc.). The `up -d` step will coordinate the running of all the containers
+as specified in the docker-compose yaml file.
 
 If this is the first time you've set up the database, you'll need to create the initial tables with 
 ```
   $ docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/create_db.py
 ```
-The dockerfile configuration will then serve the app at [[virtual machine IP on localhost]], port 80. For example, http://192.168.99.100:80 You can find your docker hosts by running
+
+The dockerfile configuration will then serve the app at [[virtual machine IP on
+localhost]], port 80. For example, http://192.168.99.100:80 You can find your
+docker hosts by running
+
 ```
   $ docker-machine ls
 ```
