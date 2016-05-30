@@ -6,20 +6,103 @@ title: Game
 description: |-
   Loosely based off the example in the README
 
-type: object
-properties:
+definitions:
+  identity:
+    anyOf:
+      - $ref: /schemata/game#/definitions/id
+  id:
+    type: number
+    description: |-
+      this could be a uuid to make it db agnostic
   black_id:
-    $ref: /schemata/player#/properties/id
+    description: black player's id
+    $ref: /schemata/player#/definitions/id
   white_id:
-    $ref: /schemata/player#/properties/id
+    description: white player's id
+    $ref: /schemata/player#/definitions/id
   game_server:
     type: string
+    description: game server id
     example: KGS
   rated:
     type: boolean
+    description: whether this was a rated game (on the server?)
   date_played:
     type: string
+    description: time the game was played
     format: date-time
   game_record:
     type: string
+    description: game record in SGF
     example: <raw sgf string>
+
+links:
+- href: /api/v1/games
+  method: POST
+  description: Report a game result
+  rel: create
+  title: Creation
+  schema:
+    type: object
+    required:
+      - game
+      - auth
+    properties:
+      game:
+        type: object
+        properties:
+          black_id:
+            $ref: /schemata/game#/definitions/black_id
+          white_id:
+            $ref: /schemata/game#/definitions/white_id
+          game_server:
+            $ref: /schemata/game#/definitions/game_server
+          rated:
+            $ref: /schemata/game#/definitions/rated
+          date_played:
+            $ref: /schemata/game#/definitions/date_played
+          game_record:
+            $ref: /schemata/game#/definitions/game_record
+      auth:
+        type: object
+        properties:
+          server_token:
+            type: string
+            format: uuid
+            description: secret server token
+          black_token:
+            type: string
+            format: uuid
+            description: secret token for black player
+          white_token:
+            type: string
+            format: uuid
+            description: secret token for white player
+  targetSchema:
+    type: object
+    properties:
+      id:
+        $ref: /schemata/game#/definitions/id
+
+- href: /api/v1/games/{game_id}
+  method: GET
+  description: Get a game result by id
+  rel: self
+  title: Read
+
+type: object
+properties:
+  id:
+    $ref: /schemata/game#/definitions/id
+  black_id:
+    $ref: /schemata/game#/definitions/black_id
+  white_id:
+    $ref: /schemata/game#/definitions/white_id
+  game_server:
+    $ref: /schemata/game#/definitions/game_server
+  rated:
+    $ref: /schemata/game#/definitions/rated
+  date_played:
+    $ref: /schemata/game#/definitions/date_played
+  game_record:
+    $ref: /schemata/game#/definitions/game_record
