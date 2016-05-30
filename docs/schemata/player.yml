@@ -4,10 +4,12 @@ $schema: http://json-schema.org/draft-04/hyper-schema
 id: schemata/player
 title: Player
 description: |-
-  I copied the database table here, didn't document any endpoints here.
+  I copied the database table here.
 
-type: object
-properties:
+definitions:
+  identity:
+    anyOf:
+      - $ref: /schemata/player#/definitions/id
   id:
     type: number
     description: |-
@@ -25,3 +27,21 @@ properties:
     format: uuid
     description:
       im totally guessing that this is a uuid
+
+links:
+- href: /api/v1/players/{player_id}
+  method: GET
+  description: Get a player by id
+  rel: self
+  title: Read
+
+type: object
+properties:
+  id:
+    $ref: /schemata/player#/definitions/id
+  name:
+    $ref: /schemata/player#/definitions/name
+  server_id:
+    $ref: /schemata/player#/definitions/server_id
+  token:
+    $ref: /schemata/player#/definitions/token
