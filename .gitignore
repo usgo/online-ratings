@@ -57,5 +57,6 @@ site/
 
 # Files specific to this application
 .env
+.env_local
 app.db
 app/static/glift.min.js

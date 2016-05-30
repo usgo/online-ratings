@@ -114,8 +114,8 @@ $ docker-machine create -d virtualbox dev
 ```
 
 The output of the above command will tell you how to set the local environment
-variables to connect to your shiny new docker host.  For me, using fish shell,
-it's something like `eval (docker-machine env dev)`
+variables to connect to your shiny new docker host.  For Bash, it's `eval
+$(docker-machine env dev)`. For fish shell it's `eval (docker-machine env dev)`.
 
 ### Linux
 Install [docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/)
@@ -124,10 +124,10 @@ Install [docker](https://docs.docker.com/engine/installation/) and [docker-compo
 Then the following commands should start the app running and start tailing the logs.
 
 ```shell
-  $ cp .env_example .env
-  $ docker-compose -f docker-compose.dev.yml build
-  $ docker-compose -f docker-compose.dev.yml up -d
-  $ docker-compose -f docker-compose.dev.yml logs
+cp .env_example .env
+docker-compose -f docker-compose.dev.yml build
+docker-compose -f docker-compose.dev.yml up -d
+docker-compose -f docker-compose.dev.yml logs
 ```
 
 The `build` step will create docker containers for each part of the app (nginx,
@@ -159,16 +159,18 @@ You might find it useful to have a python shell in Docker. This lets you interac
 ```
 
 ## Running locally, without Docker
-Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper installed on the system python.
-```
-  $ brew install python3
-  $ mkvirtualenv --python=/usr/local/bin/python3 <env name here>
-  $ git clone https://github.com/usgo/online-ratings.git
-  $ cd online-ratings
-  $ pip install -r requirements.txt
-  $ python run.py
-```
 
+Generally, we prefer running with docker. However, if you wish to run locally
+you can do so with the following:
+
+```shell
+$ cd online-ratings
+$ sed 's/^\([^#]\)/export \1/g' .env_example > .env_local && source .env_local
+$ cd web
+$ pip install -r requirements.txt
+$ python3 run.py
+* Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+```
 
 ## Running the Tests
 The standard `unittest` module has a discovery feature that will automatically find and run tests.  The directions given below will search for tests in any file named `test_*.py`.
