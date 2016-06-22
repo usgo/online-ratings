@@ -114,7 +114,7 @@ def create_game():
     db.session.add(game)
     db.session.commit()
     print("New game: %s " % str(game))
-    return jsonify(game.to_dict())
+    return jsonify(game.to_dict()), 201
 
 @api.route('/games/<int:game_id>', methods=['GET'])
 def get_game(game_id):

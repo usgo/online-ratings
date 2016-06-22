@@ -39,7 +39,7 @@ class TestGameResource(BaseTestCase):
         created_game = create_response.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, created_game[key])
-        self.assertEqual(create_response.status_code, 200)
+        self.assertEqual(create_response.status_code, 201)
 
         get_response = self.client.get(os.path.join(
             self.games_endpoint,
@@ -70,7 +70,7 @@ class TestGameResource(BaseTestCase):
         actual = r.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, actual[key])
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, 201)
 
     def test_validate_missing_auth(self):
         for k in self.good_queryparams.keys():
