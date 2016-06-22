@@ -32,9 +32,9 @@ def _result_str_valid(result):
 def validate_game_submission(queryparams, body_json):
     #required
     data = {
-        'server_tok': queryparams.get('server_tok'),
-        'b_tok': queryparams.get('b_tok'),
-        'w_tok': queryparams.get('w_tok'),
+        'server_token': queryparams.get('server_token'),
+        'black_token': queryparams.get('black_token'),
+        'white_token': queryparams.get('white_token'),
         'game_server': body_json.get('game_server'),
         'black_id': body_json.get('black_id'),
         'white_id': body_json.get('white_id'),
@@ -53,19 +53,19 @@ def validate_game_submission(queryparams, body_json):
         'game_url': body_json.get('game_url')
     })
 
-    gs = GoServer.query.filter_by(name=data['game_server'], token=data['server_tok']).first()
+    gs = GoServer.query.filter_by(name=data['game_server'], token=data['server_token']).first()
     if gs is None:
-        raise ApiException('server access token unknown or expired: %s' % data['server_tok'],
+        raise ApiException('server access token unknown or expired: %s' % data['server_token'],
                            status_code=404)
 
-    b = Player.query.filter_by(id=data['black_id'], token=data['b_tok']).first()
+    b = Player.query.filter_by(id=data['black_id'], token=data['black_token']).first()
     if b is None or b.user_id is None:
-        raise ApiException('user access token unknown or expired: %s' % data['b_tok'],
+        raise ApiException('black player access token unknown or expired: %s' % data['black_token'],
                            status_code=404)
 
-    w = Player.query.filter_by(id=data['white_id'], token=data['w_tok']).first()
+    w = Player.query.filter_by(id=data['white_id'], token=data['white_token']).first()
     if w is None or w.user_id is None:
-        raise ApiException('user access token unknown or expired: %s' % data['w_tok'],
+        raise ApiException('white player token unknown or expired: %s' % data['white_token'],
                            status_code=404)
 
     if type(data['rated']) != bool:

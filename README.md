@@ -24,9 +24,9 @@ Here's an example request to create a game:
 
 ```
 POST /api/v1/games
-  ?server_tok=secret_kgs
-  &b_tok=player_1_token
-  &w_tok=player_2_token
+  ?server_token=secret_kgs
+  &black_token=player_1_token
+  &white_token=player_2_token
 {
   "black_id": 1,
   "white_id": 2,
@@ -38,9 +38,7 @@ POST /api/v1/games
 }
 ```
 
-You can also submit a `game_url` in lieu of the `game_record` field.
-`server_tok` is the game server's secret token, and `b_tok`, `w_tok` are the
-player's secret tokens. 
+You can also submit a `game_url` in lieu of the `game_record` field. `server_token` is the game server's secret token, and `black_token`, `white_token` are the player's secret tokens. 
 
 ## Getting Started (Online Ratings backend developers)
 

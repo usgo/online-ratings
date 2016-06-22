@@ -13,9 +13,9 @@ class TestGameResource(BaseTestCase):
 
     games_endpoint = '/api/v1/games'
     good_queryparams = {
-        'server_tok': 'secret_kgs',
-        'b_tok': 'secret_foo_KGS',
-        'w_tok': 'secret_bar_KGS',
+        'server_token': 'secret_kgs',
+        'black_token': 'secret_foo_KGS',
+        'white_token': 'secret_bar_KGS',
     }
     good_bodyparams = {
         "black_id": 1,
@@ -93,18 +93,15 @@ class TestGameResource(BaseTestCase):
                 self.assertIn(k, exception_context.exception.message)
 
     def test_validate_bad_user_token(self):
-        for param in ['w_tok', 'b_tok', 'server_tok']:
+        for param in ['white_token', 'black_token', 'server_token']:
             # User token is bad
             q = self.good_queryparams.copy()
             q[param] = 'bad_tok'
             with self.assertRaises(ApiException) as exception_context:
                 validate_game_submission(q, self.good_bodyparams)
 
-            if param == 'server_tok':
-                expected = 'server access token unknown or expired: bad_tok'
-            else:
-                expected = 'user access token unknown or expired: bad_tok'
-            self.assertEqual(expected, exception_context.exception.message)
+            expected = 'token unknown or expired'
+            self.assertIn(expected, exception_context.exception.message)
 
     def test_validate_rated(self):
         bodyparams = self.good_bodyparams.copy()
