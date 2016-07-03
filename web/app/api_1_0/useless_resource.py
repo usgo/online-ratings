@@ -1,7 +1,7 @@
-from flask import jsonify, request
-from app.api_1_0.api_exception import ApiException
-# from app.models import Player
-from . import api
+# from flask import jsonify, request
+# from app.api_1_0.api_exception import ApiException
+# # from app.models import Player
+# from . import api
 
 # @api.route('/players/<int:player_id>', methods=['GET'])
 # def get_player(player_id):
@@ -16,6 +16,6 @@ from . import api
 #     player = Player.query.filter_by(token=token).first_or_404()
 #     return jsonify(player.to_dict())
 
-@api.route('/echo/< message >', methods=['GET'])
-def echo(message)
-    return jsonify({"echo:": message })
+# @api.route('/echo/<message>', methods=['GET'])
+# def echo(message)
+#     return jsonify({"echo:": message })
