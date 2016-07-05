@@ -95,7 +95,9 @@ a little easier.
 ## Getting set up with Docker
 
 ### Mac
-You'll want to install `docker`, `docker-compose`, and `docker-machine`
+You'll want to install `docker`, `docker-compose`, and `docker-machine`. Note:
+If you're using Docker for Mac (v1.12), installing docker-machine is probably
+unnecessary.
 
 ```shell
 $ brew install docker docker-compose docker-machine
@@ -134,17 +136,19 @@ The `build` step will create docker containers for each part of the app (nginx,
 flask, etc.). The `up -d` step will coordinate the running of all the containers
 as specified in the docker-compose yaml file.
 
-If this is the first time you've set up the database, you'll need to create the initial tables with 
-```
-  $ docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/create_db.py
+If this is the first time you've set up the database, you'll need to create the
+initial tables with
+
+```shell
+docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/create_db.py
 ```
 
 The dockerfile configuration will then serve the app at [[virtual machine IP on
 localhost]], port 80. For example, http://192.168.99.100:80 You can find your
-docker hosts by running
+Docker hosts by running
 
-```
-  $ docker-machine ls
+```shell
+docker-machine ls
 ```
 
 You can remap the ports that the app listens on by editing `docker-compose.base.yml` and changing the nginx ports mapping to something like `"8080:80"`
@@ -152,47 +156,68 @@ You can remap the ports that the app listens on by editing `docker-compose.base.
 ## Development
 You might find it useful to have a python shell in Docker. This lets you interactively play with database queries and such.
 ```
-  $ docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/shell.py
-  >>> from app.models import Player
-  >>> print(Player.query.filter(Player.id==1).first())
-  Player FooPlayerKGS, id 1
+docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/shell.py
+>>> from app.models import Player
+>>> print(Player.query.filter(Player.id==1).first())
+Player FooPlayerKGS, id 1
 ```
 
-## Running locally, without Docker
+## Running Locally
 
-Generally, we prefer running with docker. However, if you wish to run locally
-you can do so with the following:
+Generally, we prefer running with Docker. However, if you wish to run the web
+server locally (perhaps for a faster iteration cycle) you can do so with the
+following:
 
 ```shell
-$ cd online-ratings
-$ sed 's/^\([^#]\)/export \1/g' .env_example > .env_local && source .env_local
-$ cd web
-$ pip install -r requirements.txt
-$ python3 run.py
+cd online-ratings
+sed 's/^\([^#]\)/export \1/g' .env_example > .env_local 
+source .env_local
+cd web
+pip install -r requirements.txt
+python3 run.py
+```
+
+You should see:
+
+```shell
 * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
 ```
 
-## Running the Tests
-The standard `unittest` module has a discovery feature that will automatically find and run tests.  The directions given below will search for tests in any file named `test_*.py`.
+Note: At this point, you still need to run your local Online Ratings instance
+against a database instance. You can either create a local postgres instance and
+create some data. Or, you can point your local server at the running Docker
+images. For that, all you need to do is run through the Docker startup
+instructions above and then change `DB_SERVICE` in your `.env_local` to
+`0.0.0.0`.
 
-```
-  $ source bin/activate
-  $ cd web
-  $ python -m unittest discover
+
+## Running the Tests
+The standard `unittest` module has a discovery feature that will automatically
+find and run tests.  The directions given below will search for tests in any
+file named `test_*.py`.
+
+```shell
+source bin/activate
+cd web
+python -m unittest discover
 ```
 To see other options for running tests, you may:
-```
-  $ cd <repo root directory>
-  $ python -m unittest --help
+
+```shell
+cd <repo root directory>
+python -m unittest --help
 ```
 
 ## Deploying
 
-Deploying should be the same as testing, except that the docker machine you use is on AWS, etc. Additionally, you should run docker-compose with the prod overrides:
-```
-  $ vim .env (change passwords, secret_key to production values)
-  $ docker-compose -f docker-compose.prod.yml build
-  $ docker-compose -f docker-compose.prod.yml up -d
+Deploying should be the same as testing, except that the docker machine you use
+is on AWS, etc. Additionally, you should run docker-compose with the prod
+overrides:
+
+```shell
+vim .env (change passwords, secret_key to production values)
+docker-compose -f docker-compose.prod.yml build
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ## Documentation
