@@ -11,7 +11,7 @@ roles_users = db.Table(
     'roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('myuser.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-) 
+)
 
 go_server_admins = db.Table(
     'go_server_admin',
@@ -118,7 +118,7 @@ class Rating(db.Model):
     rating = db.Column(db.Float)
     created = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     def __str__(self):
-        return "(%f, sigma %f) for user %d" % (self.rating, self.sigma, self.user_id) 
+        return "(%f, sigma %f) for user %d" % (self.rating, self.sigma, self.user_id)
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -167,5 +167,17 @@ class Game(db.Model):
             "rated": self.rated,
         }
 
+
+class Tournament(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    event_name = db.Column(db.String(80))
+    start_date = db.column(db.DateTime())
+    venue = db.column(db.String(80))
+    director = db.column(db.String(80))
+    pairing = db.column(db.String(80))
+    rule_set = db.column(db.String(80))
+
+    def __str__(self):
+        return "Tournament: {} \n\tEvent held on: {}\n\tEvent held at: {}\n\tEvent director: {}\n\tEvent pairing: {}\n\tEvent rule set: {}".format(self.event_name, self.start_date, self.venue, self.director, self.rule_set)
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
