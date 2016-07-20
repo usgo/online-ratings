@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+<h2>Please enter Tournament Info:</h2>
+
+{% block content %}
+<div class="">
+
+  <form class="" method="post" name='new'>
+    {{ form.hidden_tag() }}
+
+        <p>Event Name: {{ form.event_name() }}</p></br>
+
+        <p>Venue: {{ form.venue() }}</p></br>
+
+        <p>Director: {{ form.director }}</p></br>
+
+        <p>Pairing: {{ form.pairing }}</p></br>
+
+        <p>Rule Set: {{ form.rule_set }}</p></br>
+
+        <p>{{form.submit }}</p>
+  </form>
+</div>
+
+{% endblock content %}

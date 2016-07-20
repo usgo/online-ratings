@@ -14,3 +14,12 @@ class SearchPlayerForm(Form):
     player_name = StringField('Username', validators=[])
     aga_id = StringField('AGA id', validators=[Optional()])
     submit = SubmitField()
+
+class AddTournamentForm(Form):
+    event_name = StringField("Tornament Name", validators=[Required()])
+    # start_date = db.Column(db.DateTime())
+    venue = StringField("Venue", validators=[Required()])
+    director = StringField("Director", validators=[Required()])
+    pairing = StringField("Pairing", validators=[Required()])
+    rule_set = StringField("Rule set", validators=[Required()])
+    submit = SubmitField()
