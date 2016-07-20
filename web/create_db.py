@@ -2,10 +2,10 @@ import datetime
 import os
 import random
 
-from flask.ext.security.utils import encrypt_password 
+from flask.ext.security.utils import encrypt_password
 
 from app import get_app
-from app.models import user_datastore, Player, GoServer, Game, User, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE, USER_ROLE, db
+from app.models import user_datastore, Player, GoServer, Game, User, Tournament, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE, USER_ROLE, db
 
 # Create data for testing
 def create_test_data():
@@ -135,10 +135,26 @@ def create_extra_data():
     print("Saving games...")
     for g in games:
         db.session.add(g)
-    db.session.commit() 
+    db.session.commit()
     strongest = max(p_priors, key = lambda k: p_priors[k])
     strongest_games = [str(g) for g in games if g.white.user_id == strongest or g.black.user_id == strongest]
     print("Strongest, %d (%f):\n%s"% (strongest, p_priors[strongest], strongest_games))
+
+    def make_tournament():
+        t = Tournament(event_name="The Ultimate Go-ing Chamionship",
+                       start_date=datetime.datetime.now(),
+                       venue="LasVegas",
+                       director="Donald J. Trump",
+                       pairing="Completely Random - It's Madness!",
+                       rule_set="To the death!")
+        return t
+
+    print("Tournament...")
+    t = make_tournament()
+    print("Saving tournament...")
+    db.session.add(t)
+    db.session.commit()
+
 
 if __name__ == '__main__':
     app = get_app('config.DockerConfiguration')

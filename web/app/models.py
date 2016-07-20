@@ -171,11 +171,11 @@ class Game(db.Model):
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     event_name = db.Column(db.String(80))
-    start_date = db.column(db.DateTime())
-    venue = db.column(db.String(80))
-    director = db.column(db.String(80))
-    pairing = db.column(db.String(80))
-    rule_set = db.column(db.String(80))
+    start_date = db.Column(db.DateTime())
+    venue = db.Column(db.String(80))
+    director = db.Column(db.String(80))
+    pairing = db.Column(db.String(80))
+    rule_set = db.Column(db.String(80))
 
     def __str__(self):
         return "Tournament: {} \n\tEvent held on: {}\n\tEvent held at: {}\n\tEvent director: {}\n\tEvent pairing: {}\n\tEvent rule set: {}".format(self.event_name, self.start_date, self.venue, self.director, self.rule_set)

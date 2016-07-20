@@ -8,5 +8,5 @@ from app.models import db, Tournament
 @tournament.route('/')
 def index():
     tournaments = Tournament.query.all()
-    x = tournaments[0]
-    return x.event_name
+    return render_template('tournament_index.html',
+                    tournaments=tournaments,)
