@@ -20,7 +20,7 @@ class TestGameResource(BaseTestCase):
     good_bodyparams = {
         "black_id": 1,
         "white_id": 2,
-        "game_server": "KGS",
+        "server_id": 1,
         'rated': True,
         'result': 'B+0.5',
         'date_played': '2014-08-19T10:30:00',

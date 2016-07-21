@@ -35,7 +35,7 @@ def validate_game_submission(queryparams, body_json):
         'server_token': queryparams.get('server_token'),
         'black_token': queryparams.get('black_token'),
         'white_token': queryparams.get('white_token'),
-        'game_server': body_json.get('game_server'),
+        'server_id': body_json.get('server_id'),
         'black_id': body_json.get('black_id'),
         'white_id': body_json.get('white_id'),
         'rated': body_json.get('rated'),
@@ -53,7 +53,7 @@ def validate_game_submission(queryparams, body_json):
         'game_url': body_json.get('game_url')
     })
 
-    gs = GoServer.query.filter_by(name=data['game_server'], token=data['server_token']).first()
+    gs = GoServer.query.filter_by(id=data['server_id'], token=data['server_token']).first()
     if gs is None:
         raise ApiException('server access token unknown or expired: %s' % data['server_token'],
                            status_code=404)
