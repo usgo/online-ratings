@@ -29,16 +29,12 @@ def _result_str_valid(result):
     return False
 
 
-def validate_game_submission(queryparams, body_json):
+def validate_game_submission(headers, body_json):
     #required
     data = {
-        'server_tok': queryparams.get('server_tok'),
-        'b_tok': queryparams.get('b_tok'),
-        'w_tok': queryparams.get('w_tok'),
-        'game_server': body_json.get('game_server'),
+        'server_id': body_json.get('server_id'),
         'black_id': body_json.get('black_id'),
         'white_id': body_json.get('white_id'),
-        'rated': body_json.get('rated'),
         'result': body_json.get('result'),
         'date_played': body_json.get('date_played'),
     }
@@ -53,23 +49,27 @@ def validate_game_submission(queryparams, body_json):
         'game_url': body_json.get('game_url')
     })
 
-    gs = GoServer.query.filter_by(name=data['game_server'], token=data['server_tok']).first()
+    server_token = headers.get('X-Auth-Server-Token')
+    black_token = headers.get('X-Auth-Black-Player-Token')
+    white_token = headers.get('X-Auth-White-Player-Token')
+
+    if any(token is None for token in (server_token, black_token, white_token)):
+        raise ApiException('Did not submit required X-Auth-(Server-Token|Black-Player-Token|White_Player-Token) headers.', 403)
+
+    gs = GoServer.query.filter_by(id=data['server_id'], token=server_token).first()
     if gs is None:
-        raise ApiException('server access token unknown or expired: %s' % data['server_tok'],
+        raise ApiException('server access token unknown or expired: %s' % server_token,
                            status_code=404)
 
-    b = Player.query.filter_by(id=data['black_id'], token=data['b_tok']).first()
+    b = Player.query.filter_by(id=data['black_id'], token=black_token).first()
     if b is None or b.user_id is None:
-        raise ApiException('user access token unknown or expired: %s' % data['b_tok'],
+        raise ApiException('black player access token unknown or expired: %s' % black_token,
                            status_code=404)
 
-    w = Player.query.filter_by(id=data['white_id'], token=data['w_tok']).first()
+    w = Player.query.filter_by(id=data['white_id'], token=white_token).first()
     if w is None or w.user_id is None:
-        raise ApiException('user access token unknown or expired: %s' % data['w_tok'],
+        raise ApiException('white player token unknown or expired: %s' % white_token,
                            status_code=404)
-
-    if type(data['rated']) != bool:
-        raise ApiException('rated must be set to True or False')
 
     if not _result_str_valid(data['result']):
         raise ApiException('format of result is incorrect')
@@ -93,12 +93,11 @@ def validate_game_submission(queryparams, body_json):
     except TypeError:
         raise ApiException(error='date_played must be in ISO 8601 format')
 
-    rated = data['rated']
     logging.info(" White: %s, Black: %s " % (w,b))
     game = Game(server_id=gs.id,
                 white_id=w.id,
                 black_id=b.id,
-                rated=rated,
+                rated=False,
                 date_played=date_played,
                 date_reported=datetime.now(),
                 result=data['result'],
@@ -110,11 +109,11 @@ def validate_game_submission(queryparams, body_json):
 @requires_json
 def create_game():
     """Post a new game result to the database."""
-    game = validate_game_submission(request.args, request.json)
+    game = validate_game_submission(request.headers, request.json)
     db.session.add(game)
     db.session.commit()
     print("New game: %s " % str(game))
-    return jsonify(game.to_dict())
+    return jsonify(game.to_dict()), 201
 
 @api.route('/games/<int:game_id>', methods=['GET'])
 def get_game(game_id):

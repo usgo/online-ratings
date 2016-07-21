@@ -160,7 +160,7 @@ class Game(db.Model):
             "id": self.id,
             "white_id": self.white_id,
             "black_id": self.black_id,
-            "game_server": self.game_server.name,
+            "server_id": self.server_id,
             "date_played": self.date_played.isoformat(),
             "date_reported": self.date_reported.isoformat(),
             "result": self.result,

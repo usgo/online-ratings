@@ -20,27 +20,26 @@ Available endpoints:
   - `GET /api/v1/players/<player_id>` Get a player by ID
   - `GET /api/v1/players?token=<token>` Get a player by their secret token.
 
-Here's an example request to create a game:
+Here's an example HTTP request to create a game:
 
 ```
-POST /api/v1/games
-  ?server_tok=secret_kgs
-  &b_tok=player_1_token
-  &w_tok=player_2_token
+POST /api/v1/games HTTP/1.1
+Content-Type: application/json
+X-Auth-Server-Token: secret_kgs
+X-Auth-Black-Player-Token: player_1_token
+X-Auth-White-Player-Token: player_2_token
+
 {
   "black_id": 1,
   "white_id": 2,
-  "game_server": "KGS",
-  'rated': True,
-  'result': 'W+R',
-  'date_played': '2015-02-26T10:30:00',
-  'game_record': '(;FF[4]GM[1]SZ[19]CA[UTF-8]BC[ja]WC[ja]EV[54th Japanese Judan]PB[Kono Takashi]BR[8p]PW[O Meien]WR[9p]KM[6.5]DT[2015-02-26]RE[W+R];B[qd];W[dp];B[pq];W[od])'
+  "server_id": 1,
+  "result": "W+R",
+  "date_played": "2015-02-26T10:30:00",
+  "game_record": "(;FF[4]GM[1]SZ[19]CA[UTF-8]BC[ja]WC[ja]EV[54th Japanese Judan]PB[Kono Takashi]BR[8p]PW[O Meien]WR[9p]KM[6.5]DT[2015-02-26]RE[W+R];B[qd];W[dp];B[pq];W[od])"
 }
 ```
 
-You can also submit a `game_url` in lieu of the `game_record` field.
-`server_tok` is the game server's secret token, and `b_tok`, `w_tok` are the
-player's secret tokens. 
+You can also submit a `game_url` in lieu of the `game_record` field. `server_token` is the game server's secret token, and `black_token`, `white_token` are the player's secret tokens. Your `server_id` can be discovered through the UI for online-ratings.
 
 ## Getting Started (Online Ratings backend developers)
 
