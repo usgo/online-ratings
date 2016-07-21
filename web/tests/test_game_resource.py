@@ -22,7 +22,6 @@ class TestGameResource(BaseTestCase):
         "black_id": 1,
         "white_id": 2,
         "server_id": 1,
-        'rated': True,
         'result': 'B+0.5',
         'date_played': '2014-08-19T10:30:00',
         'game_record': '\n'.join(open('tests/testsgf.sgf').readlines())
@@ -105,20 +104,6 @@ class TestGameResource(BaseTestCase):
 
             expected = 'token unknown or expired'
             self.assertIn(expected, exception_context.exception.message)
-
-    def test_validate_rated(self):
-        bodyparams = self.good_bodyparams.copy()
-        for is_rated in [True, False]:
-            bodyparams['rated'] = is_rated
-            game = validate_game_submission(self.good_headers, bodyparams)
-            self.assertEqual(game.rated, is_rated)
-
-        bodyparams['rated'] = '0'
-        with self.assertRaises(ApiException) as exception_context:
-            validate_game_submission(self.good_headers, bodyparams)
-
-        expected = 'rated must be set to True or False'
-        self.assertEqual(expected, exception_context.exception.message)
 
     def test_validate_result(self):
         good_results = [

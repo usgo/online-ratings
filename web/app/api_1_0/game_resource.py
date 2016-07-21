@@ -35,7 +35,6 @@ def validate_game_submission(headers, body_json):
         'server_id': body_json.get('server_id'),
         'black_id': body_json.get('black_id'),
         'white_id': body_json.get('white_id'),
-        'rated': body_json.get('rated'),
         'result': body_json.get('result'),
         'date_played': body_json.get('date_played'),
     }
@@ -72,9 +71,6 @@ def validate_game_submission(headers, body_json):
         raise ApiException('white player token unknown or expired: %s' % white_token,
                            status_code=404)
 
-    if type(data['rated']) != bool:
-        raise ApiException('rated must be set to True or False')
-
     if not _result_str_valid(data['result']):
         raise ApiException('format of result is incorrect')
 
@@ -97,12 +93,11 @@ def validate_game_submission(headers, body_json):
     except TypeError:
         raise ApiException(error='date_played must be in ISO 8601 format')
 
-    rated = data['rated']
     logging.info(" White: %s, Black: %s " % (w,b))
     game = Game(server_id=gs.id,
                 white_id=w.id,
                 black_id=b.id,
-                rated=rated,
+                rated=False,
                 date_played=date_played,
                 date_reported=datetime.now(),
                 result=data['result'],
