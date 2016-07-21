@@ -33,7 +33,6 @@ X-Auth-White-Player-Token: player_2_token
   "black_id": 1,
   "white_id": 2,
   "server_id": 1,
-  "rated": true,
   "result": "W+R",
   "date_played": "2015-02-26T10:30:00",
   "game_record": "(;FF[4]GM[1]SZ[19]CA[UTF-8]BC[ja]WC[ja]EV[54th Japanese Judan]PB[Kono Takashi]BR[8p]PW[O Meien]WR[9p]KM[6.5]DT[2015-02-26]RE[W+R];B[qd];W[dp];B[pq];W[od])"
