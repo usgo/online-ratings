@@ -29,12 +29,9 @@ def _result_str_valid(result):
     return False
 
 
-def validate_game_submission(queryparams, body_json):
+def validate_game_submission(headers, body_json):
     #required
     data = {
-        'server_token': queryparams.get('server_token'),
-        'black_token': queryparams.get('black_token'),
-        'white_token': queryparams.get('white_token'),
         'server_id': body_json.get('server_id'),
         'black_id': body_json.get('black_id'),
         'white_id': body_json.get('white_id'),
@@ -53,19 +50,26 @@ def validate_game_submission(queryparams, body_json):
         'game_url': body_json.get('game_url')
     })
 
-    gs = GoServer.query.filter_by(id=data['server_id'], token=data['server_token']).first()
+    server_token = headers.get('X-Auth-Server-Token')
+    black_token = headers.get('X-Auth-Black-Player-Token')
+    white_token = headers.get('X-Auth-White-Player-Token')
+
+    if any(token is None for token in (server_token, black_token, white_token)):
+        raise ApiException('Did not submit required X-Auth-(Server-Token|Black-Player-Token|White_Player-Token) headers.', 403)
+
+    gs = GoServer.query.filter_by(id=data['server_id'], token=server_token).first()
     if gs is None:
-        raise ApiException('server access token unknown or expired: %s' % data['server_token'],
+        raise ApiException('server access token unknown or expired: %s' % server_token,
                            status_code=404)
 
-    b = Player.query.filter_by(id=data['black_id'], token=data['black_token']).first()
+    b = Player.query.filter_by(id=data['black_id'], token=black_token).first()
     if b is None or b.user_id is None:
-        raise ApiException('black player access token unknown or expired: %s' % data['black_token'],
+        raise ApiException('black player access token unknown or expired: %s' % black_token,
                            status_code=404)
 
-    w = Player.query.filter_by(id=data['white_id'], token=data['white_token']).first()
+    w = Player.query.filter_by(id=data['white_id'], token=white_token).first()
     if w is None or w.user_id is None:
-        raise ApiException('white player token unknown or expired: %s' % data['white_token'],
+        raise ApiException('white player token unknown or expired: %s' % white_token,
                            status_code=404)
 
     if type(data['rated']) != bool:
@@ -110,7 +114,7 @@ def validate_game_submission(queryparams, body_json):
 @requires_json
 def create_game():
     """Post a new game result to the database."""
-    game = validate_game_submission(request.args, request.json)
+    game = validate_game_submission(request.headers, request.json)
     db.session.add(game)
     db.session.commit()
     print("New game: %s " % str(game))

@@ -20,13 +20,15 @@ Available endpoints:
   - `GET /api/v1/players/<player_id>` Get a player by ID
   - `GET /api/v1/players?token=<token>` Get a player by their secret token.
 
-Here's an example request to create a game:
+Here's an example HTTP request to create a game:
 
 ```
-POST /api/v1/games
-  ?server_token=secret_kgs
-  &black_token=player_1_token
-  &white_token=player_2_token
+POST /api/v1/games HTTP/1.1
+Content-Type: application/json
+X-Auth-Server-Token: secret_kgs
+X-Auth-Black-Player-Token: player_1_token
+X-Auth-White-Player-Token: player_2_token
+
 {
   "black_id": 1,
   "white_id": 2,
