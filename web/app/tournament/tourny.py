@@ -38,13 +38,16 @@ def edit_tournament(tournament_id):
         return redirect(url_for('.index'))
     return render_template('tournament_form.html', form=form)
 
-@tournament.route('/<int:tournament_id>', methods=['GET', 'DELETE'])
+@tournament.route('/<int:tournament_id>', methods=['GET'])
 def show(tournament_id):
     tournament = Tournament.query.get(tournament_id)
-    if request.method == 'GET':
-        return render_template('tournament_show.html',
-                                tournament=tournament)
-    elif request.method == 'DELETE':
-        tournament.delete()
-        db.session.commit()
-        return redirect(url_for('.index'))
+    return render_template('tournament_show.html',
+                            tournament=tournament)
+
+@tournament.route('/<int:tournament_id>/delete', methods=['POST'])
+
+def delete(tournament_id):
+    tournament = Tournament.query.get(tournament_id)
+    db.session.delete(tournament)
+    db.session.commit()
+    return redirect(url_for('.index'))

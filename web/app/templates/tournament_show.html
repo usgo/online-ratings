@@ -2,7 +2,6 @@
 
 {% block content %}
 <div class="container">
-
   <div>
     <h3>Event Name: {{ tournament.event_name }}</h3>
     <ul>
@@ -13,5 +12,10 @@
       <li>Rules: {{ tournament.rule_set }}</li>
     </ul>
   </div>
+  <form action="{{ url_for('.delete', tournament_id=tournament.id) }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input type="hidden" name="objects" id="objects" value="{{ tournament.id }}" />
+    <button type="submit">Delete</button>
+  </form>
 </div>
 {% endblock content %}

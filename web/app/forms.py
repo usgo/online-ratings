@@ -23,14 +23,3 @@ class TournamentForm(Form):
     pairing = StringField("Pairing", validators=[Required()])
     rule_set = StringField("Rule set", validators=[Required()])
     submit = SubmitField()
-
-# class EditTournamentForm(Form):
-#     # t = Tournament.query.get(int(id))
-#
-#     event_name = StringField("Tornament Name", validators=[Required()])
-#     # start_date = db.Column(db.DateTime())
-#     venue = StringField("Venue", validators=[Required()])
-#     director = StringField("Director", validators=[Required()])
-#     pairing = StringField("Pairing", validators=[Required()])
-#     rule_set = StringField("Rule set", validators=[Required()])
-#     submit = SubmitField()
