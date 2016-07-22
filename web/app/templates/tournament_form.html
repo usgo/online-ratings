@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
-<h2>Please enter Tournament Info:</h2>
+
 
 {% block content %}
-<div class="">
+<div class="container">
 
-  <form class="" method="post" name='new'>
+<h2>Please enter Tournament Info:</h2>
+  <form method="post" name='new'>
     {{ form.hidden_tag() }}
 
         <p>Event Name: {{ form.event_name() }}</p></br>
