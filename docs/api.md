@@ -106,7 +106,7 @@ HTTP/1.1 200 OK
 
 ### Game SGF
 
-Fetch the sgf contents
+Fetch a link to the sgf contents
 
 ```
 GET /api/v1/games/{game_id}/sgf
@@ -127,9 +127,7 @@ HTTP/1.1 200 OK
 ```
 
 ```json
-{
-  "data": "sgf string"
-}
+http://example.com/link/to/game.sgf
 ```
 
 

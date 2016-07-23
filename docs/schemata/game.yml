@@ -78,16 +78,12 @@ links:
 
 - href: /api/v1/games/{(%2Fschemata%2Fgame%23%2Fdefinitions%2Fidentity)}/sgf
   method: GET
-  description: Fetch the sgf contents
+  description: Fetch a link to the sgf contents
   rel: detail
   title: SGF
-  targetSchema:
-    type: object
-    properties:
-      data:
-        type: string
-        description: sgf string
-        example: sgf string
+  response_example:
+    head: HTTP/1.1 200 OK
+    body: http://example.com/link/to/game.sgf
 
 type: object
 properties:
