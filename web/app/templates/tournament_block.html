@@ -1,0 +1,15 @@
+<div>
+  <h3>Event Name: {{ tournament.event_name }}</h3>
+  <ul>
+    <li>Start Date: {{ tournament.start_date }}</li>
+    <li>Venue: {{ tournament.venue }}</li>
+    <li>Director: {{ tournament.director }}</li>
+    <li>Pairing: {{ tournament.pairing }}</li>
+    <li>Rules: {{ tournament.rule_set }}</li>
+  </ul>
+  <p>
+    <a href="{{ url_for('.show', tournament_id=tournament.id) }}"><button>Details</button></a>
+    <a href="{{ url_for('.edit_tournament', tournament_id=tournament.id) }}"><button>Edit</button></a>
+
+  </p>
+</div>

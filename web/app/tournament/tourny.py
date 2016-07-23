@@ -13,6 +13,12 @@ def index():
     return render_template('tournament_index.html',
                     tournaments=tournaments,)
 
+@tournament.route('/<int:tournament_id>', methods=['GET'])
+def show(tournament_id):
+    tournament = Tournament.query.get(tournament_id)
+    return render_template('tournament_show.html',
+    tournament=tournament)
+
 @tournament.route('/new', methods=['GET', 'POST'])
 def new_tournament():
     form = TournamentForm()
@@ -28,6 +34,7 @@ def new_tournament():
         return redirect(url_for('.index'))
     return render_template('tournament_form.html', form=form)
 
+
 @tournament.route('/<int:tournament_id>/edit', methods=['GET', 'POST'])
 def edit_tournament(tournament_id):
     t = Tournament.query.get(tournament_id)
@@ -38,14 +45,7 @@ def edit_tournament(tournament_id):
         return redirect(url_for('.index'))
     return render_template('tournament_form.html', form=form)
 
-@tournament.route('/<int:tournament_id>', methods=['GET'])
-def show(tournament_id):
-    tournament = Tournament.query.get(tournament_id)
-    return render_template('tournament_show.html',
-                            tournament=tournament)
-
 @tournament.route('/<int:tournament_id>/delete', methods=['POST'])
-
 def delete(tournament_id):
     tournament = Tournament.query.get(tournament_id)
     db.session.delete(tournament)

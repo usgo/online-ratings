@@ -5,16 +5,8 @@
   <div class="container">
     <h1>Tournaments:</h1>
     {% for tournament in tournaments %}
-      <div>
-        <h3>Event Name: {{ tournament.event_name }}</h3>
-        <ul>
-          <li>Start Date: {{ tournament.start_date }}</li>
-          <li>Venue: {{ tournament.venue }}</li>
-          <li>Director: {{ tournament.director }}</li>
-          <li>Pairing: {{ tournament.pairing }}</li>
-          <li>Rules: {{ tournament.rule_set }}</li>
-        </ul>
-      </div>
+    {% include "tournament_block.html" %}
     {% endfor %}
   </div>
+  <a href="{{ url_for('.new_tournament') }}"><button>Add Tournament</button></a>
   {% endblock content %}
