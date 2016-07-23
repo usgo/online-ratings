@@ -214,8 +214,7 @@ readability.
 
 1. Install [prmd][2] per their instructions.
 2. From root of `online-ratings`, run
-   `prmd combine --meta docs/meta.yml --output docs/schema.json docs/schemata`
-3. From root of `online-ratings`, run `prmd doc --output docs/api.md docs/schema.json`
+   `prmd combine --meta docs/meta.yml docs/schemata | prmd verify | prmd doc > docs/api.md`
 
 [JSON Schema][3] is the general format used for types and [JSON Hyper-Schema][4] is used for
 endpoint definitions.
