@@ -3,30 +3,24 @@ $schema: http://json-schema.org/draft-04/hyper-schema
 
 id: schemata/game
 title: Game
-description: |-
-  Loosely based off the example in the README
+description: A game played between two players
 
 definitions:
   identity:
-    anyOf:
-      - $ref: /schemata/game#/definitions/id
+    $ref: /schemata/game#/definitions/id
   id:
     type: integer
-    description: |-
-      this could be a uuid to make it db agnostic
+    description: game id
   black_id:
-    description: black player's id
-    $ref: /schemata/player#/definitions/id
+    type: integer
+    description: black player id
   white_id:
-    description: white player's id
-    $ref: /schemata/player#/definitions/id
+    type: integer
+    description: white player id
   game_server:
     type: string
     description: game server id
     example: KGS
-  rated:
-    type: boolean
-    description: whether this was a rated game (on the server?)
   date_played:
     type: string
     description: time the game was played
@@ -35,6 +29,10 @@ definitions:
     type: string
     description: game record in SGF
     example: <raw sgf string>
+  game_url:
+    type: string
+    description: game url
+    example: http://example.com/game.sgf
 
 links:
 - href: /api/v1/games
@@ -48,9 +46,7 @@ links:
       - black_id
       - white_id
       - game_server
-      - rated
       - date_played
-      - game_record
     properties:
       black_id:
         $ref: /schemata/game#/definitions/black_id
@@ -58,12 +54,12 @@ links:
         $ref: /schemata/game#/definitions/white_id
       game_server:
         $ref: /schemata/game#/definitions/game_server
-      rated:
-        $ref: /schemata/game#/definitions/rated
       date_played:
         $ref: /schemata/game#/definitions/date_played
       game_record:
         $ref: /schemata/game#/definitions/game_record
+      game_url:
+        $ref: /schemata/game#/definitions/game_url
   targetSchema:
     type: object
     properties:
@@ -74,11 +70,24 @@ links:
     X-Auth-Black-Player-Token: <secret token for black player>
     X-Auth-White-Player-Token: <secret token for white player>
 
-- href: /api/v1/games/{game_id}
+- href: /api/v1/games/{(%2Fschemata%2Fgame%23%2Fdefinitions%2Fidentity)}
   method: GET
   description: Get a game result by id
   rel: self
   title: Read
+
+- href: /api/v1/games/{(%2Fschemata%2Fgame%23%2Fdefinitions%2Fidentity)}/sgf
+  method: GET
+  description: Fetch the sgf contents
+  rel: detail
+  title: SGF
+  targetSchema:
+    type: object
+    properties:
+      data:
+        type: string
+        description: sgf string
+        example: sgf string
 
 type: object
 properties:
@@ -90,8 +99,6 @@ properties:
     $ref: /schemata/game#/definitions/white_id
   game_server:
     $ref: /schemata/game#/definitions/game_server
-  rated:
-    $ref: /schemata/game#/definitions/rated
   date_played:
     $ref: /schemata/game#/definitions/date_played
   game_record:

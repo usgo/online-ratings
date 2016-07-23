@@ -3,33 +3,20 @@ $schema: http://json-schema.org/draft-04/hyper-schema
 
 id: schemata/player
 title: Player
-description: |-
-  I copied the database table here.
+description: An online player
 
 definitions:
   identity:
-    anyOf:
-      - $ref: /schemata/player#/definitions/id
+    $ref: /schemata/player#/definitions/id
   id:
     type: integer
-    description: |-
-      this could be a uuid to make it db agnostic
+    description: player id
   name:
     type: string
-    description: |-
-      should this be expanded to first_name, last_name?
-  server_id:
-    type: integer
-    description: |-
-      not sure if this should be exposed, im just copying the table definition
-  token:
-    type: string
-    format: uuid
-    description:
-      im totally guessing that this is a uuid
+    description: name of the player
 
 links:
-- href: /api/v1/players/{player_id}
+- href: /api/v1/players/{(%2Fschemata%2Fplayer%23%2Fdefinitions%2Fidentity)}
   method: GET
   description: Get a player by id
   rel: self
@@ -41,7 +28,3 @@ properties:
     $ref: /schemata/player#/definitions/id
   name:
     $ref: /schemata/player#/definitions/name
-  server_id:
-    $ref: /schemata/player#/definitions/server_id
-  token:
-    $ref: /schemata/player#/definitions/token

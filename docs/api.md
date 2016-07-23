@@ -1,19 +1,18 @@
 ## <a name="resource-game">Game</a>
 
 
-Loosely based off the example in the README
+A game played between two players
 
 ### Attributes
 
 | Name | Type | Description | Example |
 | ------- | ------- | ------- | ------- |
-| **[black_id](#resource-player)** | *integer* | black player's id | `42` |
+| **black_id** | *integer* | black player id | `42` |
 | **date_played** | *date-time* | time the game was played | `"2015-01-01T12:00:00Z"` |
 | **game_record** | *string* | game record in SGF | `"<raw sgf string>"` |
 | **game_server** | *string* | game server id | `"KGS"` |
-| **id** | *integer* | this could be a uuid to make it db agnostic | `42` |
-| **rated** | *boolean* | whether this was a rated game (on the server?) | `true` |
-| **[white_id](#resource-player)** | *integer* | white player's id | `42` |
+| **id** | *integer* | game id | `42` |
+| **white_id** | *integer* | white player id | `42` |
 
 ### Game Creation
 
@@ -27,13 +26,18 @@ POST /api/v1/games
 
 | Name | Type | Description | Example |
 | ------- | ------- | ------- | ------- |
-| **black_id** | *integer* | black player's id | `42` |
+| **black_id** | *integer* | black player id | `42` |
 | **date_played** | *date-time* | time the game was played | `"2015-01-01T12:00:00Z"` |
-| **game_record** | *string* | game record in SGF | `"<raw sgf string>"` |
 | **game_server** | *string* | game server id | `"KGS"` |
-| **rated** | *boolean* | whether this was a rated game (on the server?) | `true` |
-| **white_id** | *integer* | white player's id | `42` |
+| **white_id** | *integer* | white player id | `42` |
 
+
+#### Optional Parameters
+
+| Name | Type | Description | Example |
+| ------- | ------- | ------- | ------- |
+| **game_record** | *string* | game record in SGF | `"<raw sgf string>"` |
+| **game_url** | *string* | game url | `"http://example.com/game.sgf"` |
 
 
 #### Curl Example
@@ -44,9 +48,9 @@ $ curl -n -X POST http://dev.usgo.org/api/v1/games \
   "black_id": 42,
   "white_id": 42,
   "game_server": "KGS",
-  "rated": true,
   "date_played": "2015-01-01T12:00:00Z",
-  "game_record": "<raw sgf string>"
+  "game_record": "<raw sgf string>",
+  "game_url": "http://example.com/game.sgf"
 }' \
   -H "Content-Type: application/json" \
   -H "X-Auth-Server-Token: <secret server token>" \
@@ -95,9 +99,36 @@ HTTP/1.1 200 OK
   "black_id": 42,
   "white_id": 42,
   "game_server": "KGS",
-  "rated": true,
   "date_played": "2015-01-01T12:00:00Z",
   "game_record": "<raw sgf string>"
+}
+```
+
+### Game SGF
+
+Fetch the sgf contents
+
+```
+GET /api/v1/games/{game_id}/sgf
+```
+
+
+#### Curl Example
+
+```bash
+$ curl -n http://dev.usgo.org/api/v1/games/$GAME_ID/sgf
+```
+
+
+#### Response Example
+
+```
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "data": "sgf string"
 }
 ```
 
@@ -105,16 +136,14 @@ HTTP/1.1 200 OK
 ## <a name="resource-player">Player</a>
 
 
-I copied the database table here.
+An online player
 
 ### Attributes
 
 | Name | Type | Description | Example |
 | ------- | ------- | ------- | ------- |
-| **id** | *integer* | this could be a uuid to make it db agnostic | `42` |
-| **name** | *string* | should this be expanded to first_name, last_name? | `"example"` |
-| **server_id** | *integer* | not sure if this should be exposed, im just copying the table definition | `42` |
-| **token** | *uuid* | im totally guessing that this is a uuid | `"01234567-89ab-cdef-0123-456789abcdef"` |
+| **id** | *integer* | player id | `42` |
+| **name** | *string* | name of the player | `"example"` |
 
 ### Player Read
 
@@ -141,9 +170,7 @@ HTTP/1.1 200 OK
 ```json
 {
   "id": 42,
-  "name": "example",
-  "server_id": 42,
-  "token": "01234567-89ab-cdef-0123-456789abcdef"
+  "name": "example"
 }
 ```
 
