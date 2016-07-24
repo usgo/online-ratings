@@ -3,25 +3,28 @@ $schema: http://json-schema.org/draft-04/hyper-schema
 
 id: schemata/player
 title: Player
-description: |-
-  I copied the database table here, didn't document any endpoints here.
+description: An online player
+
+definitions:
+  identity:
+    $ref: /schemata/player#/definitions/id
+  id:
+    type: integer
+    description: player id
+  name:
+    type: string
+    description: name of the player
+
+links:
+- href: /api/v1/players/{(%2Fschemata%2Fplayer%23%2Fdefinitions%2Fidentity)}
+  method: GET
+  description: Get a player by id
+  rel: self
+  title: Read
 
 type: object
 properties:
   id:
-    type: number
-    description: |-
-      this could be a uuid to make it db agnostic
+    $ref: /schemata/player#/definitions/id
   name:
-    type: string
-    description: |-
-      should this be expanded to first_name, last_name?
-  server_id:
-    type: number
-    description: |-
-      not sure if this should be exposed, im just copying the table definition
-  token:
-    type: string
-    format: uuid
-    description:
-      im totally guessing that this is a uuid
+    $ref: /schemata/player#/definitions/name
