@@ -127,7 +127,7 @@ HTTP/1.1 200 OK
 ```
 
 ```json
-http://example.com/link/to/game.sgf
+<sgf contents>
 ```
 
 

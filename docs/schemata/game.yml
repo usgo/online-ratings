@@ -83,7 +83,7 @@ links:
   title: SGF
   response_example:
     head: HTTP/1.1 200 OK
-    body: http://example.com/link/to/game.sgf
+    body: <sgf contents>
 
 type: object
 properties:
