@@ -28,7 +28,8 @@ def new_tournament():
                        venue=form.venue.data,
                        director=form.director.data,
                        pairing=form.pairing.data,
-                       rule_set=form.rule_set.data)
+                       rule_set=form.rule_set.data,
+                       submitted=form.submitted.data)
         db.session.add(t)
         db.session.commit()
         return redirect(url_for('.index'))
@@ -40,14 +41,23 @@ def edit_tournament(tournament_id):
     t = Tournament.query.get(tournament_id)
     form = TournamentForm(obj=t)
     if request.method == 'POST' and form.validate_on_submit():
-        form.populate_obj(t)
-        db.session.commit()
-        return redirect(url_for('.index'))
+        if t.submitted == False:
+            form.populate_obj(t)
+            db.session.commit()
+            return redirect(url_for('.index'))
+        elif t.submitted == True:
+            # flash("Sorry, this tournament has already been submitted and can no \
+            #       longer be edited.")
+            return redirect(url_for('.index'))
     return render_template('tournament_form.html', form=form)
 
 @tournament.route('/<int:tournament_id>/delete', methods=['POST'])
 def delete(tournament_id):
     tournament = Tournament.query.get(tournament_id)
-    db.session.delete(tournament)
-    db.session.commit()
+    if tournament.submitted == False:
+        db.session.delete(tournament)
+        db.session.commit()
+        return redirect(url_for('.index'))
+    # flash("Sorry, this tournament has already been submitted and can no \
+    #       longer be edited.")
     return redirect(url_for('.index'))

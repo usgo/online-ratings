@@ -3,10 +3,14 @@
 {% block content %}
 <div class="container">
   {% include "tournament_block.html" %}
+
+  {% if tournament.submitted == False %}
   <form action="{{ url_for('.delete', tournament_id=tournament.id) }}" method="POST">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <input type="hidden" value="{{ tournament.id }}" />
     <button type="submit">Delete</button>
   </form>
 </div>
+{% endif %}
+
 {% endblock content %}

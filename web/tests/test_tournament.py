@@ -68,3 +68,40 @@ class TestTournament(BaseTestCase):
         self.assertEqual(count, 2)
         t = Tournament.query.all()[-1]
         self.assertEqual("new_event", t.event_name)
+
+    def test_it_can_delete_a_non_submitted_tournament(self):
+        t =Tournament.query.first()
+        response = self.client.post('/tournament/'+str(t.id)+'/delete')
+        self.assertEqual(0, Tournament.query.count())
+
+    def test_it_can_not_edit_or_delete_tournament_marked_submitted(self):
+        tournament_edit_endpoint = self.tournament_endpoint + str(self.tournament_1.id) + '/edit'
+        t = Tournament.query.first()
+        #  mark tournament as submitted
+        response = self.client.post(
+            '/tournament/'+str(t.id)+'/edit', #  url_for()
+            data={"event_name" : t.event_name,
+                  "start_date" : t.start_date,
+                  "venue" : t.venue,
+                  "director" : t.director,
+                  "pairing" : t.pairing,
+                  "rule_set" : t.rule_set,
+                  "submitted": True})
+        t = Tournament.query.first()
+        self.assertEqual(True, t.submitted)
+        #  post to edit
+        response = self.client.post(
+            '/tournament/'+str(t.id)+'/edit', #  url_for()
+            data={"event_name" : "this will fail to change",
+                  "start_date" : t.start_date,
+                  "venue" : "changes after ",
+                  "director" : "submitted",
+                  "pairing" : "equals True",
+                  "rule_set" : t.rule_set,
+                  "submitted": True})
+        t = Tournament.query.first()
+        self.assertNotEqual("this will fail to change", t.event_name)
+        self.assertEqual("The Ultimate Go-ing Chamionship", t.event_name)
+        tournaments = Tournament.query.count()
+        response2 = self.client.post('/tournament/'+str(t.id)+'/delete')
+        self.assertEqual(1, tournaments)

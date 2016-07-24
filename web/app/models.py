@@ -176,15 +176,18 @@ class Tournament(db.Model):
     director = db.Column(db.String(80))
     pairing = db.Column(db.String(80))
     rule_set = db.Column(db.String(80))
+    submitted = db.Column(db.Boolean, default=False)
 
     def __str__(self):
         return "Tournament: {} \n\tEvent held on: {}\n\t \
         Event held at: {}\n\tEvent director: {}\n\t \
-        Event pairing: {}\n\tEvent rule set: {}".format(
+        Event pairing: {}\n\tEvent rule set: {}\n\t \
+        Event submitted: {}".format(
             self.event_name,
             self.start_date,
             self.venue,
             self.director,
-            self.rule_set)
+            self.rule_set,
+            self.submitted)
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)

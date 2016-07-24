@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import Required, URL, Optional
 
 
@@ -22,4 +22,5 @@ class TournamentForm(Form):
     director = StringField("Director", validators=[Required()])
     pairing = StringField("Pairing", validators=[Required()])
     rule_set = StringField("Rule set", validators=[Required()])
+    submitted = BooleanField("Submitted")
     submit = SubmitField()
