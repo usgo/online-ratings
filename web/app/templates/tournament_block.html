@@ -1,0 +1,21 @@
+<div>
+  <h3>Event Name: {{ tournament.event_name }}</h3>
+  <ul>
+    <li>Start Date: {{ tournament.start_date }}</li>
+    <li>Venue: {{ tournament.venue }}</li>
+    <li>Director: {{ tournament.director }}</li>
+    <li>Pairing: {{ tournament.pairing }}</li>
+    <li>Rules: {{ tournament.rule_set }}</li>
+    <li>Submitted: {{ tournament.submitted }}</li>
+
+  </ul>
+  <p>
+    {% if request.path != url_for('.show', tournament_id=tournament.id) %}
+    <a href="{{ url_for('.show', tournament_id=tournament.id) }}"><button>Details</button></a>
+    {% endif %}
+    {% if tournament.submitted == False %}
+    <a href="{{ url_for('.edit_tournament', tournament_id=tournament.id) }}"><button>Edit</button></a>
+    {% endif %}
+
+  </p>
+</div>
