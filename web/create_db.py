@@ -145,8 +145,16 @@ def create_extra_data():
                        start_date=datetime.datetime.now(),
                        venue="LasVegas",
                        director="Donald J. Trump",
+                       director_phone="555-5555",
+                       director_email="djnottanner@example.com",
                        pairing="Completely Random - It's Madness!",
-                       rule_set="To the death!")
+                       rule_set="To the death!",
+                       time_controls="required field",
+                       basic_time="required field",
+                       overtime_format="required field",
+                       overtime_conditions="required field",
+                       komi="required field",
+                       tie_break="required field")
         return t
 
     print("Tournament...")

@@ -1,11 +1,54 @@
 <div>
   <h3>Event Name: {{ tournament.event_name }}</h3>
   <ul>
+    {% if tournament.venue %}
+      <li>Venue: {{ tournament.venue }}</li>
+      <li>Venue Address: {{ tournament.venue_address }}</li>
+      <li>Venue State: {{ tournament.venue_state }}</li>
+      <li>Venue Zip: {{ tournament.venue_zip }}</li>
+    {% endif %}
+
     <li>Start Date: {{ tournament.start_date }}</li>
-    <li>Venue: {{ tournament.venue }}</li>
+    {% if tournament.end_date %}
+      <li>End Date {{ tournament.end_date }}</li>
+    {% endif %}
+
     <li>Director: {{ tournament.director }}</li>
+    <li>Director Phone: {{ tournament.director_phone }}</li>
+    <li>Director Email: {{ tournament.director_email }}</li>
+    {% if tournament.director_address %}
+      <li>Director Address : {{ tournament.director_address }}</li>
+    {% endif %}
+
+    <!--  display decisions-->
+
+    {% if tournament.sponsor %}
+      <li>Sponsor: {{ tournament.sponser }}</li>
+      <li>Sponsor Email: {{ tournament.sponser_email }}</li>
+      <li>Sponsor Phone: {{ tournament.sponser_phone }}</li>
+      <li>Sponsor Website: {{ tournament.sponser_website }}</li>
+      <li>Sponsor Address: {{ tournament.sponser_address }}</li>
+    {% endif %}
+
+    {% if tournament.convener %}
+      <li>Convener: {{ tournament.convener }}</li>
+      <li>Convener Email: {{ tournament.convener_email }}</li>
+      <li>Convener Phone: {{ tournament.convener_phone }}</li>
+      <li>Convener Website: {{ tournament.convener_website }}</li>
+      <li>Convener Address: {{ tournament.convener_address }}</li>
+    {% endif %}
+
     <li>Pairing: {{ tournament.pairing }}</li>
     <li>Rules: {{ tournament.rule_set }}</li>
+    <li>Time Controls: {{ tournament.time_controls }}</li>
+    <li>Basic Time: {{ tournament.basic_time }}</li>
+    <li>Overtime Format: {{ tournament.overtime_format }}</li>
+    <li>Overtime Conditions: {{ tournament.overtime_conditions }}</li>
+
+    <li>Komi: {{ tournament.komi }}</li>
+
+    <li>Tie Break: {{ tournament.tie_break }}</li>
+
     <li>Submitted: {{ tournament.submitted }}</li>
 
   </ul>

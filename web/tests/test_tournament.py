@@ -15,8 +15,16 @@ class TestTournament(BaseTestCase):
                                        start_date=datetime.datetime.now(),
                                        venue="LasVegas",
                                        director="Donald J. Trump",
+                                       director_phone="555-5555",
+                                       director_email="dj@example.com",
                                        pairing="Completely Random - It's Madness!",
-                                       rule_set="To the death!")
+                                       rule_set="To the death!",
+                                       time_controls="filler text",
+                                       basic_time="filler text",
+                                       overtime_format="filler text",
+                                       overtime_conditions="filler text",
+                                       komi="filler text",
+                                       tie_break="filler text")
         db.session.add(self.tournament_1)
         db.session.commit()
 
@@ -58,12 +66,20 @@ class TestTournament(BaseTestCase):
 
         response = self.client.post(
             '/tournament/new', #  url_for()
-            data={"event_name" : "new_event",
-                  "start_date" : datetime.datetime.now(),
-                  "venue" : "right here",
-                  "director" : "new director",
-                  "pairing" : "two on two",
-                  "rule_set" : "irish dueling"})
+            data={ "event_name": "new_event",
+                   "start_date": "date as string",
+                   "venue": "Not LasVegas",
+                   "director": "Donald J. Trump",
+                   "director_phone": "555-5555",
+                   "director_email": "dj@example.com",
+                   "pairing": "Completely Random - It's Madness!",
+                   "rule_set": "Irish Dueling",
+                   "time_controls": "filler text",
+                   "basic_time": "filler text",
+                   "overtime_format": "filler text",
+                   "overtime_conditions": "filler text",
+                   "komi": "filler text",
+                   "tie_break": "filler text" })
         count = Tournament.query.count()
         self.assertEqual(count, 2)
         t = Tournament.query.all()[-1]
@@ -74,34 +90,53 @@ class TestTournament(BaseTestCase):
         response = self.client.post('/tournament/'+str(t.id)+'/delete')
         self.assertEqual(0, Tournament.query.count())
 
-    def test_it_can_not_edit_or_delete_tournament_marked_submitted(self):
+    def test_it_can_not_edit_tournament_marked_submitted(self):
         tournament_edit_endpoint = self.tournament_endpoint + str(self.tournament_1.id) + '/edit'
         t = Tournament.query.first()
         #  mark tournament as submitted
         response = self.client.post(
-            '/tournament/'+str(t.id)+'/edit', #  url_for()
-            data={"event_name" : t.event_name,
-                  "start_date" : t.start_date,
-                  "venue" : t.venue,
-                  "director" : t.director,
-                  "pairing" : t.pairing,
-                  "rule_set" : t.rule_set,
-                  "submitted": True})
+            '/tournament/'+ str(t.id)+'/edit', #  url_for()
+            data={"event_name": t.event_name,
+                   "start_date": t.start_date,
+                   "venue": t.venue,
+                   "director": t.director,
+                   "director_phone": t.director_phone,
+                   "director_email": t.director_email,
+                   "pairing": t.pairing,
+                   "rule_set": t.rule_set,
+                   "time_controls": t.time_controls,
+                   "basic_time": t.basic_time,
+                   "overtime_format": t.overtime_format,
+                   "overtime_conditions": t.overtime_conditions,
+                   "komi": t.komi,
+                   "tie_break": t.tie_break,
+                   "submitted": True })
         t = Tournament.query.first()
         self.assertEqual(True, t.submitted)
-        #  post to edit
-        response = self.client.post(
-            '/tournament/'+str(t.id)+'/edit', #  url_for()
-            data={"event_name" : "this will fail to change",
-                  "start_date" : t.start_date,
-                  "venue" : "changes after ",
-                  "director" : "submitted",
-                  "pairing" : "equals True",
-                  "rule_set" : t.rule_set,
-                  "submitted": True})
         t = Tournament.query.first()
         self.assertNotEqual("this will fail to change", t.event_name)
         self.assertEqual("The Ultimate Go-ing Chamionship", t.event_name)
-        tournaments = Tournament.query.count()
-        response2 = self.client.post('/tournament/'+str(t.id)+'/delete')
-        self.assertEqual(1, tournaments)
+
+    def test_it_can_not_delete_tournament_marked_submitted(self):
+        tournaments_before = Tournament.query.count()
+        t = Tournament.query.first()
+        self.client.post(
+            '/tournament/'+ str(t.id)+'/edit', #  url_for()
+            data={"event_name": t.event_name,
+                   "start_date": t.start_date,
+                   "venue": t.venue,
+                   "director": t.director,
+                   "director_phone": t.director_phone,
+                   "director_email": t.director_email,
+                   "pairing": t.pairing,
+                   "rule_set": t.rule_set,
+                   "time_controls": t.time_controls,
+                   "basic_time": t.basic_time,
+                   "overtime_format": t.overtime_format,
+                   "overtime_conditions": t.overtime_conditions,
+                   "komi": t.komi,
+                   "tie_break": t.tie_break,
+                   "submitted": True })
+        response = self.client.post('/tournament/'+str(t.id)+'/delete')
+        tournaments_after = Tournament.query.count()
+        self.assertEqual(tournaments_before, tournaments_after)

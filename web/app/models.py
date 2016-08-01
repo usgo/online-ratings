@@ -171,11 +171,35 @@ class Game(db.Model):
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     event_name = db.Column(db.String(80))
-    start_date = db.Column(db.DateTime())
     venue = db.Column(db.String(80))
+    venue_address = db.Column(db.String(80))
+    venue_state = db.Column(db.String(2))
+    venue_zip = db.Column(db.String(5))
+    start_date = db.Column(db.String(30)) #  what sort of date format?
+    end_date = db.Column(db.String(30))
     director = db.Column(db.String(80))
-    pairing = db.Column(db.String(80))
-    rule_set = db.Column(db.String(80))
+    director_phone = db.Column(db.String(20))
+    director_email = db.Column(db.String(80))
+    director_address = db.Column(db.String(80)) #  do we want separate fields?
+    sponsor = db.Column(db.String(80))
+    sponsor_email = db.Column(db.String(80))
+    sponsor_phone = db.Column(db.String(20))
+    sponsor_website = db.Column(db.String(80))
+    sponsor_address = db.Column(db.String(80))
+    convener = db.Column(db.String(80))
+    convener_email = db.Column(db.String(80))
+    convener_phone = db.Column(db.String(20))
+    convener_website = db.Column(db.String(80))
+    convener_address = db.Column(db.String(80))
+    pairing = db.Column(db.String(80)) #  drop down?
+    rule_set = db.Column(db.String(80)) # drop down?
+    time_controls = db.Column(db.String(80))
+    basic_time = db.Column(db.String(80))
+    overtime_format = db.Column(db.String(80))
+    overtime_conditions = db.Column(db.String(80))
+    komi = db.Column(db.String(80))
+    tie_break = db.Column(db.String(80))
+
     submitted = db.Column(db.Boolean, default=False)
 
     def __str__(self):
