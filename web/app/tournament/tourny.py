@@ -3,8 +3,8 @@ import datetime
 from flask import current_app, render_template, redirect, url_for
 from flask import jsonify, request, Response
 from . import tournament
-from app.forms import TournamentForm
-from app.models import db, Tournament
+from app.forms import TournamentForm, TournamentPlayerForm
+from app.models import db, Tournament, TournamentPlayer
 
 
 @tournament.route('/')
@@ -84,3 +84,24 @@ def delete(tournament_id):
     # flash("Sorry, this tournament has already been submitted and can no \
     #       longer be edited.")
     return redirect(url_for('.index'))
+
+@tournament.route('/<int:tournament_id>/player/new', methods=["GET", "POST"]) #  maybe a vanity url
+def new_player(tournament_id):
+    form = TournamentPlayerForm()
+    if form.validate_on_submit():
+        #  if before first_round  - a cutoff for adding new players
+        tp = TournamentPlayer(tournament_id = tournament_id,
+                             name = form.name.data,
+                             player_id = form.player_id.data,
+                             rating = form.rating.data,
+                             affiliation = form.affiliation.data,
+                             state = form.state.data,
+                             address = form.state.data,
+                             email = form.email.data,
+                             phone = form.phone.data,
+                             citizenship = form.citizenship.data,
+                             dob = form.dob.data)
+        db.session.add(tp)
+        db.session.commit()
+        return redirect(url_for('.new_player', tournament_id=tournament_id))
+    return render_template('tournament_player_form.html', form=form)

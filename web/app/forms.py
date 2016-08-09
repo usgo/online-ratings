@@ -57,3 +57,17 @@ class TournamentForm(Form):
 
     submitted = BooleanField("Submitted")
     submit = SubmitField()
+
+class TournamentPlayerForm(Form):
+    name = StringField("Player's Name", validators=[Required()])
+    player_id = StringField("Player ID", validators=[Required()])
+    rating = StringField("Rating", validators=[Required()])
+    affiliation = StringField("Club Affiliation", validators=[Required()])
+    state = StringField("State", validators=[Required()])
+    address = StringField("Address", validators=[Required()])
+    email = StringField("Email", validators=[Required()])
+    phone = StringField("Phone", validators=[Required()])
+    citizenship = StringField("Citizenship", validators=[Required()])
+    dob = StringField("Date of Birth", validators=[Required()])
+
+    submit = SubmitField()

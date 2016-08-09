@@ -214,4 +214,26 @@ class Tournament(db.Model):
             self.rule_set,
             self.submitted)
 # Setup Flask-Security
+
+class TournamentPlayer(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tournament_id = db.Column(db.Integer)
+    name = db.Column(db.String(80))
+    player_id = db.Column(db.String(5))
+    member_ex_date = db.Column(db.String(20))
+    rating = db.Column(db.String(5))
+    affiliation = db.Column(db.String(80))
+    state = db.Column(db.String(2))
+    address = db.Column(db.String(80))
+    email = db.Column(db.String(80))
+    phone = db.Column(db.String(20))
+    citizenship = db.Column(db.String(80))
+    dob = db.Column(db.String(20))
+
+
+    def __str__(self):
+        return "Tournament Player: {}\n \
+                Member found in db: {}".format(self.name,
+                                                player_id >= 90000)
+
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)

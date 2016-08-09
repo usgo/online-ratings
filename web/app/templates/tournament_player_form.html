@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+  {% block content %}
+
+    <div class="container">
+      <h2>Enter Player Info:</h2>
+
+      <form method="post" name="new_player">
+        {{ form.hidden_tag() }}
+
+        <p>{{ form.name.label }}: {{ form.name }}</p>
+        <p>{{ form.player_id.label }}: {{ form.player_id }}</p>
+        <p>{{ form.rating.label }}: {{ form.rating }}</p>
+        <p>{{ form.affiliation.label }}: {{ form.affiliation }}</p>
+        <p>{{ form.state.label }}: {{ form.state }}</p>
+        <p>{{ form.address.label }}: {{ form.address }}</p>
+        <p>{{ form.email.label }}: {{ form.email }}</p>
+        <p>{{ form.phone.label }}: {{ form.phone }}</p>
+        <p>{{ form.citizenship.label }}: {{ form.citizenship }}</p>
+        <p>{{ form.dob.label }}: {{ form.dob }}</p>
+
+        <p>{{ form.submit }}</p>
+      </form>
+    </div>
+
+  {% endblock content %}
