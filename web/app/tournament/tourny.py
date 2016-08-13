@@ -96,7 +96,7 @@ def new_player(tournament_id):
                              rating = form.rating.data,
                              affiliation = form.affiliation.data,
                              state = form.state.data,
-                             address = form.state.data,
+                             address = form.address.data,
                              email = form.email.data,
                              phone = form.phone.data,
                              citizenship = form.citizenship.data,
@@ -105,3 +105,8 @@ def new_player(tournament_id):
         db.session.commit()
         return redirect(url_for('.new_player', tournament_id=tournament_id))
     return render_template('tournament_player_form.html', form=form)
+
+@tournament.route('/<int:tournament_id>/players', methods=["GET"])
+def players_index(tournament_id):
+    players = TournamentPlayer.query.all()
+    return render_template("tournament_players_index.html", players=players)
