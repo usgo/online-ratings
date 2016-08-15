@@ -7,57 +7,56 @@ from flask.ext.security.utils import encrypt_password
 from app import get_app
 from app.models import user_datastore, Player, GoServer, Game, User, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE, USER_ROLE, db
 
-# Create data for testing
-def create_test_data():
+
+def create_roles():
     role_user = user_datastore.create_role(**USER_ROLE._asdict())
     role_gs_admin = user_datastore.create_role(**SERVER_ADMIN_ROLE._asdict())
     role_aga_admin = user_datastore.create_role(**RATINGS_ADMIN_ROLE._asdict())
+    db.session.commit()
+    return role_user, role_gs_admin, role_aga_admin
 
-    u = user_datastore.create_user(email='admin@usgo.org',
-                                   password=encrypt_password('usgo'),
-                                   id=1)
-    user_datastore.add_role_to_user(u, role_aga_admin)
+def create_user(email, password, role, **kwargs):
+    u = user_datastore.create_user(email=email, password=encrypt_password(password), **kwargs)
+    user_datastore.add_role_to_user(u, role)
+    db.session.commit()
+    return u
 
-    kgs_admin = user_datastore.create_user(email='admin@kgs.com',
-                                           password=encrypt_password('kgs'),
-                                           id=2)
-    user_datastore.add_role_to_user(kgs_admin, role_gs_admin)
-
-    u = user_datastore.create_user(email='foo@foo.com',
-                                   aga_id=10,
-                                   password=encrypt_password('foo'),
-                                   id=3)
-    db.session.add(Player(id=1,name="FooPlayerKGS",server_id=1,user_id=3,token="secret_foo_KGS"))
-    db.session.add(Player(id=4,name="FooPlayerIGS",server_id=2,user_id=3,token="secret_foo_IGS"))
-    user_datastore.add_role_to_user(u, role_user)
-
-    u = user_datastore.create_user(email='bar@bar.com',
-                                   aga_id=20,
-                                   password=encrypt_password('bar'),
-                                   id=4)
-    db.session.add(Player(id=2,name="BarPlayerKGS",server_id=1,user_id=4,token="secret_bar_KGS"))
-    db.session.add(Player(id=5,name="BarPlayerIGS",server_id=2,user_id=4,token="secret_bar_IGS"))
-    user_datastore.add_role_to_user(u, role_user)
-
-    u = user_datastore.create_user(email='baz@baz.com',
-                                   aga_id=30,
-                                   password=encrypt_password('baz'),
-                                   id=5)
-    db.session.add(Player(id=3,name="BazPlayerKGS",server_id=1,user_id=5,token="secret_baz_KGS"))
-    db.session.add(Player(id=6,name="BazPlayerIGS",server_id=2,user_id=5,token="secret_baz_IGS"))
-    user_datastore.add_role_to_user(u, role_user)
-
-
-    gs = GoServer(id=1, name='KGS', url='http://gokgs.com', token='secret_kgs')
-    gs.admins.append(kgs_admin)
+def create_server(**kwargs):
+    gs = GoServer(**kwargs)
     db.session.add(gs)
-    db.session.add(GoServer(id=2, name='IGS',
-                            url='http://pandanet.com',
-                            token='secret_igs'))
+    db.session.commit()
+    return gs
+
+def create_test_data():
+    role_user, role_gs_admin, role_aga_admin = create_roles()
+    superadmin = create_user("admin@usgo.org", "usgo", role_aga_admin)
+    kgs_admin = create_user("admin@gokgs.com", "kgs", role_gs_admin)
+    ogs_admin = create_user("admin@ogs.com", "ogs", role_gs_admin)
+    foo_user = create_user("foo@foo.com", "foo", role_user, aga_id=10)
+    bar_user = create_user("bar@bar.com", "bar", role_user, aga_id=20)
+    baz_user = create_user("baz@baz.com", "baz", role_user, aga_id=30)
+
+    kgs_server = create_server(name="KGS", url="http://gokgs.com", token="secret_kgs")
+    kgs_server.admins.append(kgs_admin)
+    db.session.add(kgs_server)
+
+    ogs_server = create_server(name="OGS", url="http://online-go.com", token="secret_ogs")
+    ogs_server.admins.append(ogs_admin)
+    db.session.add(ogs_server)
+
+    db.session.commit()
+
+    db.session.add(Player(id=1, name="FooPlayerKGS", server_id=kgs_server.id, user_id=foo_user.id,token="secret_foo_KGS"))
+    db.session.add(Player(id=4, name="FooPlayerOGS", server_id=ogs_server.id, user_id=foo_user.id,token="secret_foo_OGS"))
+    db.session.add(Player(id=2, name="BarPlayerKGS", server_id=kgs_server.id, user_id=bar_user.id,token="secret_bar_KGS"))
+    db.session.add(Player(id=5, name="BarPlayerOGS", server_id=ogs_server.id, user_id=bar_user.id,token="secret_bar_OGS"))
+    db.session.add(Player(id=3, name="BazPlayerKGS", server_id=kgs_server.id, user_id=baz_user.id,token="secret_baz_KGS"))
+    db.session.add(Player(id=6, name="BazPlayerOGS", server_id=ogs_server.id, user_id=baz_user.id,token="secret_baz_OGS"))
+
 
     basedir = os.path.abspath(os.path.dirname(__file__))
-    with open(os.path.join(basedir, 'tests/testsgf.sgf')) as sgf_file:
-        sgf_data = "\n".join(sgf_file.readlines()).encode()
+    with open(os.path.join(basedir, 'tests/testsgf.sgf'), 'rb') as sgf_file:
+        sgf_data = sgf_file.read()
 
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5", game_record=sgf_data,
         date_played=datetime.datetime.now() - datetime.timedelta(seconds=random.randint(0,1000000))))

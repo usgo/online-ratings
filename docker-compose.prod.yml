@@ -9,7 +9,7 @@ web:
   # just to be sure that debug is off.
   environment:
     - DEBUG=False
-  command: /usr/local/bin/gunicorn -w 2 -b :5000 run:app
+  command: /usr/local/bin/gunicorn -w 2 -b :5000 manage:app
   links:
     - postgres:postgres
 

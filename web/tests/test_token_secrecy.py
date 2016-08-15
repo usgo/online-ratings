@@ -7,10 +7,10 @@ class TestTokenSecrecy(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.ratings_admin = user_datastore.get_user("admin@usgo.org")
-        self.kgs_admin = user_datastore.get_user("admin@kgs.com")
+        self.kgs_admin = user_datastore.get_user("admin@gokgs.com")
         self.random_user = user_datastore.get_user("foo@foo.com")
         self.kgs_game_server = GoServer.query.filter(GoServer.name=="KGS").first()
-        self.igs_game_server = GoServer.query.filter(GoServer.name=="IGS").first()
+        self.ogs_game_server = GoServer.query.filter(GoServer.name=="OGS").first()
 
     def login(self, email, password):
         return self.client.post('/login', data=dict(
@@ -33,9 +33,9 @@ class TestTokenSecrecy(BaseTestCase):
         kgs_game_page = os.path.join('/game_servers/', str(self.kgs_game_server.id))
         response = self.client.get(kgs_game_page)
         self.assertIn(self.kgs_game_server.token, response.data.decode('utf8'))
-        igs_game_page = os.path.join('/game_servers/', str(self.igs_game_server.id))
-        response = self.client.get(igs_game_page)
-        self.assertNotIn(self.igs_game_server.token, response.data.decode('utf8'))
+        ogs_game_page = os.path.join('/game_servers/', str(self.ogs_game_server.id))
+        response = self.client.get(ogs_game_page)
+        self.assertNotIn(self.ogs_game_server.token, response.data.decode('utf8'))
         self.logout()
 
     def test_random_person_cant_see_tokens(self):
@@ -43,7 +43,7 @@ class TestTokenSecrecy(BaseTestCase):
         kgs_game_page = os.path.join('/game_servers/', str(self.kgs_game_server.id))
         response = self.client.get(kgs_game_page)
         self.assertNotIn(self.kgs_game_server.token, response.data.decode('utf8'))
-        igs_game_page = os.path.join('/game_servers/', str(self.igs_game_server.id))
-        response = self.client.get(igs_game_page)
-        self.assertNotIn(self.igs_game_server.token, response.data.decode('utf8'))
+        ogs_game_page = os.path.join('/game_servers/', str(self.ogs_game_server.id))
+        response = self.client.get(ogs_game_page)
+        self.assertNotIn(self.ogs_game_server.token, response.data.decode('utf8'))
         self.logout()
