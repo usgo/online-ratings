@@ -88,6 +88,8 @@ def create_test_data():
 
 def create_extra_data():
     basedir = os.path.abspath(os.path.dirname(__file__))
+
+    #Make a bunch of example users
     with open(os.path.join(basedir, 'tests/testsgf.sgf')) as sgf_file:
         sgf_data = "\n".join(sgf_file.readlines()).encode()
     role_user = user_datastore.find_role('user')
@@ -151,5 +153,5 @@ if __name__ == '__main__':
         db.create_all()
         print('Creating test data...')
         create_test_data()
-        print('Creating extra data...')
+        print('Creating rating data...')
         create_extra_data()
