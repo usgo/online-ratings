@@ -1,0 +1,6 @@
+id: online_ratings
+title: Online Ratings API Documentation
+description: Endpoints to submit games to AGA
+links:
+  - href: http://dev.usgo.org
+    rel: self

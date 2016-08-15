@@ -6,13 +6,13 @@ class BaseConfiguration(object):
     DEBUG = False
     TESTING = False
 
-    ADMINS = frozenset(['youremail@yourdomain.com'])
+    ADMINS = os.environ.get('ADMINS', '').split(',')
     SECRET_KEY = None
 
     THREADS_PER_PAGE = 8
 
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
-    SECURITY_PASSWORD_SALT = 'SuPeRsEcReTsAlT'
+    SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'defaultsalt')
     SECURITY_POST_LOGIN_VIEW = '/profile'
     SECURITY_CHANGEABLE = True
     SECURITY_REGISTERABLE = True
@@ -23,7 +23,6 @@ class BaseConfiguration(object):
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
 
     MAIL_DEBUG = 0
-    MAIL_SUPPRESS_SEND = True 
 
 class DockerConfiguration(BaseConfiguration):
     DEBUG = str(os.environ.get('DEBUG')).lower() == "true"
@@ -51,3 +50,4 @@ class TestConfiguration(BaseConfiguration):
     SECURITY_PASSWORD_HASH = 'plaintext'
     WTF_CSRF_ENABLED = False
     SECRET_KEY = "justfortesting"
+    MAIL_SUPPRESS_SEND = True

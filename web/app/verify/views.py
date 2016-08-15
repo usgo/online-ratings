@@ -1,14 +1,15 @@
 from . import verify
-from .aga_membership import get_email_address
+from .aga_membership import get_aga_info
 
-from flask import abort, redirect, url_for, render_template
+from flask import abort, redirect, url_for, render_template, current_app
 from flask.ext.security import login_required
 from flask.ext.login import current_user
 from flask.ext.wtf import Form
 from flask.ext.mail import Message
 from itsdangerous import BadSignature, URLSafeSerializer
-from app.models import User
-import app, logging
+import app
+from app.models import User, db
+import logging
 
 from wtforms import IntegerField, SubmitField
 from wtforms.validators import Required
@@ -16,7 +17,7 @@ from wtforms.validators import Required
 
 def get_serializer(secret_key=None):
     if secret_key is None:
-        secret_key = app.app.secret_key #why app.app?
+        secret_key = current_app.config['SECRET_KEY']
     return URLSafeSerializer(secret_key)
 
 @verify.route('/verify/<payload>')
@@ -35,8 +36,8 @@ def verify_player(payload):
 
     user = User.query.get_or_404(user_id)
     user.aga_id = aga_id
-    app.db.session.add(user)
-    app.db.session.commit()
+    db.session.add(user)
+    db.session.commit()
     #TODO: something like user.activate(), maybe generate initial token?
     msg = 'Linked account with AGA #%s' %user.aga_id
     logging.info(msg)
@@ -49,9 +50,10 @@ def get_verify_link(user, aga_id):
                    _external=True)
 
 def send_verify_email(user, aga_id):
-    email_address = get_email_address(aga_id)
-    if email_address is None:
+    aga_info = get_aga_info(aga_id)
+    if aga_info is None:
         return False
+    email_address = aga_info['email']
     email_subject = "Confirm AGA ID for Online Ratings"
     email_body = render_template('verify/verification_email.html', 
         user=user, aga_id=aga_id, verify_link=get_verify_link(user, aga_id))

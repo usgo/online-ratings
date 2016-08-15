@@ -1,9 +1,12 @@
-online-ratings
-==============
+# Online Ratings
+
+[![Travis Build Status](https://travis-ci.org/usgo/online-ratings.svg?branch=master)](https://travis-ci.org/usgo/online-ratings)
 
 AGA Online Ratings protocol and implementation
 
-The goal of the AGA Online Ratings Protocol is to provide Go Servers with a standard way to report results between AGA members that happen on their servers to us for computing a cross-server rating.
+The goal of the AGA Online Ratings Protocol is to provide Go Servers with a
+standard way to report results between AGA members that happen on their servers
+to us for computing a cross-server rating.
 
 Other goals of the project can be found on the [implementation plan here](https://docs.google.com/document/d/1XOcpprw0Y8xhHTroYnUU7tt0rN6F3-T4_9sgOeifqwI)
 
@@ -17,63 +20,134 @@ Available endpoints:
   - `GET /api/v1/players/<player_id>` Get a player by ID
   - `GET /api/v1/players?token=<token>` Get a player by their secret token.
 
-Here's an example request to create a game:
-POST /api/v1/games
-  ?server_tok=secret_kgs
-  &b_tok=player_1_token
-  &w_tok=player_2_token
+Here's an example HTTP request to create a game:
+
+```
+POST /api/v1/games HTTP/1.1
+Content-Type: application/json
+X-Auth-Server-Token: secret_kgs
+X-Auth-Black-Player-Token: player_1_token
+X-Auth-White-Player-Token: player_2_token
+
 {
   "black_id": 1,
   "white_id": 2,
-  "game_server": "KGS",
-  'rated': True,
-  'result': 'W+R',
-  'date_played': '2015-02-26T10:30:00',
-  'game_record': '(;FF[4]GM[1]SZ[19]CA[UTF-8]SO[gokifu.com]BC[ja]WC[ja]EV[54th Japanese Judan]PB[Kono Takashi]BR[8p]PW[O Meien]WR[9p]KM[6.5]DT[2015-02-26]RE[W+R];B[qd];W[dp];B[pq];W[od];B[oc];W[nc];B[pc];W[nd];B[qf];W[ec];B[jd];W[hd];B[jf];W[mg];B[jh];W[mi];B[cd];W[de];B[ce];W[df];B[cg];W[jj];B[hf];W[ff];B[dc];W[kg];B[jg];W[gj];B[jq];W[mp];B[gq];W[po];B[qo];W[qp];B[pp];W[qq];B[qn];W[pr];B[or];W[qr];B[oq];W[pn];B[rp];W[rq];B[ro];W[pm];B[ps];W[qm];B[rm];W[rl];B[sr];W[eq];B[cm];W[ip];B[iq];W[hp];B[gp];W[fr];B[gr];W[dn];B[dm];W[em];B[cn];W[co];B[en];W[do];B[el];W[fm];B[fl];W[gm];B[gl];W[hm];B[hl];W[im];B[lq];W[dk];B[dl];W[mq];B[lr];W[di];B[il];W[ii];B[jm];W[jn];B[kn];W[ko];B[jo];W[in];B[km];W[jp];B[lo];W[kp];B[lp];W[jl];B[fo];W[ho];B[cq];W[dr];B[bo];W[bp];B[an];W[bq];B[ck];W[cj];B[bk];W[eb];B[cb];W[jc];B[kc];W[ic];B[kd];W[le];B[id];W[hc];B[gh];W[ih];B[kj];W[kk];B[lj];W[ki];B[ji];W[ij];B[kh];W[li];B[lg];W[lf];B[lh];W[mh];B[ig];W[mm];B[mn];W[qg];B[pf];W[nn];B[pg];W[mr];B[no];W[mo];B[ln];W[op];B[sq];W[nq];B[rr];W[nl];B[ms];W[ns];B[ls];W[nr];B[qs];W[oo];B[js];W[qh];B[ph];W[mb];B[hh];W[fj];B[lb];W[bj];B[ej];W[ei];B[hj];W[hi];B[gi];W[hk];B[ek];W[ob];B[fi];W[mj];B[pb];W[he];B[ie];W[dg];B[ch];W[qi];B[pi];W[rg];B[rk];W[qk];B[sl];W[dj];B[kl];W[jk];B[ak];W[re];B[qe];W[rf];B[rd];W[gf];B[jb];W[ib];B[ql];W[pj];B[pl];W[ol];B[ll];W[lk];B[rj];W[qj];B[oj];W[nf];B[oa];W[na];B[nb];W[hq])'
+  "server_id": 1,
+  "result": "W+R",
+  "date_played": "2015-02-26T10:30:00",
+  "game_record": "(;FF[4]GM[1]SZ[19]CA[UTF-8]BC[ja]WC[ja]EV[54th Japanese Judan]PB[Kono Takashi]BR[8p]PW[O Meien]WR[9p]KM[6.5]DT[2015-02-26]RE[W+R];B[qd];W[dp];B[pq];W[od])"
 }
+```
 
-You can also submit a `game_url` in lieu of the `game_record` field. `server_tok` is the game server's secret token, and `b_tok`, `w_tok` are the player's secret tokens. 
-
+You can also submit a `game_url` in lieu of the `game_record` field. `server_token` is the game server's secret token, and `black_token`, `white_token` are the player's secret tokens. Your `server_id` can be discovered through the UI for online-ratings.
 
 ## Getting Started (Online Ratings backend developers)
-### Overview:
- - Get set up with a VM to use with Docker
- - Build and run the app on the VM with Docker
- - log in using the fake login credentials found in web/create_db.py
+
+### Overview
+
+Before you get started working on Online Ratings, you'll need to do some setup:
+
+* Choose your package manager
+* Install Python3 and the relevant dependencies
+* Install the Docker command line tools.
+* Get set up with a VM to use with Docker
+* Build and run the app on the VM with Docker
+* log in using the fake login credentials found in `web/create_db.py`
+
+## Package Managers
+
+This dev guide assumes a POSIX tool chain. Most developers on this project use OSX.
+
+* OSX: Install [homebrew](http://brew.sh/)
+* Linux/Ubuntu: You should already apt-get installed
+
+## Python and Dependencies
+
+1.  Install Python3
+    * OSX: `brew install python3`
+    * Linux: You probably already have Python3 installed. If not: `sudo apt-get
+      install python3`
+4.  Install [pip](https://en.wikipedia.org/wiki/Pip_(package_manager))
+    * `curl https://bootstrap.pypa.io/get-pip.py | python3`
+5.  Install postgres
+    * OSX: `brew install postgresql`
+    * Linux: [See here](https://www.postgresql.org/download/linux/ubuntu/)
+6.  Install the python dependencies with pip.
+    * cd to `online-ratings/web` directory and run: `pip install -r requirements.txt`
+7.  Run the tests!
+    * cd to `online-ratings/web` directory and run: `python3 -m unittest
+      discover`
+
+**[Optional]**
+
+Optionally, you can install VirtualEnv, which makes working with python versions
+a little easier.
+
+1.  Install Virtual Environment: mkvirtualenv
+    * `pip install virtualenvwrapper`
+    * Add `source /usr/local/bin/virtualenvwrapper.sh` to your `.bash_profile`
+      or `.bashrc`. Alternatively, just run `source
+      /usr/local/bin/virtualenvwrapper.sh` when you need it.
+2.  Use VirtualWrapper to make a new virtual env:;
+    * `mkvirtualenv --python=/usr/local/bin/python3 online-ratings-env`
 
 ## Getting set up with Docker
+
 ### Mac
-You'll want to install docker-compose and docker-machine
-```
-  $ brew install docker-compose docker-machine
+You'll want to install `docker`, `docker-compose`, and `docker-machine`. Note:
+If you're using Docker for Mac (v1.12), installing docker-machine is probably
+unnecessary.
+
+```shell
+$ brew install docker docker-compose docker-machine
 ```
 
-You'll also want to have a virtual machine installed, such as VirtualBox. You can then set up a docker host on VirtualBox.
+You'll also want to have a virtual machine installed, such as VirtualBox. 
+
+```shell
+$ brew cask install virtualbox
 ```
-  $ docker-machine create -d virtualbox dev
+
+You can then set up a docker host on VirtualBox.
+
+```shell
+$ docker-machine create -d virtualbox dev
 ```
-The output of the above command will tell you how to set the local environment variables to connect to your shiny new docker host.  For me, using fish shell, it's something like `eval (docker-machine env dev)`
+
+The output of the above command will tell you how to set the local environment
+variables to connect to your shiny new docker host.  For Bash, it's `eval
+$(docker-machine env dev)`. For fish shell it's `eval (docker-machine env dev)`.
 
 ### Linux
 Install [docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/)
 
 ### [All]
 Then the following commands should start the app running and start tailing the logs.
-```
-  $ cp .env_example .env
-  $ docker-compose -f docker-compose.dev.yml build
-  $ docker-compose -f docker-compose.dev.yml up -d
-  $ docker-compose -f docker-compose.dev.yml logs
-```
-The `build` step will create docker containers for each part of the app (nginx, flask, etc.). The `up -d` step will coordinate the running of all the containers as specified in the docker-compose yaml file.
 
-If this is the first time you've set up the database, you'll need to create the initial tables with 
+```shell
+cp .env_example .env
+docker-compose -f docker-compose.dev.yml build
+docker-compose -f docker-compose.dev.yml up -d
+docker-compose -f docker-compose.dev.yml logs
 ```
-  $ docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/create_db.py
+
+The `build` step will create docker containers for each part of the app (nginx,
+flask, etc.). The `up -d` step will coordinate the running of all the containers
+as specified in the docker-compose yaml file.
+
+If this is the first time you've set up the database, you'll need to create the
+initial tables with
+
+```shell
+docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/create_db.py
 ```
-The dockerfile configuration will then serve the app at [[virtual machine IP on localhost]], port 80. For example, http://192.168.99.100:80 You can find your docker hosts by running
-```
-  $ docker-machine ls
+
+The dockerfile configuration will then serve the app at [[virtual machine IP on
+localhost]], port 80. For example, http://192.168.99.100:80 You can find your
+Docker hosts by running
+
+```shell
+docker-machine ls
 ```
 
 You can remap the ports that the app listens on by editing `docker-compose.base.yml` and changing the nginx ports mapping to something like `"8080:80"`
@@ -81,46 +155,107 @@ You can remap the ports that the app listens on by editing `docker-compose.base.
 ## Development
 You might find it useful to have a python shell in Docker. This lets you interactively play with database queries and such.
 ```
-  $ docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/shell.py
-  >>> from app.models import Player
-  >>> print(Player.query.filter(Player.id==1).first())
-  Player FooPlayerKGS, id 1
+docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/shell.py
+>>> from app.models import Player
+>>> print(Player.query.filter(Player.id==1).first())
+Player FooPlayerKGS, id 1
 ```
 
-## Running locally, without Docker
-Assuming you have homebrew installed, and pip/virtualenv/virtualenvwrapper installed on the system python. 
+## Running Locally
+
+Generally, we prefer running with Docker. However, if you wish to run the web
+server locally (perhaps for a faster iteration cycle) you can do so with the
+following:
+
+```shell
+cd online-ratings
+sed 's/^\([^#]\)/export \1/g' .env_example > .env_local 
+source .env_local
+cd web
+pip install -r requirements.txt
+python3 run.py
 ```
-  $ brew install python3
-  $ mkvirtualenv --python=/usr/local/bin/python3 <env name here>
-  $ git clone https://github.com/usgo/online-ratings.git
-  $ cd online-ratings
-  $ pip install -r requirements.txt
-  $ python run.py
+
+You should see:
+
+```shell
+* Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
 ```
+
+Note: At this point, you still need to run your local Online Ratings instance
+against a database instance. You can either create a local postgres instance and
+create some data. Or, you can point your local server at the running Docker
+images. For that, all you need to do is run through the Docker startup
+instructions above and then change `DB_SERVICE` in your `.env_local` to
+`0.0.0.0`.
 
 
 ## Running the Tests
-The standard `unittest` module has a discovery feature that will automatically find and run tests.  The directions given below will search for tests in any file named `test_*.py`.
-```
-  $ source bin/activate
-  $ cd web
-  $ python -m unittest discover
+The standard `unittest` module has a discovery feature that will automatically
+find and run tests.  The directions given below will search for tests in any
+file named `test_*.py`.
+
+```shell
+source bin/activate
+cd web
+python -m unittest discover
 ```
 To see other options for running tests, you may:
-```
-  $ cd <repo root directory>
-  $ python -m unittest --help
+
+```shell
+cd <repo root directory>
+python -m unittest --help
 ```
 
 ## Deploying
 
-Deploying should be the same as testing, except that the docker machine you use is on AWS, etc. Additionally, you should run docker-compose with the prod overrides:
+Deploying should be the same as testing, except that the docker machine you use
+is on AWS, etc. Additionally, you should run docker-compose with the prod
+overrides:
+
+```shell
+vim .env (change passwords, secret_key to production values)
+docker-compose -f docker-compose.prod.yml build
+docker-compose -f docker-compose.prod.yml up -d
 ```
-  $ vim .env (change passwords, secret_key to production values)
-  $ docker-compose -f docker-compose.prod.yml build
-  $ docker-compose -f docker-compose.prod.yml up -d
-```
+
+## Documentation
+
+### Running locally
+
+1. Ensure [`mkdocs`][0] is installed.
+2. Run `mkdocs serve` from within the root of `online-ratings`.
+3. Load it in a browser and profit!
+
+### Making non-API Pages
+
+Create or edit the `.md` files within `docs/`.
+
+Refer to [mkdocs][0] for more details.
+
+### Generating API Documentation
+
+Source files to be edited can be found in `docs/schemata`.  The files are in [YAML][1] for improved
+readability.
+
+1. Install [prmd][2] per their instructions.
+2. From root of `online-ratings`, run
+   `prmd combine --meta docs/meta.yml docs/schemata | prmd verify | prmd doc > docs/api.md`
+
+[JSON Schema][3] is the general format used for types and [JSON Hyper-Schema][4] is used for
+endpoint definitions.
+
+### Deploying To gh-pages
+
+1. Run `mkdocs gh-deploy --clean`.
+2. That's it!
 
 ## Questions?
 The developer mail list can be found here:
 https://groups.google.com/forum/#!forum/usgo-online-ratings
+
+[0]: http://www.mkdocs.org/
+[1]: https://en.wikipedia.org/wiki/YAML
+[2]: https://github.com/interagent/prmd
+[3]: http://json-schema.org/documentation.html
+[4]: http://json-schema.org/latest/json-schema-hypermedia.html

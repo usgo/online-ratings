@@ -144,7 +144,6 @@ def create_extra_data():
 
 if __name__ == '__main__':
     app = get_app('config.DockerConfiguration')
-    db.init_app(app)
     with app.app_context():
         db.session.remove()
         db.drop_all()

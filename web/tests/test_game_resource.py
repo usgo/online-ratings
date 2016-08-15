@@ -12,16 +12,16 @@ from app.api_1_0.api_exception import ApiException
 class TestGameResource(BaseTestCase):
 
     games_endpoint = '/api/v1/games'
-    good_queryparams = {
-        'server_tok': 'secret_kgs',
-        'b_tok': 'secret_foo_KGS',
-        'w_tok': 'secret_bar_KGS',
+    good_headers = {
+        'X-Auth-Server-Token': 'secret_kgs',
+        'X-Auth-Black-Player-Token': 'secret_foo_KGS',
+        'X-Auth-White-Player-Token': 'secret_bar_KGS',
+        'Content-Type': 'application/json',
     }
     good_bodyparams = {
         "black_id": 1,
         "white_id": 2,
-        "game_server": "KGS",
-        'rated': True,
+        "server_id": 1,
         'result': 'B+0.5',
         'date_played': '2014-08-19T10:30:00',
         'game_record': '\n'.join(open('tests/testsgf.sgf').readlines())
@@ -32,14 +32,13 @@ class TestGameResource(BaseTestCase):
     def test_games_endpoint_success(self):
         create_response = self.client.post(
             self.games_endpoint,
-            query_string=self.good_queryparams,
             data=json.dumps(self.good_bodyparams),
-            headers={"Content-Type": "application/json"}
+            headers=self.good_headers
         )
         created_game = create_response.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, created_game[key])
-        self.assertEqual(create_response.status_code, 200)
+        self.assertEqual(create_response.status_code, 201)
 
         get_response = self.client.get(os.path.join(
             self.games_endpoint,
@@ -66,59 +65,45 @@ class TestGameResource(BaseTestCase):
         bodyparams = self.good_bodyparams.copy()
         bodyparams.pop("game_record")
         bodyparams['game_url'] = game_url
-        r = self.client.post(self.games_endpoint, query_string=self.good_queryparams, data=json.dumps(bodyparams), headers={"Content-Type": "application/json"})
+        r = self.client.post(self.games_endpoint, data=json.dumps(bodyparams), headers=self.good_headers)
         actual = r.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, actual[key])
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, 201)
 
     def test_validate_missing_auth(self):
-        for k in self.good_queryparams.keys():
-            q = self.good_queryparams.copy()
+        for k in self.good_headers.keys():
+            if "X-Auth" not in k:
+                continue
+            q = self.good_headers.copy()
             q.pop(k, None)  # on each iteration, remove 1 param
             with self.assertRaises(ApiException) as exception_context:
                 validate_game_submission(q, self.good_bodyparams)
-            self.assertIn(k, exception_context.exception.message)
+                self.assertEqual(exception_context.exception.status_code, 403)
 
     def test_validate_missing_params(self):
         for k in self.good_bodyparams.keys():
             q = self.good_bodyparams.copy()
             q.pop(k, None)  # on each iteration, remove 1 param
             with self.assertRaises(ApiException) as exception_context:
-                validate_game_submission(self.good_queryparams, q)
+                validate_game_submission(self.good_headers, q)
             if k == 'game_record':
                 expected = 'One of game_record or game_url must be present'
                 self.assertEqual(expected, exception_context.exception.message)
             else:
                 self.assertIn(k, exception_context.exception.message)
 
-    def test_validate_bad_user_token(self):
-        for param in ['w_tok', 'b_tok', 'server_tok']:
-            # User token is bad
-            q = self.good_queryparams.copy()
-            q[param] = 'bad_tok'
+    def test_validate_incorrect_auth(self):
+        for k in self.good_headers.keys():
+            if "X-Auth" not in k:
+                continue
+            q = self.good_headers.copy()
+            q[k] = 'bad_tok'
             with self.assertRaises(ApiException) as exception_context:
                 validate_game_submission(q, self.good_bodyparams)
 
-            if param == 'server_tok':
-                expected = 'server access token unknown or expired: bad_tok'
-            else:
-                expected = 'user access token unknown or expired: bad_tok'
-            self.assertEqual(expected, exception_context.exception.message)
-
-    def test_validate_rated(self):
-        bodyparams = self.good_bodyparams.copy()
-        for is_rated in [True, False]:
-            bodyparams['rated'] = is_rated
-            game = validate_game_submission(self.good_queryparams, bodyparams)
-            self.assertEqual(game.rated, is_rated)
-
-        bodyparams['rated'] = '0'
-        with self.assertRaises(ApiException) as exception_context:
-            validate_game_submission(self.good_queryparams, bodyparams)
-
-        expected = 'rated must be set to True or False'
-        self.assertEqual(expected, exception_context.exception.message)
+            expected = 'token unknown or expired'
+            self.assertIn(expected, exception_context.exception.message)
 
     def test_validate_result(self):
         good_results = [

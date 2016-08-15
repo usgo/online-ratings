@@ -1,0 +1,101 @@
+---
+$schema: http://json-schema.org/draft-04/hyper-schema
+
+id: schemata/game
+title: Game
+description: A game played between two players
+
+definitions:
+  identity:
+    $ref: /schemata/game#/definitions/id
+  id:
+    type: integer
+    description: game id
+  black_id:
+    type: integer
+    description: black player id
+  white_id:
+    type: integer
+    description: white player id
+  game_server:
+    type: string
+    description: game server id
+    example: KGS
+  date_played:
+    type: string
+    description: time the game was played
+    format: date-time
+  game_record:
+    type: string
+    description: game record in SGF
+    example: <raw sgf string>
+  game_url:
+    type: string
+    description: game url
+    example: http://example.com/game.sgf
+
+links:
+- href: /api/v1/games
+  method: POST
+  description: Report a game result
+  rel: create
+  title: Creation
+  schema:
+    type: object
+    required:
+      - black_id
+      - white_id
+      - game_server
+      - date_played
+    properties:
+      black_id:
+        $ref: /schemata/game#/definitions/black_id
+      white_id:
+        $ref: /schemata/game#/definitions/white_id
+      game_server:
+        $ref: /schemata/game#/definitions/game_server
+      date_played:
+        $ref: /schemata/game#/definitions/date_played
+      game_record:
+        $ref: /schemata/game#/definitions/game_record
+      game_url:
+        $ref: /schemata/game#/definitions/game_url
+  targetSchema:
+    type: object
+    properties:
+      id:
+        $ref: /schemata/game#/definitions/id
+  http_header:
+    X-Auth-Server-Token: <secret server token>
+    X-Auth-Black-Player-Token: <secret token for black player>
+    X-Auth-White-Player-Token: <secret token for white player>
+
+- href: /api/v1/games/{(%2Fschemata%2Fgame%23%2Fdefinitions%2Fidentity)}
+  method: GET
+  description: Get a game result by id
+  rel: self
+  title: Read
+
+- href: /api/v1/games/{(%2Fschemata%2Fgame%23%2Fdefinitions%2Fidentity)}/sgf
+  method: GET
+  description: Fetch a link to the sgf contents
+  rel: detail
+  title: SGF
+  response_example:
+    head: HTTP/1.1 200 OK
+    body: <sgf contents>
+
+type: object
+properties:
+  id:
+    $ref: /schemata/game#/definitions/id
+  black_id:
+    $ref: /schemata/game#/definitions/black_id
+  white_id:
+    $ref: /schemata/game#/definitions/white_id
+  game_server:
+    $ref: /schemata/game#/definitions/game_server
+  date_played:
+    $ref: /schemata/game#/definitions/date_played
+  game_record:
+    $ref: /schemata/game#/definitions/game_record

@@ -52,10 +52,11 @@ coverage.xml
 *.log
 *.pot
 
-# Sphinx documentation
-docs/_build/
+# mkdocs deploy artifact
+site/
 
 # Files specific to this application
 .env
+.env_local
 app.db
 app/static/glift.min.js
