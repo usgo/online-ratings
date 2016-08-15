@@ -1,6 +1,8 @@
 import datetime
 import os
 import random
+import argparse
+import getpass
 
 from flask.ext.security.utils import encrypt_password 
 
@@ -141,15 +143,35 @@ def create_extra_data():
     strongest_games = [str(g) for g in games if g.white.user_id == strongest or g.black.user_id == strongest]
     print("Strongest, %d (%f):\n%s"% (strongest, p_priors[strongest], strongest_games))
 
+
+def create_barebones_data():
+    role_user, role_gs_admin, role_aga_admin = create_roles()
+    admin_username = input("Enter a superuser email address >")
+    admin_password = getpass.getpass("Enter the superuser password >")
+    superadmin = create_user(admin_username, admin_password, role_aga_admin)
+    db.session.commit()
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--drop", "-d", help="drop tables before proceeding.", action="store_true")
+    parser.add_argument("--fixtures", "-f", help="add fixtures", action="store_true")
+    parser.add_argument("--bb", help="Create barebones data", action="store_true")
+    args = parser.parse_args()
     app = get_app('config.DockerConfiguration')
     with app.app_context():
         db.session.remove()
-        db.drop_all()
+        if args.drop:
+            db.drop_all()
         db.get_engine(app).dispose()
         print('Creating tables...')
         db.create_all()
-        print('Creating test data...')
-        create_test_data()
-        print('Creating rating data...')
-        create_extra_data()
+        if args.bb:
+            print('Creating barebones data...')
+            create_barebones_data()
+        elif args.fixtures:
+            print('Creating test data...')
+            create_test_data()
+            print('Creating rating data...')
+            create_extra_data()
+        else:
+            print('not adding fixtures.')
