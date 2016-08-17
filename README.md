@@ -94,29 +94,7 @@ a little easier.
 ## Getting set up with Docker
 
 ### Mac
-You'll want to install `docker`, `docker-compose`, and `docker-machine`. Note:
-If you're using Docker for Mac (v1.12), installing docker-machine is probably
-unnecessary.
-
-```shell
-$ brew install docker docker-compose docker-machine
-```
-
-You'll also want to have a virtual machine installed, such as VirtualBox. 
-
-```shell
-$ brew cask install virtualbox
-```
-
-You can then set up a docker host on VirtualBox.
-
-```shell
-$ docker-machine create -d virtualbox dev
-```
-
-The output of the above command will tell you how to set the local environment
-variables to connect to your shiny new docker host.  For Bash, it's `eval
-$(docker-machine env dev)`. For fish shell it's `eval (docker-machine env dev)`.
+You'll want to install `docker` and `docker-compose`. This is easily done with Docker for Mac.
 
 ### Linux
 Install [docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/)
@@ -126,9 +104,9 @@ Then the following commands should start the app running and start tailing the l
 
 ```shell
 cp .env_example .env
-docker-compose -f docker-compose.dev.yml build
-docker-compose -f docker-compose.dev.yml up -d
-docker-compose -f docker-compose.dev.yml logs
+docker-compose build
+docker-compose up -d
+docker-compose logs
 ```
 
 The `build` step will create docker containers for each part of the app (nginx,
@@ -139,18 +117,12 @@ If this is the first time you've set up the database, you'll need to create the
 initial tables with
 
 ```shell
-docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/manage.py create_all_data
+docker-compose run --rm web python /usr/src/app/manage.py create_all_data
 ```
 
-The dockerfile configuration will then serve the app at [[virtual machine IP on
-localhost]], port 80. For example, http://192.168.99.100:80 You can find your
-Docker hosts by running
+The dockerfile configuration will then serve the app at localhost:80.
 
-```shell
-docker-machine ls
-```
-
-You can remap the ports that the app listens on by editing `docker-compose.base.yml` and changing the nginx ports mapping to something like `"8080:80"`
+You can remap the ports that the app listens on by editing `docker-compose.yml` and changing the nginx ports mapping to something like `"8080:80"`
 
 ## Development
 You might find it useful to have a python shell in Docker. This lets you interactively play with database queries and such.
@@ -173,7 +145,7 @@ sed 's/^\([^#]\)/export \1/g' .env_example > .env_local
 source .env_local
 cd web
 pip install -r requirements.txt
-python3 run.py
+python3 manage.py runserver
 ```
 
 You should see:
@@ -209,14 +181,12 @@ python -m unittest --help
 
 ## Deploying
 
-Deploying should be the same as testing, except that the docker machine you use
-is on AWS, etc. Additionally, you should run docker-compose with the prod
-overrides:
+Production is the same as local. (We're currently working on pushing + pulling images from Docker Hub; for now we just build + run the images on production servers.)
 
 ```shell
 vim .env (change passwords, secret_key to production values)
-docker-compose -f docker-compose.prod.yml build
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose build
+docker-compose up -d
 ```
 
 ## Documentation

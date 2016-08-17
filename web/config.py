@@ -22,7 +22,7 @@ class BaseConfiguration(object):
     MAIL_DEBUG = 0
 
 class DockerConfiguration(BaseConfiguration):
-    DEBUG = str(os.environ.get('DEBUG')).lower() == "true"
+    DEBUG = False
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
     DB_NAME = os.environ.get('DB_NAME')

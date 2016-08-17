@@ -1,22 +1,21 @@
 web:
-  extends:
-    file: docker-compose.base.yml
-    service: web
+  restart: always
+  build: ./web
+  expose:
+    - "5000"
   # reference static files so that nginx can serve them directly
   volumes:
     - /usr/src/app/app/static/
   env_file: .env
-  # just to be sure that debug is off.
-  environment:
-    - DEBUG=False
   command: /usr/local/bin/gunicorn -w 2 -b :5000 manage:app
   links:
     - postgres:postgres
 
 nginx:
-  extends:
-    file: docker-compose.base.yml
-    service: nginx
+  restart: always
+  build: ./nginx/
+  ports:
+    - "80:80"
   # references static assets from web
   volumes_from:
     - web
@@ -24,14 +23,15 @@ nginx:
     - web:web
 
 data:
-  extends:
-    file: docker-compose.base.yml
-    service: data
+  image: postgres:latest
+  volumes:
+    - /var/lib/postgresql
 
 postgres:
-  extends:
-    file: docker-compose.base.yml
-    service: postgres
+  restart: always
+  image: postgres:9.5
+  ports:
+    - "5432:5432"
   # the same env file defines both the postgres user/password
   # so that postgres creates the user, and the app uses those creds
   env_file: .env
