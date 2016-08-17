@@ -40,6 +40,7 @@ class DockerConfiguration(BaseConfiguration):
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
+    SECURITY_EMAIL_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
 
 class TestConfiguration(BaseConfiguration):
     TESTING = True
