@@ -154,8 +154,8 @@ def create_barebones_data():
     initialize_db_connections()
     db.create_all()
     role_user, role_gs_admin, role_aga_admin = create_roles()
-    admin_username = input("Enter a superuser email address >")
-    admin_password = getpass.getpass("Enter the superuser password >")
+    admin_username = input("Enter a superuser email address > ")
+    admin_password = getpass.getpass("Enter the superuser password > ")
     superadmin = create_user(admin_username, admin_password, role_aga_admin)
     db.session.commit()
 
@@ -165,3 +165,11 @@ def create_all_data():
     db.create_all()
     create_test_data()
     create_extra_data()
+
+def create_server():
+    'Create a new server.'
+    server_name = input("Enter the server's name > ")
+    server_url = input("Enter the server's URL > ")
+    user_name = input("Enter an email address for the admin of this server > ")
+    password = input("Enter a password for the admin")
+    _create_server(user_name, password, server_name, server_url)
