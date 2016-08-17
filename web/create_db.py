@@ -26,31 +26,26 @@ def create_user(email, password, role, **kwargs):
     db.session.commit()
     return u
 
-def create_server(**kwargs):
-    gs = GoServer(**kwargs)
-    db.session.add(gs)
+def _create_server(u_email, u_password, s_name, s_url, s_token=None):
+    if s_token is None:
+        s_token = uuid4()
+    server_admin_role = user_datastore.find_role(SERVER_ADMIN_ROLE.name)
+    server_admin = create_user(u_email, u_password, server_admin_role)
+    server = GoServer(name=s_name, url=s_url, token=s_token)
+    server.admins.append(server_admin)
+    db.session.add(server)
     db.session.commit()
-    return gs
+    return server
 
 def create_test_data():
     role_user, role_gs_admin, role_aga_admin = create_roles()
     superadmin = create_user("admin@usgo.org", "usgo", role_aga_admin)
-    kgs_admin = create_user("admin@gokgs.com", "kgs", role_gs_admin)
-    ogs_admin = create_user("admin@ogs.com", "ogs", role_gs_admin)
+    kgs_server = _create_server("admin@gokgs.com", "kgs", "KGS", "http://gokgs.com", s_token="secret_kgs")
+    ogs_server = _create_server("admin@ogs.com", "ogs", "OGS", "http://online-go.com", s_token="secret_ogs")
+
     foo_user = create_user("foo@foo.com", "foo", role_user, aga_id=10)
     bar_user = create_user("bar@bar.com", "bar", role_user, aga_id=20)
     baz_user = create_user("baz@baz.com", "baz", role_user, aga_id=30)
-
-    kgs_server = create_server(name="KGS", url="http://gokgs.com", token="secret_kgs")
-    kgs_server.admins.append(kgs_admin)
-    db.session.add(kgs_server)
-
-    ogs_server = create_server(name="OGS", url="http://online-go.com", token="secret_ogs")
-    ogs_server.admins.append(ogs_admin)
-    db.session.add(ogs_server)
-
-    db.session.commit()
-
     db.session.add(Player(id=1, name="FooPlayerKGS", server_id=kgs_server.id, user_id=foo_user.id,token="secret_foo_KGS"))
     db.session.add(Player(id=4, name="FooPlayerOGS", server_id=ogs_server.id, user_id=foo_user.id,token="secret_foo_OGS"))
     db.session.add(Player(id=2, name="BarPlayerKGS", server_id=kgs_server.id, user_id=bar_user.id,token="secret_bar_KGS"))
