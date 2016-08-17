@@ -1,14 +1,17 @@
 import datetime
 import os
 import random
-import argparse
 import getpass
+from uuid import uuid4
 
+from flask import current_app
 from flask.ext.security.utils import encrypt_password 
 
-from app import get_app
 from app.models import user_datastore, Player, GoServer, Game, User, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE, USER_ROLE, db
 
+def initialize_db_connections():
+    db.session.remove()
+    db.get_engine(current_app).dispose()
 
 def create_roles():
     role_user = user_datastore.create_role(**USER_ROLE._asdict())
@@ -143,35 +146,27 @@ def create_extra_data():
     strongest_games = [str(g) for g in games if g.white.user_id == strongest or g.black.user_id == strongest]
     print("Strongest, %d (%f):\n%s"% (strongest, p_priors[strongest], strongest_games))
 
+def drop_all_tables(force=False):
+    'Drop all database tables. Must use --force to actually execute.'
+    initialize_db_connections()
+    if force:
+        db.drop_all()
+    else:
+        print("Not dropping any tables without --force")
 
 def create_barebones_data():
+    'Initialize database without any data fixtures; just a superuser account.'
+    initialize_db_connections()
+    db.create_all()
     role_user, role_gs_admin, role_aga_admin = create_roles()
     admin_username = input("Enter a superuser email address >")
     admin_password = getpass.getpass("Enter the superuser password >")
     superadmin = create_user(admin_username, admin_password, role_aga_admin)
     db.session.commit()
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--drop", "-d", help="drop tables before proceeding.", action="store_true")
-    parser.add_argument("--fixtures", "-f", help="add fixtures", action="store_true")
-    parser.add_argument("--bb", help="Create barebones data", action="store_true")
-    args = parser.parse_args()
-    app = get_app('config.DockerConfiguration')
-    with app.app_context():
-        db.session.remove()
-        if args.drop:
-            db.drop_all()
-        db.get_engine(app).dispose()
-        print('Creating tables...')
-        db.create_all()
-        if args.bb:
-            print('Creating barebones data...')
-            create_barebones_data()
-        elif args.fixtures:
-            print('Creating test data...')
-            create_test_data()
-            print('Creating rating data...')
-            create_extra_data()
-        else:
-            print('not adding fixtures.')
+def create_all_data():
+    'Initialize database tables, create fake servers, users, players, game data, etc.'
+    initialize_db_connections()
+    db.create_all()
+    create_test_data()
+    create_extra_data()

@@ -139,7 +139,7 @@ If this is the first time you've set up the database, you'll need to create the
 initial tables with
 
 ```shell
-docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/create_db.py
+docker-compose -f docker-compose.dev.yml run --rm web python /usr/src/app/manage.py create_all_data
 ```
 
 The dockerfile configuration will then serve the app at [[virtual machine IP on
@@ -155,7 +155,7 @@ You can remap the ports that the app listens on by editing `docker-compose.base.
 ## Development
 You might find it useful to have a python shell in Docker. This lets you interactively play with database queries and such.
 ```
-docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/shell.py
+docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/manage.py shell
 >>> from app.models import Player
 >>> print(Player.query.filter(Player.id==1).first())
 Player FooPlayerKGS, id 1
