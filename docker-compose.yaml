@@ -29,7 +29,7 @@ data:
 
 postgres:
   restart: always
-  image: postgres:9.5
+  image: postgres:latest
   ports:
     - "5432:5432"
   # the same env file defines both the postgres user/password
