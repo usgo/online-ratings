@@ -3,9 +3,6 @@ web:
   build: ./web
   expose:
     - "5000"
-  # reference static files so that nginx can serve them directly
-  volumes:
-    - /usr/src/app/app/static/
   env_file: .env
   command: /usr/local/bin/gunicorn -w 2 -b :5000 manage:app
   links:
@@ -13,12 +10,10 @@ web:
 
 nginx:
   restart: always
-  build: ./nginx/
+  # build also includes static assets to be served by nginx
+  build: ./nginx
   ports:
     - "80:80"
-  # references static assets from web
-  volumes_from:
-    - web
   links:
     - web:web
 

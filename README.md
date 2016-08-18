@@ -94,7 +94,7 @@ a little easier.
 ## Getting set up with Docker
 
 ### Mac
-You'll want to install `docker` and `docker-compose`. This is easily done with Docker for Mac.
+You'll want to install `docker`, `docker-machine`, and `docker-compose`. This is easily done with Docker for Mac.
 
 ### Linux
 Install [docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/)
