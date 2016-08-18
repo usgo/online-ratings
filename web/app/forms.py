@@ -1,6 +1,8 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, SubmitField, BooleanField
+from wtforms import StringField, SubmitField, BooleanField, SelectField
 from wtforms.validators import Required, URL, Optional
+from wtforms.fields.html5 import DateField #  testing
+from .models import KOMI_VALUES as kv
 
 
 class AddGameServerForm(Form):
@@ -18,13 +20,14 @@ class SearchPlayerForm(Form):
 class TournamentForm(Form):
     event_name = StringField("Tournament Name", validators=[Required()])
 
-    venue = StringField("Venue (Optional)") # Venue info Optional
+    venue = StringField("Venue (Optional)")
     venue_address = StringField("Venue Address (Optional)")
     venue_state = StringField("State (Optional)")
     venue_zip = StringField("Zip (Optional)")
 
-    start_date = StringField("Start Date", validators=[Required()]) # these will change to some date format
-    end_date = StringField("End Date (Optional)")
+    start_date = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Required()])
+    end_date = DateField('End Date', format='%Y-%m-%d', validators=[Optional()])
 
     director = StringField("Director", validators=[Required()])
     director_phone = StringField("Director's Phone", validators=[Required()])
@@ -43,16 +46,17 @@ class TournamentForm(Form):
     convener_website  = StringField("Convener's Website (Optional)")
     convener_address = StringField("Convener's Address (Optional)")
 
-    pairing = StringField("Pairing", validators=[Required()])
-    rule_set = StringField("Rule set", validators=[Required()])
-
+    pairing = SelectField("Pairing", choices=[("McMahon","McMahon"),],
+                           validators=[Required()])
+    rule_set = SelectField("Rule set", choices=[("AGA", 'AGA'),
+                ('INTERNATIONAL', 'INTERNATIONAL')], validators=[Required()])
     time_controls = StringField("Time Controls", validators=[Required()])
     basic_time = StringField("Basic Time", validators=[Required()])
     overtime_format = StringField("Overtime Format", validators=[Required()])
-    overtime_conditions = StringField("Overtime Conditions", validators=[Required()])
-
-    komi = StringField("Komi", validators=[Required()])
-
+    overtime_conditions = StringField("Overtime Conditions",
+                                      validators=[Required()])
+    komi = SelectField("Komi", choices=[(x, x) for x in kv],
+                        validators=[Required()])
     tie_break = StringField("Tie Break(s)", validators=[Required()])
 
     submitted = BooleanField("Submitted")

@@ -3,6 +3,7 @@ from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from sqlalchemy.orm import relationship
 import datetime
 from collections import namedtuple
+from enum import Enum
 
 db = SQLAlchemy()
 
@@ -168,6 +169,11 @@ class Game(db.Model):
         }
 
 
+RULESETS = ["AGA", "INTERNATIONAL"]
+PAIRINGTYPES = ["McMahon"]
+KOMI_VALUES = ['0', '0.5', '1', '1.5', '2', '2.5', '3.0', '3.5', '4', '4.5', '5',
+               '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5']
+
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     event_name = db.Column(db.String(80))
@@ -175,8 +181,8 @@ class Tournament(db.Model):
     venue_address = db.Column(db.String(80))
     venue_state = db.Column(db.String(2))
     venue_zip = db.Column(db.String(5))
-    start_date = db.Column(db.String(30)) #  what sort of date format?
-    end_date = db.Column(db.String(30))
+    start_date = db.Column(db.Date) #  date/time obj
+    end_date = db.Column(db.Date) #  date/time obj
     director = db.Column(db.String(80))
     director_phone = db.Column(db.String(20))
     director_email = db.Column(db.String(80))
@@ -191,13 +197,18 @@ class Tournament(db.Model):
     convener_phone = db.Column(db.String(20))
     convener_website = db.Column(db.String(80))
     convener_address = db.Column(db.String(80))
-    pairing = db.Column(db.String(80)) #  drop down?
-    rule_set = db.Column(db.String(80)) # drop down?
+    # pairing = db.Column(db.String(80)) #  enum rop down?
+    pairing = db.Column(db.Enum(*PAIRINGTYPES,
+                        name='pairing_types'), default="McMahon")
+    # rule_set = db.Column(db.String(80)) # enum drop down?
+    rule_set = db.Column(db.Enum(*RULESETS, name='rule_sets'), default="AGA")
     time_controls = db.Column(db.String(80))
     basic_time = db.Column(db.String(80))
     overtime_format = db.Column(db.String(80))
     overtime_conditions = db.Column(db.String(80))
-    komi = db.Column(db.String(80))
+    # komi = db.Column(db.String(80)) # should be float
+    # komi = db.Column(db.Numeric(2,1))
+    komi = db.Column(db.Enum(*KOMI_VALUES, name='komi_values'), default='7')
     tie_break = db.Column(db.String(80))
 
     submitted = db.Column(db.Boolean, default=False)
