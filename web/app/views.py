@@ -1,12 +1,12 @@
 import itertools
 
 from sqlalchemy import or_
-from flask import Blueprint, render_template, request, current_app
+from flask import Blueprint, render_template, request, current_app, redirect, url_for
 from flask.ext.login import current_user
 from flask.ext.security import login_required
 from flask.ext.security import roles_required
 from .tokengen import generate_token
-from .forms import AddGameServerForm, SearchPlayerForm
+from .forms import AddGameServerForm, SearchPlayerForm, AddPlayerForm
 from .models import GoServer, Game, User, Player, SERVER_ADMIN_ROLE, RATINGS_ADMIN_ROLE
 from . import db, user_datastore
 import logging
@@ -20,13 +20,14 @@ def home():
 @ratings.route('/profile')
 @login_required
 def profile():
+    form = AddPlayerForm()
+    form.server.choices = [(server.id, server.name) for server in GoServer.query.all()]
+    players = Player.query.filter(Player.user_id == current_user.id).all()
     if current_user.is_ratings_admin():
         games = Game.query.limit(30).all()
-        players = None
     else:
-        players = Player.query.filter(Player.user_id == current_user.id).all()
         games = itertools.chain(*(Game.query.filter(or_(Game.white_id == player.id, Game.black_id == player.id)) for player in players))
-    return render_template('profile.html', user=current_user, games=games, players=players)
+    return render_template('profile.html', user=current_user, games=games, players=players, form=form)
 
 @ratings.route('/games', methods=['GET'])
 def listgames():
@@ -101,7 +102,21 @@ def users():
     users = User.query.limit(30).all()
     return render_template('users.html', user=current_user, users=users)
 
-@ratings.route('/players', methods=['GET', 'POST'])
+@ratings.route('/players', methods=['POST'])
+@login_required
+def create_player():
+    form = AddPlayerForm()
+    form.server.choices = [(server.id, server.name) for server in GoServer.query.all()]
+    if form.validate_on_submit():
+        server_id = form.server.data
+        name = form.name.data
+        db.session.add(Player(name=name, server_id=server_id, user_id=current_user.id, token=generate_token()))
+        db.session.commit()
+
+    return redirect(url_for('ratings.profile'))
+
+
+@ratings.route('/players/search', methods=['GET', 'POST'])
 def players():
     form = SearchPlayerForm()
     player_query = Player.query
@@ -114,15 +129,12 @@ def players():
 
     players = player_query.limit(30).all()
 
-    return render_template('players.html', user=current_user, players=players, form=form)
+    return render_template('players.html', players=players, form=form)
 
 @ratings.route('/players/<player_id>')
 def player(player_id):
     player = Player.query.get_or_404(player_id)
-    games = []
-    for p in player.user.players:
-        games.extend(Game.query.filter(Game.white_id == p.id).all())
-        games.extend(Game.query.filter(Game.black_id == p.id).all())
+    games = Game.query.filter(or_(Game.white_id == player_id, Game.black_id == player_id)).all()
     return render_template('player.html', user=current_user, player=player, games=games)
 
 @ratings.route('/players/<player_id>/reset_token', methods=['POST'])

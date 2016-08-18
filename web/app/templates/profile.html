@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}My Profile{% endblock %}
+{% block title %}Account{% endblock %}
 
 {% block page_content %}
 
-<h1> Your Profile </h1>
+<h1> Your Account </h1>
 <table class="table">
     <tr><td>AGA ID</td>
         {% if user.aga_id is none %}
@@ -15,7 +15,7 @@
     <tr><td>Contact Email</td><td>{{ user.email }}</td></tr>
 </table>
 
-{% if user.is_server_admin() and user.servers %}
+{% if user.is_server_admin() %}
 <h1>Your Game Server(s)</h1>
 <table class="table">
     <tr><th>Name</th><th>URL</th><th>Token</th></tr>
@@ -29,9 +29,8 @@
 </table>
 {% endif %}
 
-{% if players %}
 <div class="panel panel-default">
-    <div class="panel-heading"> Your linked players </div>
+    <div class="panel-heading"> Your profiles </div>
     <table class="table">
         <tr> <th> Server </th> <th> Name </th> <th> Token </th> </tr>
         {% for p in players %}
@@ -45,7 +44,15 @@
         {% endfor %}
     </table>
 </div>
-{% endif %}
+
+<form method="POST" action="{{ url_for('ratings.create_player') }}">
+    {{form.csrf_token}}
+    {{form.server.label}} {{form.server}}
+    {{form.name.label}} {{form.name}}
+    <input type="submit" value="Add new profile"/>
+
+</form>
+
 
 {% endblock %}
 
