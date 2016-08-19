@@ -39,12 +39,12 @@
             <td>
                 <a href="{{ url_for('ratings.player', player_id=p.id) }}">{{p.name}}</a>
             </td>
-            <td>{{ p.token }}</td>
+            <td><div class="player-token" style="display:none">{{ p.token }}</div></td>
         </tr>
         {% endfor %}
     </table>
 </div>
-
+<button id="show-token-button" onClick="showTokens()">Show tokens</button>
 <form method="POST" action="{{ url_for('ratings.create_player') }}">
     {{form.csrf_token}}
     {{form.server.label}} {{form.server}}
@@ -55,4 +55,12 @@
 
 
 {% endblock %}
-
+{% block scripts %}
+{{super()}}
+<script type="text/javascript">
+function showTokens() {
+    $('div.player-token').removeAttr('style');
+    $('#show-token-button').remove();
+}
+</script>
+{% endblock %}
