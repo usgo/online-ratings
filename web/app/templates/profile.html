@@ -13,10 +13,11 @@
         <td>{{ user.aga_id }}</td></tr>
         {% endif%}
     <tr><td>Contact Email</td><td>{{ user.email }}</td></tr>
+    <tr><td>Rating</td><td> {{ user.last_rating() or "No rating available"}}</td></tr>
 </table>
 
 {% if user.is_server_admin() %}
-<h1>Your Game Server(s)</h1>
+<h2>Your Game Server(s)</h2>
 <table class="table">
     <tr><th>Name</th><th>URL</th><th>Token</th></tr>
     {% for s in user.servers %}
@@ -29,10 +30,15 @@
 </table>
 {% endif %}
 
+<h2> Your profiles </h2>
+
 <div class="panel panel-default">
-    <div class="panel-heading"> Your profiles </div>
     <table class="table">
-        <tr><th>Server</th><th>Name</th><th>Token</th><th>Reset token</th></tr>
+        <tr>
+            <th>Server</th>
+            <th>Name</th>
+            <th>Token <button id="show-token-button" onClick="showTokens()">(Click to reveal)</button></th>
+            <th>Reset token</th></tr>
         {% for p in players %}
         <tr>
             <td>{{p.server.name}}</td>
@@ -45,19 +51,21 @@
         {% endfor %}
     </table>
 </div>
-<button id="show-token-button" onClick="showTokens()">Show tokens</button>
 
 <hr />
+
+<h2>Create a new profile </h2>
+
 
 <form method="POST" action="{{ url_for('ratings.create_player') }}">
     {{form.csrf_token}}
     {{form.server.label}} {{form.server}}
     {{form.name.label}} {{form.name}}
-    <input type="submit" value="Add new profile"/>
+    <input type="submit" value="Create"/>
 
 </form>
 
-<p>** Your token is the password that the server uses to submit rated games to the AGA. If this token is shared, anybody could submit games under your name. You can reset your token if this has happened. Your games will stop being submitted to us until you update your Go server account with the new token</p>
+<p>** Your token is the password that the server uses to submit rated games to Online Ratings. If this token is shared, anybody could submit games under your AGA ID. You can reset your token if this has happened, and your games will stop being submitted to us until you update your Go server account with the new token.</p>
 
 
 {% endblock %}
