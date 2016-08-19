@@ -10,7 +10,7 @@
 
 <table border class="table">
     <tr><td>AGA ID</td><td>{{ player.user.aga_id }}</td></tr>
-    {% if user.can_reset_player_token(player) %}<tr><td>Token</td><td>{{ player.token }}</td></tr>{% endif %}
+    <tr><td>Server</td><td>{{ player.server.name }}</td></tr>
 </table>
 {% if games %}
 <table border class="table">
@@ -53,35 +53,5 @@
 </table>
 {% endif %}
 
-{% if user.can_reset_player_token(player) %}
-<p>Your token is the password that {{player.server.name}} uses to submit rated games to the AGA. If this token is shared, anybody could submit games under your name. You can reset your token if this has happened. Your games for {{player.server.name}} will stop syncing until you update your {{player.server.name}} account with the new token</p>
-<input id="reset_token" type="button" value="Reset token for account {{player.name}}">
-{% endif %}
 
-{% endblock %}
-{% block scripts %}
-{{super()}}
-{% if user.can_reset_player_token(player) %}
-<script type="text/javascript">
-function reset_player_token(player_id) {
-    var TOKEN_RESET_ENDPOINT = "{{ url_for('ratings.reset_player_token', player_id='replacethis') }}";
-    return $.ajax({
-        method: "POST",
-        url: TOKEN_RESET_ENDPOINT.replace("replacethis", player_id)
-    });
-}
-
-$("input#reset_token").click(function () {
-    if (window.confirm("Do you really want to reset your token?")) {
-        reset_player_token({{player.id}})
-            .then(function(response) {
-                alert("Success!");
-                location.reload();
-            }).fail(function(response) {
-                alert("Uhoh, something went wrong. Please contact an admin.")
-            });
-    }
-})
-</script>
-{% endif %}
 {% endblock %}

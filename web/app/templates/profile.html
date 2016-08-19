@@ -32,7 +32,7 @@
 <div class="panel panel-default">
     <div class="panel-heading"> Your profiles </div>
     <table class="table">
-        <tr> <th> Server </th> <th> Name </th> <th> Token </th> </tr>
+        <tr><th>Server</th><th>Name</th><th>Token</th><th>Reset token</th></tr>
         {% for p in players %}
         <tr>
             <td>{{p.server.name}}</td>
@@ -40,11 +40,15 @@
                 <a href="{{ url_for('ratings.player', player_id=p.id) }}">{{p.name}}</a>
             </td>
             <td><div class="player-token" style="display:none">{{ p.token }}</div></td>
+            <td><button onclick="reset_token({{p.id}})" type="button">Reset**</td>
         </tr>
         {% endfor %}
     </table>
 </div>
 <button id="show-token-button" onClick="showTokens()">Show tokens</button>
+
+<hr />
+
 <form method="POST" action="{{ url_for('ratings.create_player') }}">
     {{form.csrf_token}}
     {{form.server.label}} {{form.server}}
@@ -52,6 +56,8 @@
     <input type="submit" value="Add new profile"/>
 
 </form>
+
+<p>** Your token is the password that the server uses to submit rated games to the AGA. If this token is shared, anybody could submit games under your name. You can reset your token if this has happened. Your games will stop being submitted to us until you update your Go server account with the new token</p>
 
 
 {% endblock %}
@@ -62,5 +68,17 @@ function showTokens() {
     $('div.player-token').removeAttr('style');
     $('#show-token-button').remove();
 }
-</script>
-{% endblock %}
+
+function reset_token(player_id) {
+    var TOKEN_RESET_ENDPOINT = "{{ url_for('ratings.reset_player_token', player_id='replacethis') }}";
+    return $.ajax({
+        method: "POST",
+        url: TOKEN_RESET_ENDPOINT.replace("replacethis", player_id)
+    }).then(function(response) {
+        alert("Token successfully reset.")
+        location.reload();
+    }).fail(function(response) {
+        alert("Uhoh, something went wrong. Please contact an admin.")
+    });
+}
+</script>{% endblock %}

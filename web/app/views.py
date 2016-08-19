@@ -22,7 +22,7 @@ def home():
 def profile():
     form = AddPlayerForm()
     form.server.choices = [(server.id, server.name) for server in GoServer.query.all()]
-    players = Player.query.filter(Player.user_id == current_user.id).all()
+    players = Player.query.filter(Player.user_id == current_user.id).order_by(Player.name.asc()).all()
     if current_user.is_ratings_admin():
         games = Game.query.limit(30).all()
     else:
