@@ -173,6 +173,7 @@ RULESETS = ["AGA", "INTERNATIONAL"]
 PAIRINGTYPES = ["McMahon"]
 KOMI_VALUES = ['0', '0.5', '1', '1.5', '2', '2.5', '3.0', '3.5', '4', '4.5', '5',
                '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5']
+TIE_BREAKS = ['SOS', 'SODOS', 'Face to Face Result', 'Random Procedure']
 
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -209,7 +210,8 @@ class Tournament(db.Model):
     # komi = db.Column(db.String(80)) # should be float
     # komi = db.Column(db.Numeric(2,1))
     komi = db.Column(db.Enum(*KOMI_VALUES, name='komi_values'), default='7')
-    tie_break = db.Column(db.String(80))
+    tie_break1 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
+    tie_break2 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
 
     submitted = db.Column(db.Boolean, default=False)
 

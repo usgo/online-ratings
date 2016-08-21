@@ -154,7 +154,8 @@ def create_extra_data():
                        overtime_format="required field",
                        overtime_conditions="required field",
                        komi="7",
-                       tie_break="required field")
+                       tie_break1="SOS",
+                       tie_break2="SODOS")
         return t
 
     print("Tournament...")

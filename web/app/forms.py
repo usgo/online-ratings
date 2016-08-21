@@ -3,6 +3,7 @@ from wtforms import StringField, SubmitField, BooleanField, SelectField
 from wtforms.validators import Required, URL, Optional
 from wtforms.fields.html5 import DateField #  testing
 from .models import KOMI_VALUES as kv
+from .models import TIE_BREAKS as tb
 
 
 class AddGameServerForm(Form):
@@ -57,7 +58,10 @@ class TournamentForm(Form):
                                       validators=[Required()])
     komi = SelectField("Komi", choices=[(x, x) for x in kv],
                         validators=[Required()])
-    tie_break = StringField("Tie Break(s)", validators=[Required()])
+    tie_break1 = SelectField("Tie Break Tier 1", choices=[(x, x) for x in tb],
+                             validators=[Required()])
+    tie_break2 = SelectField("Tie Break Tier 2", choices=[(x, x) for x in tb],
+                             validators=[Required()])
 
     submitted = BooleanField("Submitted")
     submit = SubmitField()
