@@ -138,6 +138,9 @@ docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/man
 Player FooPlayerKGS, id 1
 ```
 
+## Making database changes
+We use Alembic / Flask-Migrate to run database schema updates. To make a database schema change, first make your changes to `models.py`. Then, run `python manage.py migrate -m "Some db commit message"` to autogenerate an Alembic migration file. Finally, execute `docker-compose run --rm web python /usr/src/app/manage.py upgrade` to actually make the database changes. See [Alembic documentation](http://alembic.zzzcomputing.com/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect) for limitations on what the autogenerate can/cannot detect.
+
 ## Running Locally
 
 Generally, we prefer running with Docker. However, if you wish to run the web
