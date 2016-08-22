@@ -1,4 +1,5 @@
 from flask.ext.script import Manager
+from flask_migrate import MigrateCommand
 
 from app import get_app
 
@@ -11,6 +12,8 @@ manager.command(drop_all_tables)
 manager.command(create_barebones_data)
 manager.command(create_all_data)
 manager.command(create_server)
+
+manager.add_command('db', MigrateCommand)
 
 @manager.command
 def config():

@@ -5,6 +5,7 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.security import Security, user_registered
 from flask_wtf.csrf import CsrfProtect
 from flask_mail import Mail
+from flask_migrate import Migrate
 from .models import db, user_datastore
 from .views import ratings as ratings_blueprint, user_registered_sighandler
 from .api_1_0 import api as api_1_0_blueprint
@@ -31,6 +32,7 @@ def get_app(config):
     app.logger.addHandler(stream_handler)
 
     db.init_app(app)
+    Migrate(app, db)
     bootstrap = Bootstrap(app)
     security = Security(app, user_datastore)
     user_registered.connect(user_registered_sighandler)
