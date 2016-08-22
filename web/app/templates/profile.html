@@ -36,8 +36,8 @@
     <table class="table">
         <tr>
             <th>Server</th>
-            <th>Name</th>
-            <th>Token <button id="show-token-button" onClick="showTokens()">(Click to reveal)</button></th>
+            <th>Name <a href="#" data-toggle="tooltip" title="This is your nickname or handle on the server">?</a> </th>
+            <th>Token <a href="#" data-toggle="tooltip" title="Anyone with your token can play rated games as this profile.  Keep it secret!">?</a> &nbsp; <a href="#"id="show-token-button" onClick="showTokens()">(Show Tokens)</a></th>
             <th>Reset token</th></tr>
         {% for p in players %}
         <tr>
