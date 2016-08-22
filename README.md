@@ -113,8 +113,13 @@ The `build` step will create docker containers for each part of the app (nginx,
 flask, etc.). The `up -d` step will coordinate the running of all the containers
 as specified in the docker-compose yaml file.
 
-If this is the first time you've set up the database, you'll need to create the
-initial tables with
+If this is the first time you're getting set up, you'll need to execute database migrations with 
+
+```shell
+docker-compose run --rm web python /usr/src/app/manage.py db upgrade
+```
+
+and then create some fake data to populate the db
 
 ```shell
 docker-compose run --rm web python /usr/src/app/manage.py create_all_data

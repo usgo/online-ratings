@@ -152,7 +152,6 @@ def drop_all_tables(force=False):
 def create_barebones_data():
     'Initialize database without any data fixtures; just a superuser account.'
     initialize_db_connections()
-    db.create_all()
     role_user, role_gs_admin, role_aga_admin = create_roles()
     admin_username = input("Enter a superuser email address > ")
     admin_password = getpass.getpass("Enter the superuser password > ")
@@ -162,7 +161,6 @@ def create_barebones_data():
 def create_all_data():
     'Initialize database tables, create fake servers, users, players, game data, etc.'
     initialize_db_connections()
-    db.create_all()
     create_test_data()
     create_extra_data()
 
