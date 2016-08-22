@@ -181,7 +181,24 @@ python -m unittest --help
 
 ## Deploying
 
-Production is the same as local. (We're currently working on pushing + pulling images from Docker Hub; for now we just build + run the images on production servers.)
+Production is the same as local. Yay Docker!
+
+We build images automatically as part of the `.travis` unittesting. If you want
+to know how it works, check out [Travis: encrypting secret
+data](https://docs.travis-ci.com/user/encryption-keys/) and [Travis:
+docker](https://docs.travis-ci.com/user/docker/). Essentially, this does the following:
+
+*   When changes are pushed to the release branch,
+*   Check to ensure that the tests pass.
+*   If so, push images to the [USGO Docker hub org](https://hub.docker.com/u/usgo/)
+
+Note that due the limitations of secrets, the [commit cannot come from a
+fork](https://docs.travis-ci.com/user/pull-requests#Pull-Requests-and-Security-Restrictions):
+it must be created/pushed from the base repo (usgo/online-ratings).
+
+### Production
+
+On the server, we have yet to integrate the above image process: (Work in progress):
 
 ```shell
 vim .env (change passwords, secret_key to production values)
@@ -189,7 +206,7 @@ docker-compose build
 docker-compose up -d
 ```
 
-## Documentation
+## API Documentation
 
 ### Running locally
 
