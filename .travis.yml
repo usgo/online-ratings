@@ -1,10 +1,10 @@
 language: python
 
 env:
-  # Docker Username
-  - secure: "U21QfZbe3BasafwItwydmHjv7AnJf2XgSiIBOxJqkWjizrW1vR5S6+yQTsD7mlkk1Z+uyRd3zBEnh3UiPoaPxmtWoMbDVxA+qSYWe11IpkAgK5/j8Re/IIcwHiMug/l705qs1DpkPQm1vR8yJhqWOyMTxQNdnGeyOdrs/De46ls="
-  # Docker Password
-  - secure: "V6Nzz/c+3YoC1WtapnIV3KnllzMxCIsGTKDPGKRI6slrGTew5zBX9KbkZZlvBGH4s7Yx4o6vEIwOEDCFixjuAuWqo6wPJt5HKhHws3UQ7yXYifUKJyBcSXwxXBfd/5slgJvevjjUXUP9+D/kABjJ3thUEdZn5ukh0HIPBpl03EM="
+  global:
+    # Docker:
+    - secure: "U21QfZbe3BasafwItwydmHjv7AnJf2XgSiIBOxJqkWjizrW1vR5S6+yQTsD7mlkk1Z+uyRd3zBEnh3UiPoaPxmtWoMbDVxA+qSYWe11IpkAgK5/j8Re/IIcwHiMug/l705qs1DpkPQm1vR8yJhqWOyMTxQNdnGeyOdrs/De46ls="
+    - secure: "V6Nzz/c+3YoC1WtapnIV3KnllzMxCIsGTKDPGKRI6slrGTew5zBX9KbkZZlvBGH4s7Yx4o6vEIwOEDCFixjuAuWqo6wPJt5HKhHws3UQ7yXYifUKJyBcSXwxXBfd/5slgJvevjjUXUP9+D/kABjJ3thUEdZn5ukh0HIPBpl03EM="
 
 python:
   - 3.5
