@@ -25,4 +25,5 @@ script:
   - python3 -m unittest discover
 
 after_success:
+  - cd ..
   - ./deploy.sh
