@@ -196,6 +196,16 @@ Note that due the limitations of secrets, the [commit cannot come from a
 fork](https://docs.travis-ci.com/user/pull-requests#Pull-Requests-and-Security-Restrictions):
 it must be created/pushed from the base repo (usgo/online-ratings).
 
+### Creating a Release.
+
+In the Github UI for [usgo/online-ratings](github.com/usgo/online-ratings),
+select the **master** branch and select 'Create Pull Request'.  Then, target the
+**release** branch and describe the release. Note that as soon as the Release
+Pull Request is created and the Travis tests pass, a docker image will be built
+and pushed to the [USGO Docker Hub](https://hub.docker.com/u/usgo/).
+**Importantly**, this means that the push of the Docker image depends on the tests
+pasting, not whether the PR is merged (but it should still be merged for clarity).
+
 ### Production
 
 On the server, we have yet to integrate the above image process: (Work in progress):
