@@ -104,7 +104,7 @@ class Player(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "game_server": self.server.name,
+            "server_id": self.server_id,
             "rating": None if not last_rating else last_rating.rating
         }
 

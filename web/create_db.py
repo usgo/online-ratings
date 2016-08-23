@@ -1,12 +1,17 @@
 import datetime
 import os
 import random
+import getpass
+from uuid import uuid4
 
+from flask import current_app
 from flask.ext.security.utils import encrypt_password 
 
-from app import get_app
 from app.models import user_datastore, Player, GoServer, Game, User, RATINGS_ADMIN_ROLE, SERVER_ADMIN_ROLE, USER_ROLE, db
 
+def initialize_db_connections():
+    db.session.remove()
+    db.get_engine(current_app).dispose()
 
 def create_roles():
     role_user = user_datastore.create_role(**USER_ROLE._asdict())
@@ -21,31 +26,26 @@ def create_user(email, password, role, **kwargs):
     db.session.commit()
     return u
 
-def create_server(**kwargs):
-    gs = GoServer(**kwargs)
-    db.session.add(gs)
+def _create_server(u_email, u_password, s_name, s_url, s_token=None):
+    if s_token is None:
+        s_token = uuid4()
+    server_admin_role = user_datastore.find_role(SERVER_ADMIN_ROLE.name)
+    server_admin = create_user(u_email, u_password, server_admin_role)
+    server = GoServer(name=s_name, url=s_url, token=s_token)
+    server.admins.append(server_admin)
+    db.session.add(server)
     db.session.commit()
-    return gs
+    return server
 
 def create_test_data():
     role_user, role_gs_admin, role_aga_admin = create_roles()
     superadmin = create_user("admin@usgo.org", "usgo", role_aga_admin)
-    kgs_admin = create_user("admin@gokgs.com", "kgs", role_gs_admin)
-    ogs_admin = create_user("admin@ogs.com", "ogs", role_gs_admin)
+    kgs_server = _create_server("admin@gokgs.com", "kgs", "KGS", "http://gokgs.com", s_token="secret_kgs")
+    ogs_server = _create_server("admin@ogs.com", "ogs", "OGS", "http://online-go.com", s_token="secret_ogs")
+
     foo_user = create_user("foo@foo.com", "foo", role_user, aga_id=10)
     bar_user = create_user("bar@bar.com", "bar", role_user, aga_id=20)
     baz_user = create_user("baz@baz.com", "baz", role_user, aga_id=30)
-
-    kgs_server = create_server(name="KGS", url="http://gokgs.com", token="secret_kgs")
-    kgs_server.admins.append(kgs_admin)
-    db.session.add(kgs_server)
-
-    ogs_server = create_server(name="OGS", url="http://online-go.com", token="secret_ogs")
-    ogs_server.admins.append(ogs_admin)
-    db.session.add(ogs_server)
-
-    db.session.commit()
-
     db.session.add(Player(id=1, name="FooPlayerKGS", server_id=kgs_server.id, user_id=foo_user.id,token="secret_foo_KGS"))
     db.session.add(Player(id=4, name="FooPlayerOGS", server_id=ogs_server.id, user_id=foo_user.id,token="secret_foo_OGS"))
     db.session.add(Player(id=2, name="BarPlayerKGS", server_id=kgs_server.id, user_id=bar_user.id,token="secret_bar_KGS"))
@@ -141,15 +141,35 @@ def create_extra_data():
     strongest_games = [str(g) for g in games if g.white.user_id == strongest or g.black.user_id == strongest]
     print("Strongest, %d (%f):\n%s"% (strongest, p_priors[strongest], strongest_games))
 
-if __name__ == '__main__':
-    app = get_app('config.DockerConfiguration')
-    with app.app_context():
-        db.session.remove()
+def drop_all_tables(force=False):
+    'Drop all database tables. Must use --force to actually execute.'
+    initialize_db_connections()
+    if force:
         db.drop_all()
-        db.get_engine(app).dispose()
-        print('Creating tables...')
-        db.create_all()
-        print('Creating test data...')
-        create_test_data()
-        print('Creating rating data...')
-        create_extra_data()
+    else:
+        print("Not dropping any tables without --force")
+
+def create_barebones_data():
+    'Initialize database without any data fixtures; just a superuser account.'
+    initialize_db_connections()
+    db.create_all()
+    role_user, role_gs_admin, role_aga_admin = create_roles()
+    admin_username = input("Enter a superuser email address > ")
+    admin_password = getpass.getpass("Enter the superuser password > ")
+    superadmin = create_user(admin_username, admin_password, role_aga_admin)
+    db.session.commit()
+
+def create_all_data():
+    'Initialize database tables, create fake servers, users, players, game data, etc.'
+    initialize_db_connections()
+    db.create_all()
+    create_test_data()
+    create_extra_data()
+
+def create_server():
+    'Create a new server.'
+    server_name = input("Enter the server's name > ")
+    server_url = input("Enter the server's URL > ")
+    user_name = input("Enter an email address for the admin of this server > ")
+    password = input("Enter a password for the admin")
+    _create_server(user_name, password, server_name, server_url)

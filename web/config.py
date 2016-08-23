@@ -15,17 +15,14 @@ class BaseConfiguration(object):
     SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'defaultsalt')
     SECURITY_POST_LOGIN_VIEW = '/profile'
     SECURITY_CHANGEABLE = True
+    SECURITY_RECOVERABLE = True
     SECURITY_REGISTERABLE = True
     SECURITY_TRACKABLE = True
-
-    SECURITY_SEND_REGISTER_EMAIL = False
-    SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
-    SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
 
     MAIL_DEBUG = 0
 
 class DockerConfiguration(BaseConfiguration):
-    DEBUG = str(os.environ.get('DEBUG')).lower() == "true"
+    DEBUG = False
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
     DB_NAME = os.environ.get('DB_NAME')
@@ -43,6 +40,7 @@ class DockerConfiguration(BaseConfiguration):
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
+    SECURITY_EMAIL_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
 
 class TestConfiguration(BaseConfiguration):
     TESTING = True
