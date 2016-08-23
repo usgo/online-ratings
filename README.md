@@ -191,6 +191,7 @@ docker](https://docs.travis-ci.com/user/docker/). Essentially, this does the fol
 *   When changes are pushed to the release branch,
 *   Check to ensure that the tests pass.
 *   If so, push images to the [USGO Docker hub org](https://hub.docker.com/u/usgo/)
+    *   There should be two new images, one tagged with :latest and one with the abridged commit hash.
 
 Note that due the limitations of secrets, the [commit cannot come from a
 fork](https://docs.travis-ci.com/user/pull-requests#Pull-Requests-and-Security-Restrictions):
