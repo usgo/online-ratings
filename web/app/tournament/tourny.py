@@ -51,7 +51,8 @@ def new_tournament():
                        overtime_format=form.overtime_format.data,
                        overtime_conditions=form.overtime_conditions.data,
                        komi=form.komi.data,
-                       tie_break=form.tie_break.data,
+                       tie_break1=form.tie_break1.data,
+                       tie_break2=form.tie_break2.data,
                        submitted=form.submitted.data)
         db.session.add(t)
         db.session.commit()

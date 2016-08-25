@@ -147,14 +147,15 @@ def create_extra_data():
                        director="Donald J. Trump",
                        director_phone="555-5555",
                        director_email="djnottanner@example.com",
-                       pairing="Completely Random - It's Madness!",
-                       rule_set="To the death!",
+                       pairing="McMahon",
+                       rule_set="AGA",
                        time_controls="required field",
                        basic_time="required field",
                        overtime_format="required field",
                        overtime_conditions="required field",
-                       komi="required field",
-                       tie_break="required field")
+                       komi="7",
+                       tie_break1="SOS",
+                       tie_break2="SODOS")
         return t
 
     print("Tournament...")

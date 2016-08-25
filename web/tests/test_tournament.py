@@ -17,14 +17,15 @@ class TestTournament(BaseTestCase):
                                        director="Donald J. Trump",
                                        director_phone="555-5555",
                                        director_email="dj@example.com",
-                                       pairing="Completely Random - It's Madness!",
-                                       rule_set="To the death!",
+                                       pairing="McMahon",
+                                       rule_set="AGA",
                                        time_controls="filler text",
                                        basic_time="filler text",
                                        overtime_format="filler text",
                                        overtime_conditions="filler text",
-                                       komi="filler text",
-                                       tie_break="filler text")
+                                       komi="7",
+                                       tie_break1="SOS",
+                                       tie_break2="SODOS")
         db.session.add(self.tournament_1)
         db.session.commit()
 
@@ -67,19 +68,20 @@ class TestTournament(BaseTestCase):
         response = self.client.post(
             '/tournament/new', #  url_for()
             data={ "event_name": "new_event",
-                   "start_date": "date as string",
+                   "start_date": datetime.datetime.now().strftime('%Y-%m-%d'),
                    "venue": "Not LasVegas",
                    "director": "Donald J. Trump",
                    "director_phone": "555-5555",
                    "director_email": "dj@example.com",
-                   "pairing": "Completely Random - It's Madness!",
-                   "rule_set": "Irish Dueling",
+                   "pairing": "McMahon",
+                   "rule_set": "AGA",
                    "time_controls": "filler text",
                    "basic_time": "filler text",
                    "overtime_format": "filler text",
                    "overtime_conditions": "filler text",
-                   "komi": "filler text",
-                   "tie_break": "filler text" })
+                   "komi": "6",
+                   "tie_break1": "SOS",
+                   "tie_break2": "SODOS" })
         count = Tournament.query.count()
         self.assertEqual(count, 2)
         t = Tournament.query.all()[-1]
@@ -109,7 +111,8 @@ class TestTournament(BaseTestCase):
                    "overtime_format": t.overtime_format,
                    "overtime_conditions": t.overtime_conditions,
                    "komi": t.komi,
-                   "tie_break": t.tie_break,
+                   "tie_break1": t.tie_break1,
+                   "tie_break2": t.tie_break2,
                    "submitted": True })
         t = Tournament.query.first()
         self.assertEqual(True, t.submitted)
@@ -135,7 +138,8 @@ class TestTournament(BaseTestCase):
                    "overtime_format": t.overtime_format,
                    "overtime_conditions": t.overtime_conditions,
                    "komi": t.komi,
-                   "tie_break": t.tie_break,
+                   "tie_break1": t.tie_break1,
+                   "tie_break2": t.tie_break2,
                    "submitted": True })
         response = self.client.post('/tournament/'+str(t.id)+'/delete')
         tournaments_after = Tournament.query.count()
