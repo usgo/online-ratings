@@ -27,3 +27,4 @@ SQLAlchemy==1.0.8
 Werkzeug==0.10.4
 wheel==0.26.0
 WTForms==2.0.2
+pyparsing==2.1.8
