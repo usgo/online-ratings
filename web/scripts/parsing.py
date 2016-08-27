@@ -1,9 +1,7 @@
 from datetime import datetime
 from pyparsing import alphanums, Combine, Literal, nums, oneOf, Optional, ParseException, Regex, Suppress, Word
 
-'''
-Definition of parsers to pull data out of AGAGD SQL dumps.
-'''
+"""Definition of parsers to pull data out of AGAGD SQL dumps."""
 
 _header = Literal('INSERT INTO `games` (`Game_ID`, `Tournament_Code`, '
                   '`Game_Date`, `Round`, `Pin_Player_1`, `Color_1`, `Rank_1`, '
@@ -62,9 +60,7 @@ loader_expr = Combine(loader_expr + Literal(');'))
 
 
 def agagd_parser(file_):
-    '''
-    Generator which yields a mapping of field names to values from an AGAGD dump
-    '''
+    """Generator which yields a mapping of field names to values from an AGAGD dump"""
     for line in file_:
         if line.startswith('INSERT INTO'):
             try:
@@ -80,9 +76,7 @@ pin_change_expr = (Combine(Literal('(') + _int.setResultsName('old') + Literal('
 
 
 def pin_change_parser(file_):
-    '''
-    Generator which yields a map of pin changes: {'old': <int>, 'new': <int>}
-    '''
+    """Generator which yields a map of pin changes: {'old': <int>, 'new': <int>}"""
     for line in file_:
         if pin_change_expr.matches(line):
             yield pin_change_expr.parseString(line)

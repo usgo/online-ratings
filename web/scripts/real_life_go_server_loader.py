@@ -5,9 +5,7 @@ from flask.ext.script import Command, Option
 from scripts.parsing import agagd_parser, pin_change_parser
 from uuid import uuid4
 
-'''
-Script which loads game and user data from an AGAGD SQL dump and file with PIN changes.
-'''
+"""Script which loads game and user data from an AGAGD SQL dump and file with PIN changes."""
 
 
 def create_server(name):
@@ -21,9 +19,7 @@ def create_server(name):
 
 
 class RealLifeGoServerLoader(Command):
-    '''
-    Class which holds a little bit of state used while loading the AGAGD data.
-    '''
+    """Class which holds a little bit of state used while loading the AGAGD data."""
 
     option_list = (
                    Option('--sql_dump', '-d', dest='agagd_dump_filename'),
@@ -31,11 +27,10 @@ class RealLifeGoServerLoader(Command):
                   )
 
     def setup(self, pin_change_dump_filename):
-        '''
-        Stand-in for __init__ because we don't have necessary information
+        """Stand-in for __init__ because we don't have necessary information
         at construction time, and we are constructed regardless of whether
         this script is being run or not.
-        '''
+        """
         name = 'Real Life Go Server'
         server = db.session.query(GoServer).filter_by(name=name).first()
         if server:
@@ -52,12 +47,11 @@ class RealLifeGoServerLoader(Command):
                                  if line['old'] != line['new']}  # Prevents infinite lookup loops
 
     def get_or_make_user(self, aga_id):
-        '''
-        Returns the User object for the given AGA ID or creates it and an RLGS
+        """Returns the User object for the given AGA ID or creates it and an RLGS
         player if it does not exist.
         If the AGA ID has had one or more PIN changes, the most recent ID will
         be used.
-        '''
+        """
         while aga_id in self._pin_changes:
             aga_id = self._pin_changes[aga_id]
         if aga_id in self._users:
