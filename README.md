@@ -105,22 +105,21 @@ Then the following commands should start the app running and start tailing the l
 ```shell
 cp .env_example .env
 docker-compose build
-docker-compose up -d
-docker-compose logs
+docker-compose up
 ```
 
 The `build` step will create docker containers for each part of the app (nginx,
 flask, etc.). The `up -d` step will coordinate the running of all the containers
 as specified in the docker-compose yaml file.
 
-If this is the first time you've set up the database, you'll need to create the
-initial tables with
+**Important Note!** If this is the first time you've set up the database,
+you'll need to create the initial tables with:
 
 ```shell
 docker-compose run --rm web python /usr/src/app/manage.py create_all_data
 ```
 
-The dockerfile configuration will then serve the app at localhost:80.
+The dockerfile configuration will then serve the app at `localhost:80`.
 
 You can remap the ports that the app listens on by editing `docker-compose.yml` and changing the nginx ports mapping to something like `"8080:80"`
 
