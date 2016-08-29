@@ -34,11 +34,12 @@ def verify_player(payload):
         logging.warn("Verify called for id %s, but wrong user answered, %s" % (user_id, current_user))
         abort(404)
 
+    # TODO: Fetch the fake user account with this aga_id, take its RLGS player
+    # and reassign it to the real user; also do bookkeeping with claimed=True
     user = User.query.get_or_404(user_id)
     user.aga_id = aga_id
     db.session.add(user)
     db.session.commit()
-    #TODO: something like user.activate(), maybe generate initial token?
     msg = 'Linked account with AGA #%s' %user.aga_id
     logging.info(msg)
     return redirect(url_for('ratings.profile'))
