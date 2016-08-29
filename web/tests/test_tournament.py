@@ -4,7 +4,7 @@ import datetime
 
 from flask import url_for
 from tests import BaseTestCase
-from app.models import Tournament, db
+from app.models import Tournament, TournamentPlayer, db
 
 class TestTournament(BaseTestCase):
 

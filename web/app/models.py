@@ -1,9 +1,31 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 import datetime
 from collections import namedtuple
 from enum import Enum
+
+###################
+#  pulled from http://www.kirang.in/2014/08/09/creating-a-mutable-array-data-type-in-sqlalchemy/
+from sqlalchemy.ext.mutable import Mutable
+from sqlalchemy.dialects.postgresql import ARRAY
+
+class MutableList(Mutable, list):
+    def append(self, value):
+        list.append(self, value)
+        self.changed()
+
+    @classmethod
+    def coerce(cls, key, value):
+        if not isinstance(value, MutableList):
+            if isinstance(value, list):
+                return MutableList(value)
+            return Mutable.coerce(key, value)
+        else:
+            return value
+
+########
 
 db = SQLAlchemy()
 
@@ -182,8 +204,8 @@ class Tournament(db.Model):
     venue_address = db.Column(db.String(80))
     venue_state = db.Column(db.String(2))
     venue_zip = db.Column(db.String(5))
-    start_date = db.Column(db.Date) #  date/time obj
-    end_date = db.Column(db.Date) #  date/time obj
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
     director = db.Column(db.String(80))
     director_phone = db.Column(db.String(20))
     director_email = db.Column(db.String(80))
@@ -198,20 +220,17 @@ class Tournament(db.Model):
     convener_phone = db.Column(db.String(20))
     convener_website = db.Column(db.String(80))
     convener_address = db.Column(db.String(80))
-    # pairing = db.Column(db.String(80)) #  enum rop down?
     pairing = db.Column(db.Enum(*PAIRINGTYPES,
                         name='pairing_types'), default="McMahon")
-    # rule_set = db.Column(db.String(80)) # enum drop down?
     rule_set = db.Column(db.Enum(*RULESETS, name='rule_sets'), default="AGA")
     time_controls = db.Column(db.String(80))
     basic_time = db.Column(db.String(80))
     overtime_format = db.Column(db.String(80))
     overtime_conditions = db.Column(db.String(80))
-    # komi = db.Column(db.String(80)) # should be float
-    # komi = db.Column(db.Numeric(2,1))
     komi = db.Column(db.Enum(*KOMI_VALUES, name='komi_values'), default='7')
     tie_break1 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
     tie_break2 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
+    participants = db.Column(MutableList.as_mutable(ARRAY(db.Integer)), default=[])
 
     submitted = db.Column(db.Boolean, default=False)
 
@@ -226,11 +245,10 @@ class Tournament(db.Model):
             self.director,
             self.rule_set,
             self.submitted)
-# Setup Flask-Security
 
 class TournamentPlayer(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    tournament_id = db.Column(db.Integer)
+    tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
     name = db.Column(db.String(80))
     player_id = db.Column(db.String(5))
     member_ex_date = db.Column(db.String(20))
@@ -248,5 +266,7 @@ class TournamentPlayer(db.Model):
         return "Tournament Player: {}\n \
                 Member found in db: {}".format(self.name,
                                                 player_id >= 90000)
+
+# Setup Flask-Security
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)

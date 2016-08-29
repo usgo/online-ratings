@@ -5,7 +5,7 @@ from flask import jsonify, request, Response
 from . import tournament
 from app.forms import TournamentForm, TournamentPlayerForm
 from app.models import db, Tournament, TournamentPlayer
-
+from sqlalchemy import update
 
 @tournament.route('/')
 def index():
@@ -102,7 +102,13 @@ def new_player(tournament_id):
                              phone = form.phone.data,
                              citizenship = form.citizenship.data,
                              dob = form.dob.data)
+
         db.session.add(tp)
+        db.session.commit()
+        tourn = Tournament.query.get(tp.tournament_id)
+        player = TournamentPlayer.query.all()[-1] # player doesn't have tp id until session.commit()
+        tourn.participants.append(player.id)
+        db.session.add(tourn)
         db.session.commit()
         return redirect(url_for('.new_player', tournament_id=tournament_id))
     return render_template('tournament_player_form.html', form=form)
