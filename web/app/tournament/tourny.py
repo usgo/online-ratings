@@ -106,10 +106,6 @@ def new_player(tournament_id):
         db.session.add(tp)
         db.session.commit()
         tourn = Tournament.query.get(tp.tournament_id)
-        player = TournamentPlayer.query.all()[-1] # player doesn't have tp id until session.commit()
-        tourn.participants.append(player.id)
-        db.session.add(tourn)
-        db.session.commit()
         return redirect(url_for('.new_player', tournament_id=tournament_id))
     return render_template('tournament_player_form.html', form=form)
 

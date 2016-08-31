@@ -1,31 +1,9 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import ARRAY
 import datetime
 from collections import namedtuple
 from enum import Enum
-
-###################
-#  pulled from http://www.kirang.in/2014/08/09/creating-a-mutable-array-data-type-in-sqlalchemy/
-from sqlalchemy.ext.mutable import Mutable
-from sqlalchemy.dialects.postgresql import ARRAY
-
-class MutableList(Mutable, list):
-    def append(self, value):
-        list.append(self, value)
-        self.changed()
-
-    @classmethod
-    def coerce(cls, key, value):
-        if not isinstance(value, MutableList):
-            if isinstance(value, list):
-                return MutableList(value)
-            return Mutable.coerce(key, value)
-        else:
-            return value
-
-########
 
 db = SQLAlchemy()
 
@@ -230,7 +208,6 @@ class Tournament(db.Model):
     komi = db.Column(db.Enum(*KOMI_VALUES, name='komi_values'), default='7')
     tie_break1 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
     tie_break2 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
-    participants = db.Column(MutableList.as_mutable(ARRAY(db.Integer)), default=[])
 
     submitted = db.Column(db.Boolean, default=False)
 
@@ -248,7 +225,6 @@ class Tournament(db.Model):
 
 class TournamentPlayer(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
     name = db.Column(db.String(80))
     player_id = db.Column(db.String(5))
     member_ex_date = db.Column(db.String(20))
@@ -260,6 +236,8 @@ class TournamentPlayer(db.Model):
     phone = db.Column(db.String(20))
     citizenship = db.Column(db.String(80))
     dob = db.Column(db.String(20))
+    tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
+    tournament = relationship(Tournament)
 
 
     def __str__(self):
