@@ -36,7 +36,8 @@ class TestTournament(BaseTestCase):
 
     #  show
     def test_it_returns_an_individual_tournament(self):
-        tournament_endpoint_1 = self.tournament_endpoint + str(self.tournament_1.id)
+        tournament_endpoint_1 = self.tournament_endpoint + \
+            str(self.tournament_1.id) + "/"
         response = self.client.get(tournament_endpoint_1)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('LasVegas' in str(response.data))
@@ -49,7 +50,7 @@ class TestTournament(BaseTestCase):
         test_string = "This event name changed for testing"
         t.event_name = test_string
         response = self.client.post(
-            '/tournament/'+str(t.id)+'/edit', #  url_for()
+            '/tournament/'+str(t.id)+'/edit/', #  url_for()
             data={"event_name" : t.event_name,
                   "start_date" : t.start_date,
                   "venue" : t.venue,
@@ -66,7 +67,7 @@ class TestTournament(BaseTestCase):
         self.assertEqual(1, count)
 
         response = self.client.post(
-            '/tournament/new', #  url_for()
+            '/tournament/new/', #  url_for()
             data={ "event_name": "new_event",
                    "start_date": datetime.datetime.now().strftime('%Y-%m-%d'),
                    "venue": "Not LasVegas",
@@ -89,7 +90,7 @@ class TestTournament(BaseTestCase):
 
     def test_it_can_delete_a_non_submitted_tournament(self):
         t =Tournament.query.first()
-        response = self.client.post('/tournament/'+str(t.id)+'/delete')
+        response = self.client.post('/tournament/'+str(t.id)+'/delete/')
         self.assertEqual(0, Tournament.query.count())
 
     def test_it_can_not_edit_tournament_marked_submitted(self):
@@ -97,7 +98,7 @@ class TestTournament(BaseTestCase):
         t = Tournament.query.first()
         #  mark tournament as submitted
         response = self.client.post(
-            '/tournament/'+ str(t.id)+'/edit', #  url_for()
+            '/tournament/'+ str(t.id)+'/edit/', #  url_for()
             data={"event_name": t.event_name,
                    "start_date": t.start_date,
                    "venue": t.venue,
@@ -124,7 +125,7 @@ class TestTournament(BaseTestCase):
         tournaments_before = Tournament.query.count()
         t = Tournament.query.first()
         self.client.post(
-            '/tournament/'+ str(t.id)+'/edit', #  url_for()
+            '/tournament/'+ str(t.id)+'/edit/', #  url_for()
             data={"event_name": t.event_name,
                    "start_date": t.start_date,
                    "venue": t.venue,
@@ -141,6 +142,6 @@ class TestTournament(BaseTestCase):
                    "tie_break1": t.tie_break1,
                    "tie_break2": t.tie_break2,
                    "submitted": True })
-        response = self.client.post('/tournament/'+str(t.id)+'/delete')
+        response = self.client.post('/tournament/'+str(t.id)+'/delete/')
         tournaments_after = Tournament.query.count()
         self.assertEqual(tournaments_before, tournaments_after)

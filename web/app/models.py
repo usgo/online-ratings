@@ -208,6 +208,7 @@ class Tournament(db.Model):
     komi = db.Column(db.Enum(*KOMI_VALUES, name='komi_values'), default='7')
     tie_break1 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
     tie_break2 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
+    # tournament_players = relationship('TournamentPlayer')
 
     submitted = db.Column(db.Boolean, default=False)
 
@@ -226,7 +227,7 @@ class Tournament(db.Model):
 class TournamentPlayer(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80))
-    player_id = db.Column(db.String(5))
+    aga_num = db.Column(db.String(5))
     member_ex_date = db.Column(db.String(20))
     rating = db.Column(db.String(5))
     affiliation = db.Column(db.String(80))
@@ -237,7 +238,8 @@ class TournamentPlayer(db.Model):
     citizenship = db.Column(db.String(80))
     dob = db.Column(db.String(20))
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
-    tournament = relationship(Tournament)
+    tournament = relationship(Tournament,
+        backref=db.backref('Tournament', cascade='all, delete-orphan'))
 
 
     def __str__(self):

@@ -2,19 +2,32 @@
 
 {% block content %}
 <div class="container">
-  <h1>Players List</h1>
+  <h1>{{ players[0].tournament.event_name }}</h1>
+</br>
   {% for player in players %}
 
-    <h4>{{ player.name }}<h4>
-    <li>{{ player.player_id }}</li>
-    <li>{{ player.rating }}</li>
-    <li>{{ player.affiliation }}</li>
-    <li>{{ player.state }}</li>
-    <li>{{ player.address }}</li>
-    <li>{{ player.email }}</li>
-    <li>{{ player.phone }}</li>
-    <li>{{ player.citizenship }}</li>
-    <li>{{ player.dob }}</li><hr>
+    <h4>Name: {{ player.name }}<h4>
+    <p>AGA Number: {{ player.aga_num }}</p>
+    <p>Player Rating: {{ player.rating }}</p>
+    <p>Club Affiliation: {{ player.affiliation }}</p>
+    <p>State: {{ player.state }}</p>
+    <p>Address: {{ player.address }}</p>
+    <p>Email: {{ player.email }}</p>
+    <p>Phone {{ player.phone }}</p>
+    <p>Citizenship: {{ player.citizenship }}</p>
+    <p>Date of Birth: {{ player.dob }}</p>
+    <a href="{{ url_for('.edit_player', tournament_id=player.tournament_id, tournament_player_id=player.id) }}"><button>Edit</button></a>
+
+    {% if player.tournament.submitted == False %}
+    <form action="{{ url_for('.delete_player',
+      tournament_id=player.tournament.id,
+      tournament_player_id=player.id) }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+      <button type="submit">Delete Player</button>
+    </form>
+    {% endif %}
+  <hr>
   {% endfor %}
 </div>
 

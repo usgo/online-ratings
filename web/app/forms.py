@@ -68,7 +68,7 @@ class TournamentForm(Form):
 
 class TournamentPlayerForm(Form):
     name = StringField("Player's Name", validators=[Required()])
-    player_id = StringField("Player ID", validators=[Required()])
+    aga_num = StringField("AGA Number", validators=[Required()])
     rating = StringField("Rating", validators=[Required()])
     affiliation = StringField("Club Affiliation", validators=[Required()])
     state = StringField("State", validators=[Required()])
