@@ -2,8 +2,9 @@
 
 {% block content %}
 <div class="container">
-  <h1>{{ players[0].tournament.event_name }}</h1>
+  <h1>{{ tournament.event_name }}</h1>
 </br>
+{% if players.count() > 0 %}
   {% for player in players %}
 
     <h4>Name: {{ player.name }}<h4>
@@ -30,5 +31,11 @@
   <hr>
   {% endfor %}
 </div>
+{% else %}
+  <h2>No players yet entered for this tournament.</h2>
+  {% if tournament %}
+  <a href="{{ url_for('.new_player', tournament_id=tournament.id) }}"><button>Add Player</button></a>
+  {% endif %}
+{% endif %}
 
 {% endblock content %}

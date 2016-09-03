@@ -3,6 +3,8 @@
   {% block content %}
 
     <div class="container">
+      <h1>{{ tournament.event_name }}</h1>
+
       <h2>Enter Player Info:</h2>
 
       <form method="post" name="new_player">
@@ -21,6 +23,7 @@
 
         <p>{{ form.submit }}</p>
       </form>
+      <p><a href="{{ url_for('.players_index', tournament_id=tournament.id) }}"><button>Cancel</button></a></p>
     </div>
 
   {% endblock content %}
