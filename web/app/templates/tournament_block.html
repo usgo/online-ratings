@@ -58,12 +58,10 @@
     <a href="{{ url_for('.show', tournament_id=tournament.id) }}"><button>Details</button></a>
     {% endif %}
     {% if tournament.submitted == False %}
-    <div class="pull-left">
+
       <a href="{{ url_for('.edit_tournament', tournament_id=tournament.id) }}"><button>Edit</button></a>
-    </div>
     {% endif %}
-    <div class="pull-left">
-      <a href="{{ url_for('.new_player', tournament_id=tournament.id) }}"></a>
-    </div>
+      <a href="{{ url_for('.new_player', tournament_id=tournament.id) }}"><button>Add Player</button></a>
+      <a href="{{ url_for('.players_index', tournament_id=tournament.id) }}"><button>View Players</button></a>
   </p>
 </div>

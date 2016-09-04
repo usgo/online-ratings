@@ -69,14 +69,13 @@ def edit_tournament(tournament_id):
     t = Tournament.query.get(tournament_id)
     form = TournamentForm(obj=t)
     if request.method == 'POST' and form.validate_on_submit():
-        if t.submitted == False:
+        if t and t.submitted == False:
             form.populate_obj(t)
             db.session.commit()
             return redirect(url_for('.index'))
-        elif t.submitted == True:
-            # flash("Sorry, this tournament has already been submitted and can no \
-            #       longer be edited.")
-            return redirect(url_for('.index'))
+        elif t and t.submitted == True and request.methond =='POST':
+            # flash("Cannot alter submitted record")
+            redirect(url_for('.index'))
     return render_template('tournament_form.html', form=form)
 
 @tournament.route('/<int:tournament_id>/delete/', methods=['POST'])
@@ -94,48 +93,61 @@ def delete(tournament_id):
 def new_player(tournament_id):
     form = TournamentPlayerForm()
     tournament = Tournament.query.get(tournament_id)
-    if request.method == 'POST' and form.validate_on_submit():
-        #  if before first_round  - a cutoff for adding new players
-        tp = TournamentPlayer(tournament_id = tournament_id,
-                             name = form.name.data,
-                             aga_num = form.aga_num.data,
-                             rating = form.rating.data,
-                             affiliation = form.affiliation.data,
-                             state = form.state.data,
-                             address = form.address.data,
-                             email = form.email.data,
-                             phone = form.phone.data,
-                             citizenship = form.citizenship.data,
-                             dob = form.dob.data)
+    if tournament and tournament.submitted == False:
+        if request.method == 'POST' and form.validate_on_submit():
+            #  if before first_round  - a cutoff for adding new players
+            tp = TournamentPlayer(tournament_id = tournament_id,
+                                 name = form.name.data,
+                                 aga_num = form.aga_num.data,
+                                 rating = form.rating.data,
+                                 affiliation = form.affiliation.data,
+                                 state = form.state.data,
+                                 address = form.address.data,
+                                 email = form.email.data,
+                                 phone = form.phone.data,
+                                 citizenship = form.citizenship.data,
+                                 dob = form.dob.data)
 
-        db.session.add(tp)
-        db.session.commit()
-        # tourn = Tournament.query.get(tp.tournament_id)
-        return redirect(url_for('.new_player', tournament_id=tournament_id))
-    return render_template('tournament_player_form.html', form=form, tournament=tournament)
+            db.session.add(tp)
+            db.session.commit()
+            return redirect(url_for('.new_player', tournament_id=tournament_id))
+    elif tournament and tournament.submitted == True:
+        #  flash(Cannot alter submitted reccord)
+        redirect(url_for('.index'))
+    return render_template('tournament_player_form.html', form=form,
+        tournament=tournament)
 
 @tournament.route('/<int:tournament_id>/players/', methods=["GET"])
 def players_index(tournament_id):
-    players = TournamentPlayer.query.filter_by(tournament_id=tournament_id)
     tournament = Tournament.query.get(tournament_id)
-    return render_template("tournament_players_index.html", players=players,
-        tournament=tournament)
+    if tournament:
+        players = TournamentPlayer.query.filter_by(tournament_id=tournament_id)
+        tournament = Tournament.query.get(tournament_id)
+        return render_template("tournament_players_index.html", players=players,
+            tournament=tournament)
+    else:
+        # flash("No tournament record found")
+        return redirect(url_for('.index'))
 
 @tournament.route('/<int:tournament_id>/player/' +
     '<int:tournament_player_id>/edit/', methods=['GET', 'POST'])
 def edit_player(tournament_id, tournament_player_id):
     tournament = Tournament.query.get(tournament_id)
-    if tournament:
+    if tournament and tournament.submitted == False:
         tp = TournamentPlayer.query.get(tournament_player_id)
         form = TournamentPlayerForm(obj=tp)
         if request.method == 'POST' and form.validate_on_submit():
             form.populate_obj(tp)
             db.session.commit()
-            return redirect(url_for('.players_index', tournament_id=tournament_id))
+            return redirect(url_for('.players_index',
+                tournament_id=tournament_id))
         elif request.method == 'GET':
-            if tp.tournament.submitted == False:
-                return render_template('tournament_player_form.html',
-                    form=form, tournament=tournament)
+            return render_template('tournament_player_form.html',
+                form=form, tournament=tournament)
+    elif tournament and tournament.submitted == True:
+        # flash("Cannont alter submitted record")
+        return redirect(url_for('.index'))
+
     else:
         flash('Tournament id {{ tournament_id }} does not exist.')
         return redirect(url_for('.index'))
@@ -143,17 +155,15 @@ def edit_player(tournament_id, tournament_player_id):
 @tournament.route('/<int:tournament_id>/player/' +
     '<int:tournament_player_id>/delete/', methods=['POST'])
 def delete_player(tournament_id, tournament_player_id):
+    tournament = Tournament.query.get(tournament_player_id)
     tp = TournamentPlayer.query.get(tournament_player_id)
-    if tp.tournament.submitted == False:
+    if tournament and tp and tournament.submitted == False:
         db.session.delete(tp)
         db.session.commit()
         # flash("{{ tp.name }} has been deleted from" +
         #     "{{ tp.tournament.event_name}}")
-        if TournamentPlayer.query.filter_by(tournament_id=tournament_id).count() > 0:
-            return redirect(url_for('.players_index',
+        return redirect(url_for('.players_index',
                 tournament_id=tournament_id))
-        else:
-            return redirect(url_for('.show', tournament_id=tournament_id))
     else:
         # flash("Could not delete player: {{ tp.name }}")
         return redirect(url_for('.players_index',

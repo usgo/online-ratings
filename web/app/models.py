@@ -171,8 +171,8 @@ class Game(db.Model):
 
 RULESETS = ["AGA", "INTERNATIONAL"]
 PAIRINGTYPES = ["McMahon"]
-KOMI_VALUES = ['0', '0.5', '1', '1.5', '2', '2.5', '3.0', '3.5', '4', '4.5', '5',
-               '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5']
+KOMI_VALUES = ['0', '0.5', '1', '1.5', '2', '2.5', '3.0', '3.5', '4', '4.5',
+    '5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5']
 TIE_BREAKS = ['SOS', 'SODOS', 'Face to Face Result', 'Random Procedure']
 
 class Tournament(db.Model):
@@ -244,9 +244,7 @@ class TournamentPlayer(db.Model):
 
     def __str__(self):
         return "Tournament Player: {}\n \
-                Member found in db: {}".format(self.name,
-                                                player_id >= 90000)
-
+                Member found in db: {}".format(self.name)
 # Setup Flask-Security
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)

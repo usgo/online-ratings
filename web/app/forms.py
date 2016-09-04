@@ -1,7 +1,7 @@
 from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField, BooleanField, SelectField
 from wtforms.validators import Required, URL, Optional
-from wtforms.fields.html5 import DateField #  testing
+from wtforms.fields.html5 import DateField
 from .models import KOMI_VALUES as kv
 from .models import TIE_BREAKS as tb
 
@@ -31,7 +31,8 @@ class TournamentForm(Form):
     end_date = DateField('End Date', format='%Y-%m-%d', validators=[Optional()])
 
     director = StringField("Director", validators=[Required()])
-    director_phone = StringField("Director's Phone", validators=[Required()])
+    director_phone = StringField("Director's Phone",
+        validators=[Required()])
     director_email = StringField("Director's Email", validators=[Required()])
     director_address = StringField("Director's Address (Optional)")
 
