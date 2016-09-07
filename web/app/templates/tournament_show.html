@@ -6,9 +6,9 @@
 
   {% if tournament.submitted == False %}
   <a href="{{ url_for( '.new_player', tournament_id=tournament.id )}}"><button>Add Player</button></a></br>
-  <form action="{{ url_for('.delete', tournament_id=tournament.id) }}" method="POST">
+  <form action="{{ url_for('.show', tournament_id=tournament.id) }}" method="POST">
+    <input type="hidden" name="_method" value="DELETE">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <input type="hidden" value="{{ tournament.id }}" />
     <button type="submit">Delete</button>
   </form>
 </div>

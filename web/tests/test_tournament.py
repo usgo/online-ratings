@@ -140,7 +140,7 @@ class TestTournament(BaseTestCase):
         t = Tournament.query.first()
         #  mark tournament as submitted
         response = self.client.post(
-            '/tournament/'+ str(t.id)+'/edit/', #  url_for()
+            '/tournament/'+ str(t.id)+'/', #  url_for()
             data={"event_name": t.event_name,
                    "start_date": t.start_date,
                    "venue": t.venue,
@@ -189,7 +189,7 @@ class TestTournament(BaseTestCase):
         t = Tournament.query.first()
         #  mark tournament as submitted
         response = self.client.post(
-            '/tournament/'+ str(t.id)+'/edit/', #  url_for()
+            '/tournament/'+ str(t.id)+'/', #  url_for()
             data={"event_name": t.event_name,
                    "start_date": t.start_date,
                    "venue": t.venue,
@@ -237,7 +237,7 @@ class TestTournament(BaseTestCase):
         t = Tournament.query.first()
         #  mark tournament as submitted
         response = self.client.post(
-            '/tournament/'+ str(t.id)+'/edit/', #  url_for()
+            '/tournament/'+ str(t.id)+'/', #  url_for()
             data={"event_name": t.event_name,
                    "start_date": t.start_date,
                    "venue": t.venue,
@@ -305,12 +305,11 @@ class TestTournament(BaseTestCase):
 
     #  new
     def test_it_can_add_a_new_tournament(self):
-        tournament_new_endpoint = self.tournament_endpoint + '/new'
         count = Tournament.query.count()
         self.assertEqual(1, count)
 
         response = self.client.post(
-            '/tournament/new/', #  url_for()
+            '/tournament/', #  url_for()
             data={ "event_name": "new_event",
                    "start_date": datetime.datetime.now().strftime('%Y-%m-%d'),
                    "venue": "Not LasVegas",
@@ -331,10 +330,30 @@ class TestTournament(BaseTestCase):
         t = Tournament.query.all()[-1]
         self.assertEqual("new_event", t.event_name)
 
+
     def test_it_can_delete_a_non_submitted_tournament(self):
-        t =Tournament.query.first()
-        response = self.client.post('/tournament/'+str(t.id)+'/delete/')
-        self.assertEqual(0, Tournament.query.count())
+        response = self.client.post(
+            '/tournament/', #  url_for()
+            data={ "event_name": "new_event",
+                   "start_date": datetime.datetime.now().strftime('%Y-%m-%d'),
+                   "venue": "Not LasVegas",
+                   "director": "Donald J. Trump",
+                   "director_phone": "555-5555",
+                   "director_email": "dj@example.com",
+                   "pairing": "McMahon",
+                   "rule_set": "AGA",
+                   "time_controls": "filler text",
+                   "basic_time": "filler text",
+                   "overtime_format": "filler text",
+                   "overtime_conditions": "filler text",
+                   "komi": "6",
+                   "tie_break1": "SOS",
+                   "tie_break2": "SODOS" })
+        self.assertEqual(2, Tournament.query.count())
+        t = Tournament.query.all()[-1]
+        response = self.client.delete("tournament/" + str(t.id) + "/")
+        self.assertEqual(1, Tournament.query.count())
+        
 
     def test_it_can_not_edit_tournament_marked_submitted(self):
         tournament_edit_endpoint = self.tournament_endpoint + \
@@ -342,7 +361,7 @@ class TestTournament(BaseTestCase):
         t = Tournament.query.first()
         #  mark tournament as submitted
         response = self.client.post(
-            '/tournament/'+ str(t.id)+'/edit/', #  url_for()
+            '/tournament/'+ str(t.id)+'/', #  url_for()
             data={"event_name": t.event_name,
                    "start_date": t.start_date,
                    "venue": t.venue,
@@ -369,7 +388,7 @@ class TestTournament(BaseTestCase):
         tournaments_before = Tournament.query.count()
         t = Tournament.query.first()
         self.client.post(
-            '/tournament/'+ str(t.id)+'/edit/', #  url_for()
+            '/tournament/'+ str(t.id)+'/', #  url_for()
             data={"event_name": t.event_name,
                    "start_date": t.start_date,
                    "venue": t.venue,

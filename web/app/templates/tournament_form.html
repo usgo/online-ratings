@@ -6,7 +6,8 @@
 <div class="container">
 
 <h2>Please enter Tournament Info:</h2>
-  <form method="post" name='new'>
+  <form method="post" name='/' {% if tournament %} action="{{ url_for('.show', tournament_id=tournament.id) }}" {% endif %}
+                               {% if not tournament %} action="{{ url_for('.index') }}" {% endif %}>
     {{ form.hidden_tag() }}
 
         <p>{{ form.event_name.label }}: {{ form.event_name }}</p>
@@ -52,7 +53,6 @@
         <p>{{ form.tie_break2.label }}: {{ form.tie_break2 }}</p>
 
         <p>Check to Submit Finalized Tournament Record:  {{ form.submitted }}</p>
-
         <p>{{ form.submit }}</p>
   </form>
 </div>

@@ -7,87 +7,92 @@ from app.forms import TournamentForm, TournamentPlayerForm
 from app.models import db, Tournament, TournamentPlayer
 from sqlalchemy import update
 
-@tournament.route('/')
+@tournament.route('/', methods=['GET', 'POST'])
 def index():
+    form = TournamentForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            t = Tournament(event_name=form.event_name.data,
+                           venue=form.venue.data,
+                           venue_address=form.venue_address.data,
+                           venue_state=form.venue_state.data,
+                           venue_zip=form.venue_zip.data,
+                           start_date=form.start_date.data,
+                           end_date=form.end_date.data,
+                           director=form.director.data,
+                           director_phone=form.director_phone.data,
+                           director_email=form.director_email.data,
+                           director_address=form.director_address.data,
+                           sponsor=form.sponsor.data,
+                           sponsor_phone=form.sponsor_phone.data,
+                           sponsor_email=form.sponsor_email.data,
+                           sponsor_website=form.sponsor_website.data,
+                           sponsor_address=form.sponsor_address.data,
+                           convener=form.convener.data,
+                           convener_phone=form.convener_phone.data,
+                           convener_email=form.convener_email.data,
+                           convener_website=form.convener_website.data,
+                           convener_address=form.convener_address.data,
+                           pairing=form.pairing.data,
+                           rule_set=form.rule_set.data,
+                           time_controls=form.time_controls.data,
+                           basic_time=form.basic_time.data,
+                           overtime_format=form.overtime_format.data,
+                           overtime_conditions=form.overtime_conditions.data,
+                           komi=form.komi.data,
+                           tie_break1=form.tie_break1.data,
+                           tie_break2=form.tie_break2.data,
+                           submitted=form.submitted.data)
+            db.session.add(t)
+            db.session.commit()
+            # flash("Tournament successfully created.")
+            return redirect(url_for('.index'))
     tournaments = Tournament.query.all()
     return render_template('tournament_index.html',
                     tournaments=tournaments,)
 
-@tournament.route('/<int:tournament_id>/', methods=['GET'])
+@tournament.route('/<int:tournament_id>/', methods=['GET', 'POST', 'DELETE'])
 def show(tournament_id):
     tournament = Tournament.query.get(tournament_id)
     if tournament:
+        method_delete = request.form.get('_method', '').upper()
+        if method_delete:
+            if tournament.submitted == False:
+                db.session.delete(tournament)
+                db.session.commit()
+                return redirect(url_for('.index'))
+            # flash("Sorry, this tournament has already been submitted and can no \
+            #       longer be edited.")
+            return redirect(url_for('.index'))
+        if request.method == 'POST':
+            form = TournamentForm()
+            if tournament and tournament.submitted == False:
+                if form.validate_on_submit():
+                    form.populate_obj(tournament)
+                    db.session.commit()
+                    # flash("Tournament successfully edited.")
+                    return redirect(url_for('.index'))
+            elif tournament and tournament.submitted == True and request.methond =='POST':
+                # flash("Cannot alter submitted record")
+                redirect(url_for('.index'))
         return render_template('tournament_show.html',
             tournament=tournament)
     else:
         # flash('Tournament id {{ tournament_id }} does not exist.')
         return redirect(url_for('.index'))
 
-@tournament.route('/new/', methods=['GET', 'POST'])
+@tournament.route('/new/', methods=['GET'])
 def new_tournament():
     form = TournamentForm()
-    if form.validate_on_submit():
-        t = Tournament(event_name=form.event_name.data,
-                       venue=form.venue.data,
-                       venue_address=form.venue_address.data,
-                       venue_state=form.venue_state.data,
-                       venue_zip=form.venue_zip.data,
-                       start_date=form.start_date.data,
-                       end_date=form.end_date.data,
-                       director=form.director.data,
-                       director_phone=form.director_phone.data,
-                       director_email=form.director_email.data,
-                       director_address=form.director_address.data,
-                       sponsor=form.sponsor.data,
-                       sponsor_phone=form.sponsor_phone.data,
-                       sponsor_email=form.sponsor_email.data,
-                       sponsor_website=form.sponsor_website.data,
-                       sponsor_address=form.sponsor_address.data,
-                       convener=form.convener.data,
-                       convener_phone=form.convener_phone.data,
-                       convener_email=form.convener_email.data,
-                       convener_website=form.convener_website.data,
-                       convener_address=form.convener_address.data,
-                       pairing=form.pairing.data,
-                       rule_set=form.rule_set.data,
-                       time_controls=form.time_controls.data,
-                       basic_time=form.basic_time.data,
-                       overtime_format=form.overtime_format.data,
-                       overtime_conditions=form.overtime_conditions.data,
-                       komi=form.komi.data,
-                       tie_break1=form.tie_break1.data,
-                       tie_break2=form.tie_break2.data,
-                       submitted=form.submitted.data)
-        db.session.add(t)
-        db.session.commit()
-        return redirect(url_for('.index'))
     return render_template('tournament_form.html', form=form)
 
 
-@tournament.route('/<int:tournament_id>/edit/', methods=['GET', 'POST'])
+@tournament.route('/<int:tournament_id>/edit/', methods=['GET'])
 def edit_tournament(tournament_id):
-    t = Tournament.query.get(tournament_id)
-    form = TournamentForm(obj=t)
-    if request.method == 'POST' and form.validate_on_submit():
-        if t and t.submitted == False:
-            form.populate_obj(t)
-            db.session.commit()
-            return redirect(url_for('.index'))
-        elif t and t.submitted == True and request.methond =='POST':
-            # flash("Cannot alter submitted record")
-            redirect(url_for('.index'))
-    return render_template('tournament_form.html', form=form)
-
-@tournament.route('/<int:tournament_id>/delete/', methods=['POST'])
-def delete(tournament_id):
     tournament = Tournament.query.get(tournament_id)
-    if tournament.submitted == False:
-        db.session.delete(tournament)
-        db.session.commit()
-        return redirect(url_for('.index'))
-    # flash("Sorry, this tournament has already been submitted and can no \
-    #       longer be edited.")
-    return redirect(url_for('.index'))
+    form = TournamentForm(obj=tournament)
+    return render_template('tournament_form.html', form=form, tournament=tournament)
+
 
 @tournament.route('/<int:tournament_id>/player/new/', methods=["GET", "POST"]) #  maybe a vanity url
 def new_player(tournament_id):
