@@ -21,14 +21,14 @@
     <p>Phone {{ player.phone }}</p>
     <p>Citizenship: {{ player.citizenship }}</p>
     <p>Date of Birth: {{ player.dob }}</p>
-    <a href="{{ url_for('.edit_player', tournament_id=player.tournament_id, tournament_player_id=player.id) }}"><button>Edit</button></a>
+    <a href="{{ url_for('.select_player', tournament_player_id=player.id, tournament_id=tournament.id) }}"><button>Edit</button></a>
 
     {% if tournament.submitted == False %}
-    <form action="{{ url_for('.delete_player',
-      tournament_id=player.tournament.id,
-      tournament_player_id=player.id) }}" method="POST">
+    <form action="{{ url_for('.select_player',
+        tournament_id=tournament.id,
+        tournament_player_id=player.id) }}" method="POST">
+      <input type="hidden" name="_method" value='DELETE' />
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
       <button type="submit">Delete Player</button>
     </form>
     {% endif %}

@@ -59,8 +59,7 @@ class TestTournament(BaseTestCase):
     def test_tournament_player_edit_url(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + \
-            "/edit/"
+            "/player/" + str(self.tournament_1_player.id) + "/"
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
@@ -76,24 +75,25 @@ class TestTournament(BaseTestCase):
     def test_delete_player_url(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + \
-            "/delete/"
+            "/player/" + str(self.tournament_1_player.id) + "/"
         before = TournamentPlayer.query.count()
         self.assertEqual(1, before)
-        response = self.client.post(url)
+        response = self.client.delete(url, data={'_method': 'DELETE'})
+        # import pdb; pdb.set_trace()
         after = TournamentPlayer.query.count()
         self.assertEqual(0, after)
 
     # new player - post
     def test_can_create_new_tournament_player(self):
         url = self.tournament_endpoint + \
-            str(self.tournament_1.id) + \
-            "/player/new/"
+            str(self.tournament_1.id) + "/players/"
         before = TournamentPlayer.query.count()
+        tournament = Tournament.query.get(self.tournament_1.id)
         self.assertEqual(1, before)
         response = self.client.post(
             url,
-            data={ "name": 'player 2',
+            data={ "tournament_id": tournament.id,
+                    "name": 'player 2',
                    "aga_num": '23456',
                    "rating": '11',
                    "affiliation": 'The Go Getters',
@@ -102,8 +102,8 @@ class TestTournament(BaseTestCase):
                    "email": 'player2@example.com',
                    "phone": '234-567-8901',
                    "citizenship": 'usa',
-                   "dob": '11/11/11',
-                  "tournament_id": self.tournament_1.id })
+                   "dob": '11/11/11'
+                   })
         self.assertEqual(302, response.status_code)
         after = TournamentPlayer.query.count()
         self.assertEqual(2, after)
@@ -114,22 +114,23 @@ class TestTournament(BaseTestCase):
     def test_it_can_edit_an_existing_tournament_player(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + \
-            "/edit/"
+            "/player/" + str(self.tournament_1_player.id) + "/"
         player = TournamentPlayer.query.get(self.tournament_1_player.id)
         player.name = "Test Edit"
-        response = self.client.post(
+        response = self.client.put(
             url,
-            data={'name': player.name,
-                  "aga_num": player.aga_num,
-                  "rating": player.rating,
-                    "affiliation": player.affiliation,
-                    "state": player.state,
-                    "address": player.address,
-                    "email": player.email,
-                    "phone": player.phone,
-                    "citizenship": player.citizenship,
-                    "dob": player.dob })
+            data={ "name": player.name,
+                   "aga_num": player.aga_num,
+                   "rating": player.rating,
+                   "affiliation": player.affiliation,
+                   "state": player.state,
+                   "address": player.address,
+                   "email": player.email,
+                   "phone": player.phone,
+                   "citizenship": player.citizenship,
+                   "dob": player.dob,
+                   "_method": "PUT"} )
+
         player = TournamentPlayer.query.get(self.tournament_1_player.id)
         self.assertEqual("Test Edit", player.name)
 
@@ -351,13 +352,14 @@ class TestTournament(BaseTestCase):
                    "tie_break2": "SODOS" })
         self.assertEqual(2, Tournament.query.count())
         t = Tournament.query.all()[-1]
-        response = self.client.delete("tournament/" + str(t.id) + "/")
+        response = self.client.delete("tournament/" + str(t.id) + "/",
+            data={'_method':'DELETE'})
         self.assertEqual(1, Tournament.query.count())
-        
+
 
     def test_it_can_not_edit_tournament_marked_submitted(self):
         tournament_edit_endpoint = self.tournament_endpoint + \
-            str(self.tournament_1.id) + '/edit'
+            str(self.tournament_1.id) + '/'
         t = Tournament.query.first()
         #  mark tournament as submitted
         response = self.client.post(

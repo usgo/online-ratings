@@ -141,7 +141,7 @@ def create_extra_data():
     print("Strongest, %d (%f):\n%s"% (strongest, p_priors[strongest], strongest_games))
 
     def make_tournament():
-        t = Tournament(event_name="The Ultimate Go-ing Chamionship",
+        t = Tournament(event_name="The Ultimate Go-ing Championship",
                        start_date=datetime.datetime.now(),
                        venue="LasVegas",
                        director="Donald J. Trump",
