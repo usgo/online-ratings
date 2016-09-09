@@ -46,6 +46,29 @@ class TestTournament(BaseTestCase):
         db.session.add(self.tournament_1_player)
         db.session.commit()
 
+    def markTournamentSubmitted(self, tourn):
+        t = Tournament.query.get(tourn.id)
+        response = self.client.put(
+            '/tournament/'+ str(t.id)+'/',
+            data={"event_name": t.event_name,
+                   "start_date": t.start_date,
+                   "venue": t.venue,
+                   "director": t.director,
+                   "director_phone": t.director_phone,
+                   "director_email": t.director_email,
+                   "pairing": t.pairing,
+                   "rule_set": t.rule_set,
+                   "time_controls": t.time_controls,
+                   "basic_time": t.basic_time,
+                   "overtime_format": t.overtime_format,
+                   "overtime_conditions": t.overtime_conditions,
+                   "komi": t.komi,
+                   "tie_break1": t.tie_break1,
+                   "tie_break2": t.tie_break2,
+                   "submitted": True,
+                   "_method": "PUT" })
+
+
 ###  TournamentPlayer Tests
     # players index
     def test_tournament_player_index_url(self):
@@ -137,33 +160,15 @@ class TestTournament(BaseTestCase):
     # sad path - cannot create, edit, or delete player if tournament submitted
     def test_it_cannot_add_new_player_if_tournament_marked_submitted(self):
         tournament_edit_endpoint = self.tournament_endpoint + \
-            str(self.tournament_1.id) + '/edit'
+            str(self.tournament_1.id) + '/'
         t = Tournament.query.first()
-        #  mark tournament as submitted
-        response = self.client.post(
-            '/tournament/'+ str(t.id)+'/', #  url_for()
-            data={"event_name": t.event_name,
-                   "start_date": t.start_date,
-                   "venue": t.venue,
-                   "director": t.director,
-                   "director_phone": t.director_phone,
-                   "director_email": t.director_email,
-                   "pairing": t.pairing,
-                   "rule_set": t.rule_set,
-                   "time_controls": t.time_controls,
-                   "basic_time": t.basic_time,
-                   "overtime_format": t.overtime_format,
-                   "overtime_conditions": t.overtime_conditions,
-                   "komi": t.komi,
-                   "tie_break1": t.tie_break1,
-                   "tie_break2": t.tie_break2,
-                   "submitted": True })
+        self.markTournamentSubmitted(t)
         t = Tournament.query.first()
         self.assertEqual(True, t.submitted)
         #  TournamentPlayer test
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/new/"
+            "/players/"
         before = TournamentPlayer.query.count()
         self.assertEqual(1, before)
         response = self.client.post(
@@ -178,7 +183,7 @@ class TestTournament(BaseTestCase):
                    "phone": '234-567-8901',
                    "citizenship": 'usa',
                    "dob": '11/11/11',
-                  "tournament_id": self.tournament_1.id })
+                   "tournament_id": self.tournament_1.id })
         after = TournamentPlayer.query.count()
         self.assertEqual(1, after)
         no_new_player = TournamentPlayer.query.filter_by(name="player 2")
@@ -188,35 +193,16 @@ class TestTournament(BaseTestCase):
         tournament_edit_endpoint = self.tournament_endpoint + \
             str(self.tournament_1.id) + '/edit'
         t = Tournament.query.first()
-        #  mark tournament as submitted
-        response = self.client.post(
-            '/tournament/'+ str(t.id)+'/', #  url_for()
-            data={"event_name": t.event_name,
-                   "start_date": t.start_date,
-                   "venue": t.venue,
-                   "director": t.director,
-                   "director_phone": t.director_phone,
-                   "director_email": t.director_email,
-                   "pairing": t.pairing,
-                   "rule_set": t.rule_set,
-                   "time_controls": t.time_controls,
-                   "basic_time": t.basic_time,
-                   "overtime_format": t.overtime_format,
-                   "overtime_conditions": t.overtime_conditions,
-                   "komi": t.komi,
-                   "tie_break1": t.tie_break1,
-                   "tie_break2": t.tie_break2,
-                   "submitted": True })
+        self.markTournamentSubmitted(t)
         t = Tournament.query.first()
         self.assertEqual(True, t.submitted)
         #  TournamentPlayer test
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + \
-            "/edit/"
+            "/player/" + str(self.tournament_1_player.id) + "/"
         player = TournamentPlayer.query.get(self.tournament_1_player.id)
         failed_update = "Test Edit"
-        response = self.client.post(
+        response = self.client.put(
             url,
             data={ 'name': player.name,
                    "aga_num": failed_update,
@@ -227,51 +213,33 @@ class TestTournament(BaseTestCase):
                     "email": player.email,
                     "phone": player.phone,
                     "citizenship": player.citizenship,
-                    "dob": player.dob })
+                    "dob": player.dob,
+                    "_method": "PUT" })
         player = TournamentPlayer.query.get(self.tournament_1_player.id)
         self.assertNotEqual("Test Edit", player.name)
         self.assertEqual("Tester Testington", player.name)
 
     def test_it_cannot_delete_player_if_tournament_marked_submitted(self):
         tournament_edit_endpoint = self.tournament_endpoint + \
-        str(self.tournament_1.id) + '/edit'
+        str(self.tournament_1.id) + '/'
         t = Tournament.query.first()
-        #  mark tournament as submitted
-        response = self.client.post(
-            '/tournament/'+ str(t.id)+'/', #  url_for()
-            data={"event_name": t.event_name,
-                   "start_date": t.start_date,
-                   "venue": t.venue,
-                   "director": t.director,
-                   "director_phone": t.director_phone,
-                   "director_email": t.director_email,
-                   "pairing": t.pairing,
-                   "rule_set": t.rule_set,
-                   "time_controls": t.time_controls,
-                   "basic_time": t.basic_time,
-                   "overtime_format": t.overtime_format,
-                   "overtime_conditions": t.overtime_conditions,
-                   "komi": t.komi,
-                   "tie_break1": t.tie_break1,
-                   "tie_break2": t.tie_break2,
-                   "submitted": True })
+        self.markTournamentSubmitted(t)
         t = Tournament.query.first()
         self.assertEqual(True, t.submitted)
         #  TournamentPlayer test
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + \
-            "/delete/"
+            "/player/" + str(self.tournament_1_player.id) + "/"
         before = TournamentPlayer.query.count()
         self.assertEqual(1, before)
-        response = self.client.post(url)
+        response = self.client.delete(url, data={"_method":"DELETE"})
         after = TournamentPlayer.query.count()
         self.assertEqual(1, after)
         player = TournamentPlayer.query.get(self.tournament_1_player.id)
         self.assertEqual("Tester Testington", player.name)
-
 ### End TournamentPlayer Tests
 
+### Tournament Tests
     #  index
     def test_tournament_base_url(self):
         response = self.client.get(self.tournament_endpoint)
@@ -362,51 +330,31 @@ class TestTournament(BaseTestCase):
             str(self.tournament_1.id) + '/'
         t = Tournament.query.first()
         #  mark tournament as submitted
-        response = self.client.post(
-            '/tournament/'+ str(t.id)+'/', #  url_for()
-            data={"event_name": t.event_name,
-                   "start_date": t.start_date,
-                   "venue": t.venue,
-                   "director": t.director,
-                   "director_phone": t.director_phone,
-                   "director_email": t.director_email,
-                   "pairing": t.pairing,
-                   "rule_set": t.rule_set,
-                   "time_controls": t.time_controls,
-                   "basic_time": t.basic_time,
-                   "overtime_format": t.overtime_format,
-                   "overtime_conditions": t.overtime_conditions,
-                   "komi": t.komi,
-                   "tie_break1": t.tie_break1,
-                   "tie_break2": t.tie_break2,
-                   "submitted": True })
+        self.markTournamentSubmitted(t)
         t = Tournament.query.first()
         self.assertEqual(True, t.submitted)
         t = Tournament.query.first()
-        self.assertNotEqual("this will fail to change", t.event_name)
+        self.assertEqual(t.event_name, self.tournament_1.event_name)
+        test_string = "this will fail to change"
+        response = self.client.put(
+            '/tournament/'+str(t.id)+'/', #  url_for()
+            data={"event_name" : test_string,
+                  "start_date" : t.start_date,
+                  "venue" : t.venue,
+                  "director" : t.director,
+                  "pairing" : t.pairing,
+                  "rule_set" : t.rule_set,
+                  "_method": "PUT" })
+        t = Tournament.query.first()
+        t = Tournament.query.first()
+        self.assertNotEqual(test_string, t.event_name)
         self.assertEqual("The Ultimate Go-ing Chamionship", t.event_name)
 
     def test_it_can_not_delete_tournament_marked_submitted(self):
         tournaments_before = Tournament.query.count()
         t = Tournament.query.first()
-        self.client.post(
-            '/tournament/'+ str(t.id)+'/', #  url_for()
-            data={"event_name": t.event_name,
-                   "start_date": t.start_date,
-                   "venue": t.venue,
-                   "director": t.director,
-                   "director_phone": t.director_phone,
-                   "director_email": t.director_email,
-                   "pairing": t.pairing,
-                   "rule_set": t.rule_set,
-                   "time_controls": t.time_controls,
-                   "basic_time": t.basic_time,
-                   "overtime_format": t.overtime_format,
-                   "overtime_conditions": t.overtime_conditions,
-                   "komi": t.komi,
-                   "tie_break1": t.tie_break1,
-                   "tie_break2": t.tie_break2,
-                   "submitted": True })
-        response = self.client.post('/tournament/'+str(t.id)+'/delete/')
+        self.markTournamentSubmitted(t)
+        response = self.client.delete('/tournament/'+str(t.id)+'/',
+            data={ "_method": "DELETE" })
         tournaments_after = Tournament.query.count()
         self.assertEqual(tournaments_before, tournaments_after)

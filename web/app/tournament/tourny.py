@@ -48,36 +48,38 @@ def index():
             # flash("Tournament successfully created.")
             return redirect(url_for('.index'))
     tournaments = Tournament.query.all()
-    return render_template('tournament_index.html',
-                    tournaments=tournaments,)
+    return render_template('tournament_index.html', tournaments=tournaments)
 
-@tournament.route('/<int:tournament_id>/', methods=['GET', 'POST', 'DELETE'])
+@tournament.route('/<int:tournament_id>/', methods=['GET', 'POST',
+                                                'PUT', 'DELETE'])
 def show(tournament_id):
     tournament = Tournament.query.get(tournament_id)
     if tournament:
-        method_delete = request.form.get('_method', '').upper()
-        if method_delete: #  this is a cheat to make tests pass
-            if tournament.submitted == False:
-                db.session.delete(tournament)
-                db.session.commit()
-                # flash('{{ tournament.event_name }} has been deleted')
-                return redirect(url_for('.index'))
-            # flash("Sorry, this tournament has already been submitted and can no \
-            #       longer be edited.")
-            return redirect(url_for('.index'))
-        if request.method == 'POST':
-            form = TournamentForm()
-            if tournament and tournament.submitted == False:
-                if form.validate_on_submit():
-                    form.populate_obj(tournament)
-                    db.session.commit()
-                    # flash("Tournament successfully edited.")
-                    return redirect(url_for('.index'))
-            elif tournament and tournament.submitted == True and request.methond =='POST':
+        if request.method == "GET":
+            return render_template('tournament_show.html',
+                tournament=tournament)
+        elif request.method != "GET" and tournament.submitted == False:
+            method = request.form.get('_method', '').upper()
+            if method:
+                if tournament.submitted == False:
+                    if method == "DELETE":
+                        db.session.delete(tournament)
+                        db.session.commit()
+                        # flash('{{ tournament.event_name }} has been deleted')
+                        return redirect(url_for('.index'))
+                    elif method == "PUT":
+                        form = TournamentForm(obj=tournament)
+                        if form.validate_on_submit():
+                            form.populate_obj(tournament)
+                            db.session.commit()
+                            # flash("Tournament successfully edited.")
+                            return redirect(url_for('.show',
+                                tournament_id=tournament_id))
                 # flash("Cannot alter submitted record")
-                redirect(url_for('.index'))
-        return render_template('tournament_show.html',
-            tournament=tournament)
+                return redirect(url_for('.index'))
+        else:
+            # flash("Cannot alter submitted record")
+            return redirect(url_for('.index'))
     else:
         # flash('Tournament id {{ tournament_id }} does not exist.')
         return redirect(url_for('.index'))
@@ -92,7 +94,8 @@ def new_tournament():
 def edit_tournament(tournament_id):
     tournament = Tournament.query.get(tournament_id)
     form = TournamentForm(obj=tournament)
-    return render_template('tournament_form.html', form=form, tournament=tournament)
+    return render_template('tournament_form.html',
+                            form=form, tournament=tournament)
 
 @tournament.route('/<int:tournament_id>/players/', methods=["GET", "POST"])
 def players_index(tournament_id):

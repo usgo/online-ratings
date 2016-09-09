@@ -14,13 +14,14 @@
     {% endif %}
 
     <li>Director: {{ tournament.director }}</li>
-    <li>Director Phone: {{ tournament.director_phone }}</li>
     <li>Director Email: {{ tournament.director_email }}</li>
+    {% if tournament.phone %}
+      <li>Director Phone: {{ tournament.director_phone }}</li>
+    {% endif %}
     {% if tournament.director_address %}
       <li>Director Address : {{ tournament.director_address }}</li>
     {% endif %}
 
-    <!--  display decisions-->
 
     {% if tournament.sponsor %}
       <li>Sponsor: {{ tournament.sponser }}</li>

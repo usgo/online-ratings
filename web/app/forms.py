@@ -31,10 +31,9 @@ class TournamentForm(Form):
     end_date = DateField('End Date', format='%Y-%m-%d', validators=[Optional()])
 
     director = StringField("Director", validators=[Required()])
-    director_phone = StringField("Director's Phone",
-        validators=[Required()])
-    director_email = StringField("Director's Email", validators=[Required()])
+    director_phone = StringField("Director's Phone (Optional)")
     director_address = StringField("Director's Address (Optional)")
+    director_email = StringField("Director's Email", validators=[Required()])
 
     sponsor = StringField("Tournament Sponser (Optional)")
     sponsor_email = StringField("Sponsor's Email (Optional)")
