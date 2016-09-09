@@ -3,7 +3,7 @@ from dateutil.parser import parse as parse_iso8601
 import logging
 import requests
 
-from flask import jsonify, request, Response
+from flask import jsonify, request, Response, current_app
 from . import api
 from app.api_1_0.api_exception import ApiException
 from app.api_1_0.utils import requires_json
@@ -81,7 +81,8 @@ def validate_game_submission(headers, body_json):
         game_record = data['game_record'].encode()
     else:
         try:
-            response = requests.get(data['game_url'], verify=False)
+            timeout = current_app.config['GAME_FETCH_HTTP_TIMEOUT']
+            response = requests.get(data['game_url'], verify=False, timeout=timeout)
             game_record = response.content
         except Exception as e:
             logging.info("Got invalid game_url %s" % data.get("game_url", ""))
