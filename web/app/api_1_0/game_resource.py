@@ -84,10 +84,14 @@ def validate_game_submission(headers, body_json):
             timeout = current_app.config['GAME_FETCH_HTTP_TIMEOUT']
             response = requests.get(data['game_url'], verify=False, timeout=timeout)
             game_record = response.content
-        except Exception as e:
-            logging.info("Got invalid game_url %s" % data.get("game_url", ""))
+        except requests.exceptions.Timeout as e:
+            logging.info('Request to %s timed out' % data.get('game_url', ''))
             logging.info(e)
-            raise ApiException('game_url provided (%s) was invalid!' % data.get('game_url', '<None>'))
+            raise ApiException('game_url provided (%s) timed out upon fetch' % data.get('game_url', ''))
+        except Exception as e:
+            logging.info('Got invalid game_url %s' % data.get('game_url', ''))
+            logging.info(e)
+            raise ApiException('game_url provided (%s) was invalid!' % data.get('game_url', ''))
 
     try:
         date_played = parse_iso8601(data['date_played'])
