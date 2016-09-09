@@ -19,7 +19,6 @@
     <th>White</th>
     <th>Black</th>
     <th>Result</th>
-    <th>Rated?</th>
     <th>Date Played</th>
     <th>Game Record</th>
   </tr>
@@ -45,7 +44,6 @@
         </a>
       </td>
       <td>{{g.result}}</td>
-      <td>{{g.rated}}</td>
       <td>{{g.date_played}}</td>
       <td><a href="{{url_for('ratings.gamedetail', game_id=g.id)}}">link</a></td>
     </tr>
