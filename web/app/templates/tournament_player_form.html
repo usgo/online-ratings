@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+  {% block content %}
+
+    <div class="container">
+      <h1>{{ tournament.event_name }}</h1>
+
+      <h2>Enter Player Info:</h2>
+
+      <form name="new_player" {% if not tp %} action="{{ url_for('.players_index', tournament_id=tournament.id) }}" {% endif %}
+        {% if tp %} action="{{ url_for('.select_player', tournament_id=tournament.id, tournament_player_id=tp.id) }}"{% endif %} method="post" >
+        {{ form.hidden_tag() }}
+        {% if tp %}<input type="hidden" name="_method" value="PUT"> {% endif %}
+
+        <p>{{ form.name.label }}: {{ form.name }}</p>
+        <p>{{ form.aga_num.label }}: {{ form.aga_num }}</p>
+        <p>{{ form.rating.label }}: {{ form.rating }}</p>
+        <p>{{ form.affiliation.label }}: {{ form.affiliation }}</p>
+        <p>{{ form.state.label }}: {{ form.state }}</p>
+        <p>{{ form.address.label }}: {{ form.address }}</p>
+        <p>{{ form.email.label }}: {{ form.email }}</p>
+        <p>{{ form.phone.label }}: {{ form.phone }}</p>
+        <p>{{ form.citizenship.label }}: {{ form.citizenship }}</p>
+        <p>{{ form.dob.label }}: {{ form.dob }}</p>
+
+        <p>{{ form.submit }}</p>
+      </form>
+      <p><a href="{{ url_for('.players_index', tournament_id=tournament.id) }}"><button>Cancel</button></a></p>
+    </div>
+
+  {% endblock content %}

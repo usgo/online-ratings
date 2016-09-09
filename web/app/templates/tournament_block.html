@@ -14,13 +14,14 @@
     {% endif %}
 
     <li>Director: {{ tournament.director }}</li>
-    <li>Director Phone: {{ tournament.director_phone }}</li>
     <li>Director Email: {{ tournament.director_email }}</li>
+    {% if tournament.phone %}
+      <li>Director Phone: {{ tournament.director_phone }}</li>
+    {% endif %}
     {% if tournament.director_address %}
       <li>Director Address : {{ tournament.director_address }}</li>
     {% endif %}
 
-    <!--  display decisions-->
 
     {% if tournament.sponsor %}
       <li>Sponsor: {{ tournament.sponser }}</li>
@@ -58,8 +59,10 @@
     <a href="{{ url_for('.show', tournament_id=tournament.id) }}"><button>Details</button></a>
     {% endif %}
     {% if tournament.submitted == False %}
-    <a href="{{ url_for('.edit_tournament', tournament_id=tournament.id) }}"><button>Edit</button></a>
-    {% endif %}
 
+      <a href="{{ url_for('.edit_tournament', tournament_id=tournament.id) }}"><button>Edit</button></a>
+    {% endif %}
+      <a href="{{ url_for('.new_player', tournament_id=tournament.id) }}"><button>Add Player</button></a>
+      <a href="{{ url_for('.players_index', tournament_id=tournament.id) }}"><button>View Players</button></a>
   </p>
 </div>

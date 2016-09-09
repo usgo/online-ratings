@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>{{ tournament.event_name }}</h1>
+</br>
+<a href="{{ url_for('.index') }}"><button>
+  All Tournaments</button></a>
+  <a href="{{ url_for('.show', tournament_id=tournament.id) }}"><button>
+    Tournament Details</button></a>
+{% if players.count() > 0 %}
+  {% for player in players %}
+
+    <h4>Name: {{ player.name }}<h4>
+    <p>AGA Number: {{ player.aga_num }}</p>
+    <p>Player Rating: {{ player.rating }}</p>
+    <p>Club Affiliation: {{ player.affiliation }}</p>
+    <p>State: {{ player.state }}</p>
+    <p>Address: {{ player.address }}</p>
+    <p>Email: {{ player.email }}</p>
+    <p>Phone {{ player.phone }}</p>
+    <p>Citizenship: {{ player.citizenship }}</p>
+    <p>Date of Birth: {{ player.dob }}</p>
+    <a href="{{ url_for('.select_player', tournament_player_id=player.id, tournament_id=tournament.id) }}"><button>Edit</button></a>
+
+    {% if tournament.submitted == False %}
+    <form action="{{ url_for('.select_player',
+        tournament_id=tournament.id,
+        tournament_player_id=player.id) }}" method="POST">
+      <input type="hidden" name="_method" value='DELETE' />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <button type="submit">Delete Player</button>
+    </form>
+    {% endif %}
+  <hr>
+  {% endfor %}
+</div>
+{% else %}
+  <h2>No players yet entered for this tournament.</h2>
+  {% if tournament %}
+  <a href="{{ url_for('.new_player', tournament_id=tournament.id) }}"><button>Add Player</button></a>
+  {% endif %}
+{% endif %}
+
+{% endblock content %}

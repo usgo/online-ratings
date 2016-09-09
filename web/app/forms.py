@@ -1,7 +1,7 @@
 from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField, BooleanField, SelectField
 from wtforms.validators import Required, URL, Optional
-from wtforms.fields.html5 import DateField #  testing
+from wtforms.fields.html5 import DateField
 from .models import KOMI_VALUES as kv
 from .models import TIE_BREAKS as tb
 
@@ -31,9 +31,9 @@ class TournamentForm(Form):
     end_date = DateField('End Date', format='%Y-%m-%d', validators=[Optional()])
 
     director = StringField("Director", validators=[Required()])
-    director_phone = StringField("Director's Phone", validators=[Required()])
-    director_email = StringField("Director's Email", validators=[Required()])
+    director_phone = StringField("Director's Phone (Optional)")
     director_address = StringField("Director's Address (Optional)")
+    director_email = StringField("Director's Email", validators=[Required()])
 
     sponsor = StringField("Tournament Sponser (Optional)")
     sponsor_email = StringField("Sponsor's Email (Optional)")
@@ -64,4 +64,18 @@ class TournamentForm(Form):
                              validators=[Required()])
 
     submitted = BooleanField("Submitted")
+    submit = SubmitField()
+
+class TournamentPlayerForm(Form):
+    name = StringField("Player's Name", validators=[Required()])
+    aga_num = StringField("AGA Number", validators=[Required()])
+    rating = StringField("Rating", validators=[Required()])
+    affiliation = StringField("Club Affiliation", validators=[Required()])
+    state = StringField("State", validators=[Required()])
+    address = StringField("Address", validators=[Required()])
+    email = StringField("Email", validators=[Required()])
+    phone = StringField("Phone", validators=[Required()])
+    citizenship = StringField("Citizenship", validators=[Required()])
+    dob = StringField("Date of Birth", validators=[Required()])
+
     submit = SubmitField()

@@ -4,9 +4,17 @@
 
 {% block content %}
 <div class="container">
-
 <h2>Please enter Tournament Info:</h2>
-  <form method="post" name='new'>
+
+<!--  if new  else edit -->
+  <form method="post" name='/' {% if not tournament %}
+    action="{{ url_for('.index') }}" > {% endif %}
+
+    {% if tournament %}
+      action="{{ url_for('.show', tournament_id=tournament.id) }}" >
+        <input type="hidden" name="_method" value="PUT">
+    {% endif %}
+
     {{ form.hidden_tag() }}
 
         <p>{{ form.event_name.label }}: {{ form.event_name }}</p>
@@ -22,8 +30,8 @@
         <p>{{ form.end_date.label }}: {{ form.end_date }}</p>
 
         <p>{{ form.director.label }}: {{ form.director }}</p>
-        <p>{{ form.director_phone.label }}: {{ form.director_phone }}</p>
         <p>{{ form.director_email.label }}: {{ form.director_email }}</p>
+        <p>{{ form.director_phone.label }}: {{ form.director_phone }}</p>
         <p>{{ form.director_address.label }}: {{ form.director_address }}</p>
 
         <p>{{ form.sponsor.label }}: {{ form.sponsor }}</p>
@@ -45,14 +53,15 @@
         <p>{{ form.time_controls.label }}: {{ form.time_controls }}</p>
         <p>{{ form.basic_time.label }}: {{ form.basic_time }}</p>
         <p>{{ form.overtime_format.label }}: {{ form.overtime_format }}</p>
-        <p>{{ form.overtime_conditions.label }}: {{ form.overtime_conditions }}</p>
+        <p>{{ form.overtime_conditions.label }}:
+            {{ form.overtime_conditions }}</p>
 
         <p>{{ form.komi.label }}: {{ form.komi }}</p>
         <p>{{ form.tie_break1.label }}: {{ form.tie_break1 }}</p>
         <p>{{ form.tie_break2.label }}: {{ form.tie_break2 }}</p>
 
-        <p>Check to Submit Finalized Tournament Record:  {{ form.submitted }}</p>
-
+        <p>Check to Submit Finalized Tournament Record:
+            {{ form.submitted }}</p>
         <p>{{ form.submit }}</p>
   </form>
 </div>

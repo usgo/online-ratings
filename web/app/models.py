@@ -171,8 +171,8 @@ class Game(db.Model):
 
 RULESETS = ["AGA", "INTERNATIONAL"]
 PAIRINGTYPES = ["McMahon"]
-KOMI_VALUES = ['0', '0.5', '1', '1.5', '2', '2.5', '3.0', '3.5', '4', '4.5', '5',
-               '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5']
+KOMI_VALUES = ['0', '0.5', '1', '1.5', '2', '2.5', '3.0', '3.5', '4', '4.5',
+    '5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5']
 TIE_BREAKS = ['SOS', 'SODOS', 'Face to Face Result', 'Random Procedure']
 
 class Tournament(db.Model):
@@ -182,8 +182,8 @@ class Tournament(db.Model):
     venue_address = db.Column(db.String(80))
     venue_state = db.Column(db.String(2))
     venue_zip = db.Column(db.String(5))
-    start_date = db.Column(db.Date) #  date/time obj
-    end_date = db.Column(db.Date) #  date/time obj
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
     director = db.Column(db.String(80))
     director_phone = db.Column(db.String(20))
     director_email = db.Column(db.String(80))
@@ -198,20 +198,17 @@ class Tournament(db.Model):
     convener_phone = db.Column(db.String(20))
     convener_website = db.Column(db.String(80))
     convener_address = db.Column(db.String(80))
-    # pairing = db.Column(db.String(80)) #  enum rop down?
     pairing = db.Column(db.Enum(*PAIRINGTYPES,
                         name='pairing_types'), default="McMahon")
-    # rule_set = db.Column(db.String(80)) # enum drop down?
     rule_set = db.Column(db.Enum(*RULESETS, name='rule_sets'), default="AGA")
     time_controls = db.Column(db.String(80))
     basic_time = db.Column(db.String(80))
     overtime_format = db.Column(db.String(80))
     overtime_conditions = db.Column(db.String(80))
-    # komi = db.Column(db.String(80)) # should be float
-    # komi = db.Column(db.Numeric(2,1))
     komi = db.Column(db.Enum(*KOMI_VALUES, name='komi_values'), default='7')
     tie_break1 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
     tie_break2 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
+    # tournament_players = relationship('TournamentPlayer')
 
     submitted = db.Column(db.Boolean, default=False)
 
@@ -226,5 +223,28 @@ class Tournament(db.Model):
             self.director,
             self.rule_set,
             self.submitted)
+
+class TournamentPlayer(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(80))
+    aga_num = db.Column(db.Integer)
+    member_ex_date = db.Column(db.String(20))
+    rating = db.Column(db.String(5))
+    affiliation = db.Column(db.String(80))
+    state = db.Column(db.String(2))
+    address = db.Column(db.String(80))
+    email = db.Column(db.String(80))
+    phone = db.Column(db.String(20))
+    citizenship = db.Column(db.String(80))
+    dob = db.Column(db.String(20))
+    tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
+    tournament = relationship(Tournament,
+        backref=db.backref('Tournament', cascade='all, delete-orphan'))
+
+
+    def __str__(self):
+        return "Tournament Player: {}\n \
+                Member found in db: {}".format(self.name)
 # Setup Flask-Security
+
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
