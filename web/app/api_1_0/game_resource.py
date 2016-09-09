@@ -54,7 +54,7 @@ def validate_game_submission(headers, body_json):
     white_token = headers.get('X-Auth-White-Player-Token')
 
     if any(token is None for token in (server_token, black_token, white_token)):
-        raise ApiException('Did not submit required X-Auth-(Server-Token|Black-Player-Token|White_Player-Token) headers.', 403)
+        raise ApiException('Did not submit required X-Auth-(Server-Token|Black-Player-Token|White-Player-Token) headers.', 403)
 
     gs = GoServer.query.filter_by(id=data['server_id'], token=server_token).first()
     if gs is None:
