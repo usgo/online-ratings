@@ -36,6 +36,8 @@ def validate_game_submission(headers, body_json):
         'black_id': body_json.get('black_id'),
         'white_id': body_json.get('white_id'),
         'result': body_json.get('result'),
+        'handicap': body_json.get('handicap'),
+        'komi': body_json.get('komi'),
         'date_played': body_json.get('date_played'),
     }
 
@@ -98,6 +100,12 @@ def validate_game_submission(headers, body_json):
     except TypeError:
         raise ApiException(error='date_played must be in ISO 8601 format')
 
+    try:
+        handicap = int(data['handicap'])
+        komi = float(data['komi'])
+    except ValueError:
+        raise ApiException('invalid handicap or komi')
+
     logging.info(" White: %s, Black: %s " % (w,b))
     game = Game(server_id=gs.id,
                 white_id=w.id,
@@ -106,6 +114,8 @@ def validate_game_submission(headers, body_json):
                 date_played=date_played,
                 date_reported=datetime.now(),
                 result=data['result'],
+                handicap=handicap,
+                komi=komi,
                 game_record=game_record
                 )
     return game

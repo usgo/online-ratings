@@ -23,6 +23,8 @@ class TestGameResource(BaseTestCase):
         "white_id": 2,
         "server_id": 1,
         'result': 'B+0.5',
+        'handicap': 0,
+        'komi': 6.5,
         'date_played': '2014-08-19T10:30:00',
         'game_record': '\n'.join(open('tests/testsgf.sgf').readlines())
     }
