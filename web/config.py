@@ -20,6 +20,7 @@ class BaseConfiguration(object):
     SECURITY_TRACKABLE = True
 
     MAIL_DEBUG = 0
+    GAME_FETCH_HTTP_TIMEOUT = 10
 
 class DockerConfiguration(BaseConfiguration):
     DEBUG = False
@@ -41,8 +42,6 @@ class DockerConfiguration(BaseConfiguration):
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
     SECURITY_EMAIL_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
-
-    GAME_FETCH_HTTP_TIMEOUT = 10
 
 class TestConfiguration(BaseConfiguration):
     TESTING = True
