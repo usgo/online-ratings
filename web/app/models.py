@@ -130,7 +130,7 @@ class Rating(db.Model):
     created = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
     def __str__(self):
-        return "(%f, sigma %f) for user %d" % (self.rating, self.sigma, self.user_id) 
+        return "(%f) for user %d" % (self.rating, self.user_id)
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
