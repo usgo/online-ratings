@@ -31,6 +31,15 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
 
+  db_migrate:
+    build: ./web
+    env_file: .env
+    links:
+      - postgres:postgres
+    volumes:
+      - ./web/migrations/versions:/usr/src/app/migrations/versions
+    command: python manage.py db migrate -m "description of schema changes"
+
 volumes:
   pgdata: {}
 
