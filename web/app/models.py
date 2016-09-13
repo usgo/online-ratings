@@ -1,6 +1,7 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 import datetime
 from collections import namedtuple
 
@@ -28,17 +29,17 @@ USER_ROLE = _Role("user", "Default role")
 # Define models
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    description = db.Column(db.String(255), nullable=False)
 
 class User(db.Model, UserMixin):
     __tablename__="myuser"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     aga_id = db.Column(db.String(25))
-    email = db.Column(db.String(255), unique=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255))
-    claimed = db.Column(db.Boolean, default=False)
-    active = db.Column(db.Boolean())
+    claimed = db.Column(db.Boolean, default=False, nullable=False)
+    active = db.Column(db.Boolean(), default=True, nullable=False)
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
@@ -46,7 +47,7 @@ class User(db.Model, UserMixin):
     current_login_at = db.Column(db.DateTime())
     last_login_ip = db.Column(db.String(25))
     current_login_ip = db.Column(db.String(25))
-    login_count = db.Column(db.Integer)
+    login_count = db.Column(db.Integer, default=0, nullable=False)
     players = relationship("Player")
 
     # For every AGA member, a fake user (aga_id, claimed=False) is created.
@@ -80,9 +81,9 @@ class User(db.Model, UserMixin):
 
 class GoServer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    url = db.Column(db.String(180))
-    token = db.Column(db.Text, unique=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    url = db.Column(db.String(180), nullable=False)
+    token = db.Column(db.Text, unique=True, nullable=False)
     players = db.relationship('Player')
     admins = db.relationship(
         'User',
@@ -96,15 +97,15 @@ class GoServer(db.Model):
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20))
-    server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('myuser.id'))
+    name = db.Column(db.String(20), nullable=False)
+    server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('myuser.id'), nullable=False)
     user = db.relationship('User', foreign_keys=user_id)
     server = db.relationship('GoServer',
                               foreign_keys=server_id,
                               backref=db.backref('server_id',
                                                  lazy='dynamic'))
-    token = db.Column(db.Text, unique=True)
+    token = db.Column(db.String(100), unique=True, nullable=False)
 
     def __str__(self):
         return "Player %s on server %s, user %s" % (self.name, self.server_id, self.user_id)
@@ -120,47 +121,48 @@ class Player(db.Model):
 
 class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('myuser.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('myuser.id'), nullable=False)
     user = db.relationship('User',
                              foreign_keys=user_id,
                              backref=db.backref('user_rating', lazy='dynamic'))
-    sigma = db.Column(db.Float)
-    rating = db.Column(db.Float)
+    sigma = db.Column(db.Float, nullable=False)
+    rating = db.Column(db.Float, nullable=False)
     created = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
     def __str__(self):
         return "(%f, sigma %f) for user %d" % (self.rating, self.sigma, self.user_id) 
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'))
+    server_id = db.Column(db.Integer, db.ForeignKey('go_server.id'), nullable=False)
     game_server = db.relationship('GoServer',
                                   foreign_keys=server_id,
                                   backref=db.backref('game_server_id',
                                                      lazy='dynamic'))
 
-    white_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    white_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     white = db.relationship('Player',
                             foreign_keys=white_id,
                             backref=db.backref('w_server_account',
                                                lazy='dynamic'))
 
-    black_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    black_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     black = db.relationship('Player',
                             foreign_keys=black_id,
                             backref=db.backref('b_server_account',
                                                lazy='dynamic'))
 
-    date_played = db.Column(db.DateTime)
-    date_reported = db.Column(db.DateTime)
+    date_played = db.Column(db.DateTime, nullable=False)
+    date_reported = db.Column(db.DateTime, nullable=False, default=func.now())
 
-    result = db.Column(db.String(10))
-    rated = db.Column(db.Boolean) #has the game been rated.
+    result = db.Column(db.String(10), nullable=False)
+    rated = db.Column(db.Boolean, nullable=False, default=False) #has the game been rated.
     game_record = db.Column(db.LargeBinary)
     game_url = db.Column(db.String(100))
 
-    handicap = db.Column(db.Integer, default=0)
-    komi = db.Column(db.Float, default=7.5)
+    handicap = db.Column(db.Integer, default=0, nullable=False)
+    komi = db.Column(db.Float, default=7.5, nullable=False)
 
     def __str__(self):
         return "%s (w) vs %s (b) %s handicap, %s komi, played on %s, result %s" % (self.white.name, self.black.name, self.handicap, self.komi, self.game_server, self.result)
