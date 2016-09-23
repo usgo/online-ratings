@@ -4,6 +4,7 @@ from wtforms.validators import Required, URL, Optional
 from wtforms.fields.html5 import DateField
 from .models import KOMI_VALUES as kv
 from .models import TIE_BREAKS as tb
+from .models import MATCH_RESULTS as mr
 
 
 class AddGameServerForm(Form):
@@ -78,4 +79,11 @@ class TournamentPlayerForm(Form):
     citizenship = StringField("Citizenship", validators=[Required()])
     dob = StringField("Date of Birth", validators=[Required()])
 
+    submit = SubmitField()
+
+class MatchResultsForm(Form):
+    player_1_name = StringField("Black's Name")
+    player_2_name= StringField("White's Name")
+    result = SelectField("Match Result", choices=[(x, x) for x in mr],
+                           validators=[Required()])
     submit = SubmitField()

@@ -9,6 +9,10 @@
   <a href="{{ url_for('.show', tournament_id=tournament.id) }}"><button>
     Tournament Details</button></a>
 {% if players.count() > 0 %}
+<form class="" action="{{ url_for('.matches_index', tournament_id=tournament.id) }}" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type='submit'>Pair</button>
+</form>
   {% for player in players %}
 
     <h4>Name: {{ player.name }}<h4>
