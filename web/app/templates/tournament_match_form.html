@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+
+
+    <form action="{{ url_for('.match', tournament_id=match.tournament_id, match_id=match.id) }}" method="post">
+      <input type="hidden" name="_method" value="PUT">
+      {{ form.hidden_tag() }}
+      <p>{{ form.player_1_name.label }} {{ form.player_1_name }}</p>
+      <p>{{ form.player_2_name.label }} {{ form.player_2_name }}</p>
+      <p>{{ form.result.label }}  {{ form.result }}</p>
+      <p>{{ form.submit }}</p>
+    </form>
+    </div>
+
+{% endblock content %}
