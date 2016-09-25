@@ -175,7 +175,7 @@ KOMI_VALUES = ['0', '0.5', '1', '1.5', '2', '2.5', '3.0', '3.5', '4', '4.5',
     '5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5']
 TIE_BREAKS = ['SOS', 'SODOS', 'Face to Face Result', 'Random Procedure']
 MATCH_RESULTS = ['White Wins', 'Black Wins', 'Jigo', 'No Result',
-    'White Forfeit', 'Black Foreit', 'Double Foreit']
+    'White Forfeit', 'Black Forfeit', 'Double Forfeit']
 
 class Tournament(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -262,9 +262,3 @@ class Match(db.Model):
 # Setup Flask-Security
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-
-#  players paired (shuffl)
-#  match result inputted (Black Wins)
-    # Player 1 +win
-    # Player 2 +loss
-        # for first iteration this will mean Player2 is out.
