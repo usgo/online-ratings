@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome!{% endblock %}
+
+{% block page_content %}
+
+<h1> Welcome to Online Ratings! </h1>
+
+<h2>How does this work? </h2>
+
+<p> There are a lot of Go servers online that try to assign you a rating - KGS, OGS, IGS, Tygem, WBaduk, and countless others. The problem is that these ratings don't always agree with each other, or with the AGA's own rating system.</p>
+
+<p> We're putting together a way for all these Go organizations to combine their game data, and calculate a single, more accurate rating.</p>
+
+<p> For this to work, we need a way to put all of your accounts from OGS, KGS, etc. together.</p>
+
+<p> Here's how it works:</p>
+<ol>
+    <li> For each account you have, generate a new password </li>
+    <li> Submit this password to the server (OGS, KGS, etc.) </li>
+</ol>
+
+<p> That's it! Once the server knows who you are, they'll do the rest of the work in sending us the game data. </p>
+
+<p> Head over to <a href="{{url_for('ratings.profile')}}"> your account page</a> to get started</p>
+
+{% endblock %}

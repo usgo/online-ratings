@@ -41,6 +41,7 @@
                     </ul>
                 </li>
                 {% endif %}
+                <li><a href={{url_for('ratings.help')}}>Help</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
             {% if current_user.is_authenticated() %}

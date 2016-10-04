@@ -17,6 +17,10 @@ ratings = Blueprint("ratings", __name__)
 def home():
     return render_template('index.html')
 
+@ratings.route('/help')
+def help():
+    return render_template('help.html')
+
 @ratings.route('/profile')
 @login_required
 def profile():
