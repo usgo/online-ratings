@@ -6,12 +6,13 @@
 
 <h1> Your Account </h1>
 <table class="table">
-    <tr><td>AGA ID</td>
-        {% if user.aga_id is none %}
-        <td><a href="{{url_for('verify.verify_form')}}"> Link your AGA account </a></td></tr>
-        {% else %}
-        <td>{{ user.aga_id }}</td></tr>
-        {% endif%}
+   <tr><td>AGA ID</td>
+       {% if user.aga_id is none %}
+       <td><a href="{{url_for('verify.verify_form')}}"> Link your AGA account </a></td>
+       {% else %}
+       <td>{{ user.aga_id }}</td>
+       {% endif %}
+    </tr>
     <tr><td>Contact Email</td><td>{{ user.email }}</td></tr>
     <tr><td>Rating</td><td> {{ user.last_rating() or "No rating available"}}</td></tr>
 </table>

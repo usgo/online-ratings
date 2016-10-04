@@ -12,7 +12,7 @@
         <div class="navbar-collapse collapse">
             <img class="navbar-brand" style="padding: 5px"src="/static/agalogo2.png"><a class="navbar-brand" href="/">AGA Online Ratings</a>
             <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
+                <li><a href="{{url_for('ratings.home')}}">Home</a></li>
                 {% if current_user.has_role('ratings_admin') %}
                 <li class="dropdown">
                     <a href="#" data-toggle="dropdown" class="dropdown-toggle">Ratings Admin<b class="caret"></b></a>
