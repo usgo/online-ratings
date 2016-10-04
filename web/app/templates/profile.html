@@ -38,8 +38,8 @@
         <tr>
             <th>Server</th>
             <th>Name <a href="#" data-toggle="tooltip" title="This is your nickname or handle on the server">?</a> </th>
-            <th>Token <a href="#" data-toggle="tooltip" title="Anyone with your token can play rated games as this profile.  Keep it secret!">?</a> &nbsp; <a href="#"id="show-token-button" onClick="showTokens()">(Show Tokens)</a></th>
-            <th>Reset token</th></tr>
+            <th>Password <a href="#" data-toggle="tooltip" title="Anyone with your password can play rated games as this profile.  Keep it secret!">?</a> &nbsp; <a href="#"id="show-token-button" onClick="showTokens()">(Show Passwords)</a></th>
+            <th>Reset password <a href="#" data-toggle="tooltip" title="Reset this password - games submitted using the old password won't be recorded anymore"></th></tr>
         {% for p in players %}
         <tr>
             <td>{{p.server.name}}</td>
@@ -47,24 +47,18 @@
                 <a href="{{ url_for('ratings.player', player_id=p.id) }}">{{p.name}}</a>
             </td>
             <td><div class="player-token" style="display:none">{{ p.token }}</div></td>
-            <td><button onclick="reset_token({{p.id}})" type="button">Reset**</td>
+            <td><button onclick="reset_token({{p.id}})" type="button">REVOKE</td>
         </tr>
+        {% else %}
+        <tr><td colspan="4">No profiles yet! To get started, create a profile below. </td></tr>
         {% endfor %}
     </table>
 </div>
 
-<p>** Your token is the password that the server uses to submit rated games to Online Ratings. If this token is shared, anybody could submit games under your AGA ID. You can reset your token if this has happened, and your games will stop being submitted to us until you update your Go server account with the new token.</p>
-
-<hr />
-
-<h2>Create a new profile </h2>
-
-
 <form method="POST" action="{{ url_for('ratings.create_player') }}">
     {{form.csrf_token}}
-    {{form.server.label}} {{form.server}}
-    {{form.name.label}} {{form.name}}
-    <input type="submit" value="Create"/>
+    Username {{form.name}} on server {{form.server}}
+    <input type="submit" value="GENERATE"/>
 
 </form>
 
@@ -84,7 +78,7 @@ function reset_token(player_id) {
         method: "POST",
         url: TOKEN_RESET_ENDPOINT.replace("replacethis", player_id)
     }).then(function(response) {
-        alert("Token successfully reset.")
+        alert("Password successfully reset.")
         location.reload();
     }).fail(function(response) {
         alert("Uhoh, something went wrong. Please contact an admin.")
