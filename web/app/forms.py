@@ -5,6 +5,7 @@ from wtforms.fields.html5 import DateField
 from .models import KOMI_VALUES as kv
 from .models import TIE_BREAKS as tb
 from .models import MATCH_RESULTS as mr
+from .models import PAIRINGTYPES as pt
 
 
 class AddGameServerForm(Form):
@@ -82,8 +83,10 @@ class TournamentPlayerForm(Form):
     submit = SubmitField()
 
 class MatchResultsForm(Form):
-    player_1_name = StringField("Black's Name")
-    player_2_name= StringField("White's Name")
+    player_1_name = StringField("Black's Name", validators=[Optional()]) 
+    player_2_name= StringField("White's Name", validators=[Optional()])
     result = SelectField("Match Result", choices=[(x, x) for x in mr],
                            validators=[Required()])
+    result_notation = StringField("Result Notation", validators=[Optional()])
+    pairing = SelectField("Pairing", choices=[(x, x) for x in pt])
     submit = SubmitField()

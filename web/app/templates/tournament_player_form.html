@@ -8,7 +8,7 @@
       <h2>Enter Player Info:</h2>
 
       <form name="new_player" {% if not tp %} action="{{ url_for('.players_index', tournament_id=tournament.id) }}" {% endif %}
-        {% if tp %} action="{{ url_for('.select_player', tournament_id=tournament.id, tournament_player_id=tp.id) }}"{% endif %} method="post" >
+        {% if tp %} action="{{ url_for('.select_player', tournament_id=tournament.id, tournament_player_id=tp.aga_num) }}"{% endif %} method="post" >
         {{ form.hidden_tag() }}
         {% if tp %}<input type="hidden" name="_method" value="PUT"> {% endif %}
 

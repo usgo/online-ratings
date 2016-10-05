@@ -153,7 +153,7 @@ def create_extra_data():
                        basic_time="required field",
                        overtime_format="required field",
                        overtime_conditions="required field",
-                       komi="7",
+                       komi="7.5",
                        tie_break1="SOS",
                        tie_break2="SODOS")
         return t

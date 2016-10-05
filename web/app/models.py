@@ -170,14 +170,14 @@ class Game(db.Model):
 
 
 RULESETS = ["AGA", "INTERNATIONAL"]
-PAIRINGTYPES = ["McMahon"]
-KOMI_VALUES = ['0', '0.5', '1', '1.5', '2', '2.5', '3.0', '3.5', '4', '4.5',
-    '5', '5.5', '6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5']
+PAIRINGTYPES = ["McMahon", "Temporary_Alternative"]
+KOMI_VALUES = ['0', '0.5', '5.5', '6.5', '7.5']
 TIE_BREAKS = ['SOS', 'SODOS', 'Face to Face Result', 'Random Procedure']
 MATCH_RESULTS = ['White Wins', 'Black Wins', 'Jigo', 'No Result',
     'White Forfeit', 'Black Forfeit', 'Double Forfeit']
 
 class Tournament(db.Model):
+    __tablename__ = 'tournament'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     event_name = db.Column(db.String(80))
     venue = db.Column(db.String(80))
@@ -210,6 +210,7 @@ class Tournament(db.Model):
     komi = db.Column(db.Enum(*KOMI_VALUES, name='komi_values'), default='7')
     tie_break1 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
     tie_break2 = db.Column(db.Enum(*TIE_BREAKS, name='tie_breaks'))
+    rounds = relationship("Round", backref='tournament', cascade='all, delete-orphan')
     # tournament_players = relationship('TournamentPlayer')
 
     submitted = db.Column(db.Boolean, default=False)
@@ -227,9 +228,10 @@ class Tournament(db.Model):
             self.submitted)
 
 class TournamentPlayer(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    __tablename__ = 'tournament_player'
+    # id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80))
-    aga_num = db.Column(db.Integer)
+    aga_num = db.Column(db.Integer, primary_key=True)
     member_ex_date = db.Column(db.String(20))
     rating = db.Column(db.String(5))
     affiliation = db.Column(db.String(80))
@@ -248,16 +250,27 @@ class TournamentPlayer(db.Model):
         return "Tournament Player: {}\n \
                 Member found in db: {}".format(self.name)
 
+
+class Round(db.Model):
+    __tablename__ = 'tourny_round'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
+
+
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    player_1_id = db.Column(db.Integer)
+    player_1_aga_num = db.Column(db.Integer, db.ForeignKey('tournament_player.aga_num'), nullable=True)
     player_1_name = db.Column(db.String(80))
-    player_2_id = db.Column(db.Integer)
+    player_2_aga_num = db.Column(db.Integer, db.ForeignKey('tournament_player.aga_num'), nullable=True)
     player_2_name = db.Column(db.String(80))
     result = db.Column(db.Enum(*MATCH_RESULTS, name='match_results'),
         default='No Result')
+    result_notation = db.Column(db.String(80), default="")
+    pairing = db.Column(db.Enum(*PAIRINGTYPES, name='pairing_types'),
+        default='McMahon')
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
-    # tournament = relationship(Tournament, backref=db.backref('tourny'))
+    tourny_round = db.Column(db.Integer), db.ForeignKey('tourny_round.id')
+
 
 # Setup Flask-Security
 

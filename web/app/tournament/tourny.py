@@ -4,7 +4,7 @@ from flask import current_app, render_template, redirect, url_for
 from flask import jsonify, request, Response
 from . import tournament
 from app.forms import TournamentForm, TournamentPlayerForm, MatchResultsForm
-from app.models import db, Tournament, TournamentPlayer, Match
+from app.models import db, Tournament, TournamentPlayer, Match, Round
 from sqlalchemy import update
 ###
 from random import shuffle
@@ -182,77 +182,120 @@ def matches_index(tournament_id):
         tournament_id=tournament_id,
         matches=matches)
 
-    if request.method == 'POST':
-        players = TournamentPlayer.query.filter_by(tournament_id=tournament_id)
-        players_list = list(players)
-        shuffle(players_list)
-        while len(players_list) > 0:
-            if len(players_list) % 2 == 0:
-                match = Match(player_1_id = players_list.pop().id,
-                              player_2_id = players_list.pop().id,
-                              tournament_id = tournament_id)
-                db.session.add(match)
-                db.session.commit()
-                match = Match.query.all()[-1]
-                match.player_1_name = players.filter_by(
-                    id=match.player_1_id).first().name
-                match.player_2_name = players.filter_by(
-                    id=match.player_2_id).first().name
-                db.session.add(match)
-                db.session.commit()
-            else:
-                match = Match(player_1_id = players_list.pop().id,
-                              player_2_id = -1,
-                              tournament_id = tournament_id)
-                db.session.add(match)
-                db.session.commit()
-                match = Match.query.all()[-1]
-                match.player_1_name = players.filter_by(
-                    id=match.player_1_id).first().name
-                match.player_2_name = "BYE"
-                db.session.add(match)
-                db.session.commit()
-        return redirect(url_for('.matches_index',
-        tournament_id=tournament_id))
+
+@tournament.route('/<tournament_id>/full_pairing/', methods=['POST'])
+def full_pairing(tournament_id):
+    """Currently the full_pairing method takes all tournament players and pairs them each into a match object"""
+    tournament = Tournament.query.get(tournament_id)
+    players = TournamentPlayer.query.filter_by(tournament_id=tournament_id)
+    players_list = list(players)
+    shuffle(players_list)
+
+    tourny_round = Round(tournament_id=tournament_id)
+    db.session.add(tourny_round)
+    db.session.commit()
+    tourny_round = Round.query.all()[-1]
+    while len(players_list) > 0:
+        if len(players_list) % 2 == 0:
+            match = Match(player_1_aga_num = players_list.pop().aga_num,
+                          player_2_aga_num = players_list.pop().aga_num,
+                          tournament_id = tournament_id,
+                          pairing = tournament.pairing,
+                          tourny_round = tourny_round.id)
+            db.session.add(match)
+            db.session.commit()
+            match = Match.query.all()[-1]
+            match.player_1_name = players.filter_by(
+                aga_num=match.player_1_aga_num).first().name
+            match.player_2_name = players.filter_by(
+                aga_num=match.player_2_aga_num).first().name
+            db.session.add(match)
+            db.session.commit()
+        else:
+            match = Match(player_1_aga_num = players_list.pop().aga_num,
+                        #   player_2_aga_num = "",
+                          tournament_id = tournament_id,
+                          pairing = tournament.pairing,
+                          tourny_round = tourny_round.id)
+            db.session.add(match)
+            db.session.commit()
+            match = Match.query.all()[-1]
+            match.player_1_name = players.filter_by(
+                aga_num=match.player_1_aga_num).first().name
+            # match.player_2_name = "BYE"
+            db.session.add(match)
+            db.session.commit()
+    return redirect(url_for('.matches_index',
+    tournament_id=tournament_id))
+
+
+#  treating empty string returned by form as equal to None in DB
+def empty_player(none, empty_string):
+    if (none == None and empty_string == '') or (none == '' and empty_string == None):
+        return True
+    else:
+        return False
 
 
 @tournament.route('/<tournament_id>/match/<match_id>/', methods=['POST'])
 def match(tournament_id, match_id):
+    """PUT Method for match editing"""
     method = request.form.get('_method', '').upper()
     match = Match.query.get(match_id)
     if method == 'PUT':
         form = MatchResultsForm(obj=match)
         if form.validate_on_submit():
-            if form.player_1_name.data == match.player_1_name and form.player_2_name.data == match.player_2_name:
+            if (form.player_1_name.data == match.player_1_name or empty_player(form.player_1_name.data, match.player_1_name)) and (
+            form.player_2_name.data == match.player_2_name or empty_player(form.player_2_name.data, match.player_2_name)):
                 form.populate_obj(match)
                 db.session.commit()
                 return redirect(url_for('.matches_index', tournament_id=tournament_id))
             else:
                 if form.player_1_name.data != match.player_1_name:
-                    tp1 = TournamentPlayer.query.filter_by(tournament_id=match.tournament_id,
-                                                      name=form.player_1_name.data).first()
-                    if tp1:
-                        match.player_1_name = tp1.name
-                        match.player_1_id = tp1.id
+                    if form.player_1_name.data == "":
+                        match.player_1_name = None
+                        match.player_1_aga_num = None
                         match.result = form.result.data
+                        match.result_notation = form.result_notation.data
                         db.session.commit()
+                        # flash("Player removed from match")
                     else:
-                        # flash("Player not entered in tournament")
-                        return redirect(url_for('.matches_index',
+                        tp1 = TournamentPlayer.query.filter_by(tournament_id=match.tournament_id,
+                                                      name=form.player_1_name.data).first()
+                        if tp1:
+                            match.player_1_name = tp1.name
+                            match.player_1_id = tp1.aga_num
+                            match.result = form.result.data
+                            match.result_notation = form.result_notation.data
+                            db.session.commit()
+                            #  flash('Match Modified')
+                        else:
+                            #flash("Player not entered in tournament")
+                            return redirect(url_for('.matches_index',
                                         tournament_id=tournament_id))
 
                 if form.player_2_name.data != match.player_2_name:
-                    tp2 = TournamentPlayer.query.filter_by(tournament_id=match.tournament_id,
+                    if form.player_2_name.data != match.player_2_name:
+                        if form.player_2_name.data == "":
+                            match.player_2_name = None
+                            match.player_2_aga_num = None
+                            match.result = form.result.data
+                            match.result_notation = form.result_notation.data
+                            db.session.commit()
+                            # flash("Player removed from match")
+                        else:
+                            tp2 = TournamentPlayer.query.filter_by(tournament_id=match.tournament_id,
                                                            name=form.player_2_name.data).first()
-                    if tp2:
-                        match.player_2_name = tp2.name
-                        match.player_2_id = tp2.id
-                        match.result = form.result.data
-                        db.session.commit()
-                    else:
-                        # flash("Player not entered in tournament")
-                        return redirect(url_for('.matches_index',
-                                 tournament_id=tournament_id))
+                            if tp2:
+                                match.player_2_name = tp2.name
+                                match.player_2_id = tp2.aga_num
+                                match.result = form.result.data
+                                match.result_notation = form.result_notation.data
+                                db.session.commit()
+                            else:
+                                # flash("Player not entered in tournament")
+                                return redirect(url_for('.matches_index',
+                                         tournament_id=tournament_id))
 
                 return redirect(url_for('.matches_index',
                          tournament_id=tournament_id))

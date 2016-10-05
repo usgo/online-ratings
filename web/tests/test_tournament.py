@@ -24,7 +24,7 @@ class TestTournament(BaseTestCase):
             basic_time="filler text",
             overtime_format="filler text",
             overtime_conditions="filler text",
-            komi="7",
+            komi="7.5",
             tie_break1="SOS",
             tie_break2="SODOS")
         db.session.add(self.tournament_1)
@@ -82,7 +82,7 @@ class TestTournament(BaseTestCase):
     def test_tournament_player_edit_url(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + "/"
+            "/player/" + str(self.tournament_1_player.aga_num) + "/"
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
@@ -98,7 +98,7 @@ class TestTournament(BaseTestCase):
     def test_delete_player_url(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + "/"
+            "/player/" + str(self.tournament_1_player.aga_num) + "/"
         before = TournamentPlayer.query.count()
         self.assertEqual(1, before)
         response = self.client.delete(url, data={'_method': 'DELETE'})
@@ -137,8 +137,8 @@ class TestTournament(BaseTestCase):
     def test_it_can_edit_an_existing_tournament_player(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + "/"
-        player = TournamentPlayer.query.get(self.tournament_1_player.id)
+            "/player/" + str(self.tournament_1_player.aga_num) + "/"
+        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
         player.name = "Test Edit"
         response = self.client.put(
             url,
@@ -154,7 +154,7 @@ class TestTournament(BaseTestCase):
                    "dob": player.dob,
                    "_method": "PUT"} )
 
-        player = TournamentPlayer.query.get(self.tournament_1_player.id)
+        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
         self.assertEqual("Test Edit", player.name)
 
     # sad path - cannot create, edit, or delete player if tournament submitted
@@ -199,8 +199,8 @@ class TestTournament(BaseTestCase):
         #  TournamentPlayer test
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + "/"
-        player = TournamentPlayer.query.get(self.tournament_1_player.id)
+            "/player/" + str(self.tournament_1_player.aga_num) + "/"
+        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
         failed_update = "Test Edit"
         response = self.client.put(
             url,
@@ -215,7 +215,7 @@ class TestTournament(BaseTestCase):
                     "citizenship": player.citizenship,
                     "dob": player.dob,
                     "_method": "PUT" })
-        player = TournamentPlayer.query.get(self.tournament_1_player.id)
+        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
         self.assertNotEqual("Test Edit", player.name)
         self.assertEqual("Tester Testington", player.name)
 
@@ -229,13 +229,13 @@ class TestTournament(BaseTestCase):
         #  TournamentPlayer test
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.id) + "/"
+            "/player/" + str(self.tournament_1_player.aga_num) + "/"
         before = TournamentPlayer.query.count()
         self.assertEqual(1, before)
         response = self.client.delete(url, data={"_method":"DELETE"})
         after = TournamentPlayer.query.count()
         self.assertEqual(1, after)
-        player = TournamentPlayer.query.get(self.tournament_1_player.id)
+        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
         self.assertEqual("Tester Testington", player.name)
 ### End TournamentPlayer Tests
 
@@ -291,7 +291,7 @@ class TestTournament(BaseTestCase):
                    "basic_time": "filler text",
                    "overtime_format": "filler text",
                    "overtime_conditions": "filler text",
-                   "komi": "6",
+                   "komi": "7.5",
                    "tie_break1": "SOS",
                    "tie_break2": "SODOS" })
         count = Tournament.query.count()
@@ -315,7 +315,7 @@ class TestTournament(BaseTestCase):
                    "basic_time": "filler text",
                    "overtime_format": "filler text",
                    "overtime_conditions": "filler text",
-                   "komi": "6",
+                   "komi": "7.5",
                    "tie_break1": "SOS",
                    "tie_break2": "SODOS" })
         self.assertEqual(2, Tournament.query.count())

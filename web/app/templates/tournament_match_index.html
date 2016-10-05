@@ -7,7 +7,9 @@
     <p>Match ID {{ match.id }}</p>
     <p>Black's Name: {{ match.player_1_name}}</p>
     <p>White's Name: {{ match.player_2_name }}</p>
-    <p>Match Result: {{ match.result}}</p>
+    <p>Match Pairing: {{ match.pairing }}</p>
+    <p>Match Result: {{ match.result }}</p>
+    <p>Match Result Notation: {{ match.result_notation }}</p>
     <a href="{{ url_for('.edit_match', tournament_id=match.tournament_id, match_id=match.id)}}"><button type="button" name="button">Edit Match</button></a>
     </br></br>
   </div>

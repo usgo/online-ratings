@@ -9,7 +9,7 @@
   <a href="{{ url_for('.show', tournament_id=tournament.id) }}"><button>
     Tournament Details</button></a>
 {% if players.count() > 0 %}
-<form class="" action="{{ url_for('.matches_index', tournament_id=tournament.id) }}" method="post">
+<form class="" action="{{ url_for('.full_pairing', tournament_id=tournament.id) }}" method="post">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <button type='submit'>Pair</button>
 </form>
@@ -25,12 +25,12 @@
     <p>Phone {{ player.phone }}</p>
     <p>Citizenship: {{ player.citizenship }}</p>
     <p>Date of Birth: {{ player.dob }}</p>
-    <a href="{{ url_for('.select_player', tournament_player_id=player.id, tournament_id=tournament.id) }}"><button>Edit</button></a>
+    <a href="{{ url_for('.select_player', tournament_player_id=player.aga_num, tournament_id=tournament.id) }}"><button>Edit</button></a>
 
     {% if tournament.submitted == False %}
     <form action="{{ url_for('.select_player',
         tournament_id=tournament.id,
-        tournament_player_id=player.id) }}" method="POST">
+        tournament_player_id=player.aga_num) }}" method="POST">
       <input type="hidden" name="_method" value='DELETE' />
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <button type="submit">Delete Player</button>
