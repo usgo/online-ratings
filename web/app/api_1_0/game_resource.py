@@ -116,6 +116,7 @@ def validate_game_submission(headers, body_json):
                 result=data['result'],
                 handicap=handicap,
                 komi=komi,
+                game_url=data['game_url'],
                 game_record=game_record
                 )
     return game
