@@ -48,7 +48,8 @@
                 <li class="navbar-text">Logged in as {{current_user.email}}</li>
                 <li><a href="{{url_for_security('logout')}}">Logout</a></li>
             {% else %}
-                <li><a href="{{url_for_security('login')}}">Login/Register</a></li>
+                <li><a href="{{url_for_security('register')}}">Register</a></li>
+                <li><a href="{{url_for_security('login')}}">Login</a></li>
             {% endif %}
             </ul>
         </div>
