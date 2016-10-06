@@ -137,6 +137,11 @@ docker-compose run --rm web python /usr/src/app/manage.py shell
 Player FooPlayerKGS, id 1
 ```
 
+You might also find it useful to have a postgres shell.
+```
+docker-compose run --rm psql
+```
+
 ## Making database changes
 We use Alembic / Flask-Migrate to run database schema updates.
 

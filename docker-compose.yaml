@@ -40,6 +40,14 @@ services:
       - ./web/migrations/versions:/usr/src/app/migrations/versions
     command: python manage.py db migrate -m "description of schema changes"
 
+  psql:
+    image: postgres:latest
+    env_file: .env
+    links:
+      - postgres:postgres
+    # psql relies on env variable PGPASSWORD to bypass the usual password prompt
+    command: psql -h postgres -d $DB_NAME -U $DB_USER
+
 volumes:
   pgdata: {}
 
