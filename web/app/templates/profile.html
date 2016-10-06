@@ -39,7 +39,7 @@
             <th>Server</th>
             <th>Name <a href="#" data-toggle="tooltip" title="This is your nickname or handle on the server">?</a> </th>
             <th>Password <a href="#" data-toggle="tooltip" title="Anyone with your password can play rated games as this profile.  Keep it secret!">?</a> &nbsp; <a href="#"id="show-token-button" onClick="showTokens()">(Show Passwords)</a></th>
-            <th>Reset password <a href="#" data-toggle="tooltip" title="Reset this password - games submitted using the old password won't be recorded anymore"></th></tr>
+            <th>Reset password <a href="#" data-toggle="tooltip" title="Reset this password - games will stop being submitted until you re-enter your new password">?</a></th></tr>
         {% for p in players %}
         <tr>
             <td>{{p.server.name}}</td>
@@ -47,7 +47,7 @@
                 <a href="{{ url_for('ratings.player', player_id=p.id) }}">{{p.name}}</a>
             </td>
             <td><div class="player-token" style="display:none">{{ p.token }}</div></td>
-            <td><button onclick="reset_token({{p.id}})" type="button">REVOKE</td>
+            <td><button onclick="reset_token({{p.id}})" type="button">Reset</td>
         </tr>
         {% else %}
         <tr><td colspan="4">No profiles yet! To get started, create a profile below. </td></tr>
@@ -58,7 +58,7 @@
 <form method="POST" action="{{ url_for('ratings.create_player') }}">
     {{form.csrf_token}}
     Username {{form.name}} on server {{form.server}}
-    <input type="submit" value="GENERATE"/>
+    <input type="submit" value="Create profile"/>
 
 </form>
 
