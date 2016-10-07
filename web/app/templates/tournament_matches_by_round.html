@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Round {{ matches[0].t_round }}</h1>
+  {% for match in matches %}
+  <div>
+    <p>Match ID {{ match.id }}</p>
+    <p>Black's Name: {{ match.player_1_name}}</p>
+    <p>White's Name: {{ match.player_2_name }}</p>
+    <p>Match Pairing: {{ match.pairing }}</p>
+    <p>Match Result: {{ match.result }}</p>
+    <p>Match Result Notation: {{ match.result_notation }}</p>
+    {% if match.tourny_round.submitted == False %}
+      <a href="{{ url_for('.edit_match', tournament_id=match.tournament_id, match_id=match.id)}}"><button type="button" name="button">Edit Match</button></a>
+    {% endif %}
+    </br></br>
+  </div>
+  {% endfor %}
+
+<!--  why???-->
+{% if matches[0].tourny_round.submitted == True and
+  latest_round %}
+  <form action="{{ url_for('.full_pairing',
+                   tournament_id=tournament_id) }}" method="POST">
+    <!-- <input type="submit" value="Pair for Next Round"> -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Pair for Next Round</button>
+  </form>
+{% endif %}
+
+<!--  if round being viewed is not currently open round; link to next round-->
+{% if matches[0].tourny_round.submitted == True %}
+  <a href="{{ url_for('.matches_by_round_index', tournament_id=tournament_id,
+              round_id=(matches[0].t_round + 1)) }}">
+              <button type="button">View Next Round</button></a>
+{% endif %}
+
+{% if matches[0].tourny_round.submitted == False %}
+
+  <form action="{{ url_for('.submit_round',
+                   tournament_id=tournament_id,
+                   round_id=matches[0].t_round) }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Submit Round</button>
+  </form>
+{% endif %}
+
+</div>
+{% endblock content%}

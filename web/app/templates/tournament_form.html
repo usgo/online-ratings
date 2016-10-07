@@ -13,6 +13,9 @@
     {% if tournament %}
       action="{{ url_for('.show', tournament_id=tournament.id) }}" >
         <input type="hidden" name="_method" value="PUT">
+        <!--  Using HTML Forms for PUT and DELETE require smuggling those 
+              values in as hidden inputs on POST requests.
+              Ajax could be used to clean this up -->
     {% endif %}
 
     {{ form.hidden_tag() }}

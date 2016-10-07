@@ -10,6 +10,9 @@
     <input type="hidden" name="_method" value="DELETE">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <button type="submit">Delete</button>
+    <!--  Using HTML Forms for PUT and DELETE require smuggling those
+          values in as hidden inputs on POST requests.
+          Ajax could be used to clean this up -->
   </form>
 </div>
 {% endif %}

@@ -1,7 +1,7 @@
 
 import datetime
 from flask import current_app, render_template, redirect, url_for
-from flask import jsonify, request, Response
+from flask import jsonify, request, Response, flash
 from . import tournament
 from app.forms import TournamentForm, TournamentPlayerForm, MatchResultsForm
 from app.models import db, Tournament, TournamentPlayer, Match, Round
@@ -177,7 +177,8 @@ def select_player(tournament_id, tournament_player_id):
 @tournament.route('/<tournament_id>/matches/', methods=['GET'])
 def matches_index(tournament_id):
     any_matches = Match.query.count()
-    matches = Match.query.filter_by(tournament_id=tournament_id)
+    matches = Match.query.filter_by(
+        tournament_id=tournament_id).order_by("t_round, id")
     if any_matches > 0:
         return render_template('tournament_match_index.html',
         tournament_id=tournament_id,
@@ -187,30 +188,36 @@ def matches_index(tournament_id):
         return redirect(url_for('.show', tournament_id=tournament_id))
 
 
-#### experiment
-
-@tournament.route('/<tournament_id>/round/<round_id>/matches', methods=['GET'])
+@tournament.route('/<tournament_id>/round/<round_id>/', methods=['GET'])
+@tournament.route('/<tournament_id>/round/<round_id>/matches/', methods=['GET'])
 def matches_by_round_index(tournament_id, round_id):
+    ###
+    # this ugly piece allows for conditional in the template
+    # if viewed round is latest_round
+    latest_round = False
+    round_in_url = round_id
+    if round_in_url == str(Round.query.all()[-1].id):
+        latest_round = True
+        ###
     any_matches = Match.query.filter_by(tournament_id=tournament_id,
                                         t_round=round_id).count()
     matches = Match.query.filter_by(tournament_id=tournament_id,
                                     t_round=round_id)
     if any_matches > 0:
-        return render_template('tournament_match_index.html',
+        return render_template('tournament_matches_by_round.html',
         tournament_id=tournament_id,
         matches=matches,
-        round_id=round_id)
+        round_id=round_id,
+        latest_round=latest_round)
     else:
         #  flash('URL Error')
         return redirect(url_for('.show', tournament_id=tournament_id))
 
 
-###
-
-
 @tournament.route('/<tournament_id>/full_pairing/', methods=['POST'])
 def full_pairing(tournament_id):
-    """Currently the full_pairing method takes all tournament players and pairs them each into a match object"""
+    """Currently the full_pairing method takes all tournament players,
+    shuffles them, and pairs them each into a match object"""
     tournament = Tournament.query.get(tournament_id)
     players = TournamentPlayer.query.filter_by(tournament_id=tournament_id)
     players_list = list(players)
@@ -271,11 +278,16 @@ def match(tournament_id, match_id):
     if method == 'PUT':
         form = MatchResultsForm(obj=match)
         if form.validate_on_submit():
-            if (form.player_1_name.data == match.player_1_name or empty_player(form.player_1_name.data, match.player_1_name)) and (
-            form.player_2_name.data == match.player_2_name or empty_player(form.player_2_name.data, match.player_2_name)):
+            if (form.player_1_name.data == match.player_1_name or empty_player(
+                form.player_1_name.data, match.player_1_name)) and (
+                form.player_2_name.data == match.player_2_name or empty_player(
+                form.player_2_name.data, match.player_2_name)):
+
                 form.populate_obj(match)
                 db.session.commit()
-                return redirect(url_for('.matches_index', tournament_id=tournament_id))
+                return redirect(url_for('.matches_by_round_index',
+                    tournament_id=tournament_id,
+                    round_id=match.t_round))
             else:
                 if form.player_1_name.data != match.player_1_name:
                     if form.player_1_name.data == "":
@@ -286,8 +298,9 @@ def match(tournament_id, match_id):
                         db.session.commit()
                         # flash("Player removed from match")
                     else:
-                        tp1 = TournamentPlayer.query.filter_by(tournament_id=match.tournament_id,
-                                                      name=form.player_1_name.data).first()
+                        tp1 = TournamentPlayer.query.filter_by(
+                            tournament_id=match.tournament_id,
+                            name=form.player_1_name.data).first()
                         if tp1:
                             match.player_1_name = tp1.name
                             match.player_1_id = tp1.aga_num
@@ -297,8 +310,9 @@ def match(tournament_id, match_id):
                             #  flash('Match Modified')
                         else:
                             #flash("Player not entered in tournament")
-                            return redirect(url_for('.matches_index',
-                                        tournament_id=tournament_id))
+                            return redirect(url_for('.matches_by_round_index',
+                                tournament_id=tournament_id,
+                                round_id=match.t_round))
 
                 if form.player_2_name.data != match.player_2_name:
                     if form.player_2_name.data != match.player_2_name:
@@ -310,8 +324,9 @@ def match(tournament_id, match_id):
                             db.session.commit()
                             # flash("Player removed from match")
                         else:
-                            tp2 = TournamentPlayer.query.filter_by(tournament_id=match.tournament_id,
-                                                           name=form.player_2_name.data).first()
+                            tp2 = TournamentPlayer.query.filter_by(
+                                tournament_id=match.tournament_id,
+                                name=form.player_2_name.data).first()
                             if tp2:
                                 match.player_2_name = tp2.name
                                 match.player_2_id = tp2.aga_num
@@ -320,11 +335,13 @@ def match(tournament_id, match_id):
                                 db.session.commit()
                             else:
                                 # flash("Player not entered in tournament")
-                                return redirect(url_for('.matches_index',
-                                         tournament_id=tournament_id))
+                                return redirect(url_for('.matches_by_round_index',
+                                    tournament_id=tournament_id,
+                                    round_id=match.t_round))
 
-                return redirect(url_for('.matches_index',
-                         tournament_id=tournament_id))
+                return redirect(url_for('.matches_by_round_index',
+                    tournament_id=tournament_id,
+                    round_id=match.t_round))
 
 @tournament.route('/<tournament_id>/match/<match_id>/edit/', methods=['GET'])
 def edit_match(tournament_id, match_id):
@@ -333,16 +350,18 @@ def edit_match(tournament_id, match_id):
     return render_template('tournament_match_form.html', match=match, form=form)
 
 
-@tournament.route('/<tournament_id>/round/<round_id>', methods=['POST'])
+@tournament.route('/<tournament_id>/round/<round_id>/', methods=['POST'])
 def submit_round(tournament_id, round_id):
     tournament_round = Round.query.get(round_id)
     if tournament_round:
-        # fail
         tournament_round.submitted = True
-        # db.session.add(tourny_round)
         db.session.commit()
-        return redirect(url_for('.matches_index', tournament_id=tournament_id))
+        return redirect(url_for('.matches_by_round_index',
+            tournament_id=tournament_id,
+            round_id=round_id))
     else:
-        return redirect(url_for('.matches_index', tournament_id=tournament_id))
-# template if/else display edit or display match for new round
+        # flash("Error: Something went wrong")
+        return redirect(url_for('.matches_by_round_index',
+            tournament_id=tournament_id,
+            round_id=round_id))
 # tourny  match edit if round.submitted == false

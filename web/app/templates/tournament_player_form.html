@@ -11,6 +11,9 @@
         {% if tp %} action="{{ url_for('.select_player', tournament_id=tournament.id, tournament_player_id=tp.aga_num) }}"{% endif %} method="post" >
         {{ form.hidden_tag() }}
         {% if tp %}<input type="hidden" name="_method" value="PUT"> {% endif %}
+        <!--  Using HTML Forms for PUT and DELETE require smuggling those
+              values in as hidden inputs on POST requests.
+              Ajax could be used to clean this up -->
 
         <p>{{ form.name.label }}: {{ form.name }}</p>
         <p>{{ form.aga_num.label }}: {{ form.aga_num }}</p>
