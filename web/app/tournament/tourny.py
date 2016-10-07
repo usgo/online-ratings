@@ -174,13 +174,38 @@ def select_player(tournament_id, tournament_player_id):
             tournament_id=tournament_id))
 
 
-@tournament.route('/<tournament_id>/matches/', methods=['GET', 'POST'])
+@tournament.route('/<tournament_id>/matches/', methods=['GET'])
 def matches_index(tournament_id):
-    if request.method == "GET":
-        matches = Match.query.filter_by(tournament_id=tournament_id)
+    any_matches = Match.query.count()
+    matches = Match.query.filter_by(tournament_id=tournament_id)
+    if any_matches > 0:
         return render_template('tournament_match_index.html',
         tournament_id=tournament_id,
         matches=matches)
+    else:
+        #  flash('URL Error')
+        return redirect(url_for('.show', tournament_id=tournament_id))
+
+
+#### experiment
+
+@tournament.route('/<tournament_id>/round/<round_id>/matches', methods=['GET'])
+def matches_by_round_index(tournament_id, round_id):
+    any_matches = Match.query.filter_by(tournament_id=tournament_id,
+                                        t_round=round_id).count()
+    matches = Match.query.filter_by(tournament_id=tournament_id,
+                                    t_round=round_id)
+    if any_matches > 0:
+        return render_template('tournament_match_index.html',
+        tournament_id=tournament_id,
+        matches=matches,
+        round_id=round_id)
+    else:
+        #  flash('URL Error')
+        return redirect(url_for('.show', tournament_id=tournament_id))
+
+
+###
 
 
 @tournament.route('/<tournament_id>/full_pairing/', methods=['POST'])
@@ -201,7 +226,7 @@ def full_pairing(tournament_id):
                           player_2_aga_num = players_list.pop().aga_num,
                           tournament_id = tournament_id,
                           pairing = tournament.pairing,
-                          tourny_round = tourny_round.id)
+                          t_round = tourny_round.id)
             db.session.add(match)
             db.session.commit()
             match = Match.query.all()[-1]
@@ -216,7 +241,7 @@ def full_pairing(tournament_id):
                         #   player_2_aga_num = "",
                           tournament_id = tournament_id,
                           pairing = tournament.pairing,
-                          tourny_round = tourny_round.id)
+                          t_round = tourny_round.id)
             db.session.add(match)
             db.session.commit()
             match = Match.query.all()[-1]
@@ -225,8 +250,9 @@ def full_pairing(tournament_id):
             # match.player_2_name = "BYE"
             db.session.add(match)
             db.session.commit()
-    return redirect(url_for('.matches_index',
-    tournament_id=tournament_id))
+    return redirect(url_for('.matches_by_round_index',
+    tournament_id=tournament_id,
+    round_id=tourny_round.id))
 
 
 #  treating empty string returned by form as equal to None in DB
@@ -305,3 +331,18 @@ def edit_match(tournament_id, match_id):
     match = Match.query.get(match_id)
     form = MatchResultsForm(obj=match)
     return render_template('tournament_match_form.html', match=match, form=form)
+
+
+@tournament.route('/<tournament_id>/round/<round_id>', methods=['POST'])
+def submit_round(tournament_id, round_id):
+    tournament_round = Round.query.get(round_id)
+    if tournament_round:
+        # fail
+        tournament_round.submitted = True
+        # db.session.add(tourny_round)
+        db.session.commit()
+        return redirect(url_for('.matches_index', tournament_id=tournament_id))
+    else:
+        return redirect(url_for('.matches_index', tournament_id=tournament_id))
+# template if/else display edit or display match for new round
+# tourny  match edit if round.submitted == false

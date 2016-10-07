@@ -255,6 +255,7 @@ class Round(db.Model):
     __tablename__ = 'tourny_round'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
+    submitted = db.Column(db.Boolean, default=False)
 
 
 class Match(db.Model):
@@ -269,8 +270,9 @@ class Match(db.Model):
     pairing = db.Column(db.Enum(*PAIRINGTYPES, name='pairing_types'),
         default='McMahon')
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
-    tourny_round = db.Column(db.Integer), db.ForeignKey('tourny_round.id')
-
+    t_round = db.Column(db.Integer, db.ForeignKey('tourny_round.id'))
+    tourny_round= relationship('Round',
+        backref=db.backref('Round', cascade='all, delete-orphan'))
 
 # Setup Flask-Security
 
