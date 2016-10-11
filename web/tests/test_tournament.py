@@ -31,6 +31,7 @@ class TestTournament(BaseTestCase):
         db.session.commit()
 
         self.tournament_1_player = TournamentPlayer(
+            id='1',
             name="Tester Testington",
             aga_num="12345",
             rating="100",
@@ -82,7 +83,7 @@ class TestTournament(BaseTestCase):
     def test_tournament_player_edit_url(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.aga_num) + "/"
+            "/player/" + str(self.tournament_1_player.id) + "/"
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
@@ -98,7 +99,7 @@ class TestTournament(BaseTestCase):
     def test_delete_player_url(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.aga_num) + "/"
+            "/player/" + str(self.tournament_1_player.id) + "/"
         before = TournamentPlayer.query.count()
         self.assertEqual(1, before)
         response = self.client.delete(url, data={'_method': 'DELETE'})
@@ -116,7 +117,7 @@ class TestTournament(BaseTestCase):
         response = self.client.post(
             url,
             data={ "tournament_id": tournament.id,
-                    "name": 'player 2',
+                   "name": 'player 2',
                    "aga_num": '23456',
                    "rating": '11',
                    "affiliation": 'The Go Getters',
@@ -137,8 +138,8 @@ class TestTournament(BaseTestCase):
     def test_it_can_edit_an_existing_tournament_player(self):
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.aga_num) + "/"
-        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
+            "/player/" + str(self.tournament_1_player.id) + "/"
+        player = TournamentPlayer.query.get(self.tournament_1_player.id)
         player.name = "Test Edit"
         response = self.client.put(
             url,
@@ -154,7 +155,7 @@ class TestTournament(BaseTestCase):
                    "dob": player.dob,
                    "_method": "PUT"} )
 
-        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
+        player = TournamentPlayer.query.get(self.tournament_1_player.id)
         self.assertEqual("Test Edit", player.name)
 
     # sad path - cannot create, edit, or delete player if tournament submitted
@@ -199,8 +200,8 @@ class TestTournament(BaseTestCase):
         #  TournamentPlayer test
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.aga_num) + "/"
-        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
+            "/player/" + str(self.tournament_1_player.id) + "/"
+        player = TournamentPlayer.query.get(self.tournament_1_player.id)
         failed_update = "Test Edit"
         response = self.client.put(
             url,
@@ -215,7 +216,7 @@ class TestTournament(BaseTestCase):
                     "citizenship": player.citizenship,
                     "dob": player.dob,
                     "_method": "PUT" })
-        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
+        player = TournamentPlayer.query.get(self.tournament_1_player.id)
         self.assertNotEqual("Test Edit", player.name)
         self.assertEqual("Tester Testington", player.name)
 
@@ -229,13 +230,13 @@ class TestTournament(BaseTestCase):
         #  TournamentPlayer test
         url = self.tournament_endpoint + \
             str(self.tournament_1.id) + \
-            "/player/" + str(self.tournament_1_player.aga_num) + "/"
+            "/player/" + str(self.tournament_1_player.id) + "/"
         before = TournamentPlayer.query.count()
         self.assertEqual(1, before)
         response = self.client.delete(url, data={"_method":"DELETE"})
         after = TournamentPlayer.query.count()
         self.assertEqual(1, after)
-        player = TournamentPlayer.query.get(self.tournament_1_player.aga_num)
+        player = TournamentPlayer.query.get(self.tournament_1_player.id)
         self.assertEqual("Tester Testington", player.name)
 ### End TournamentPlayer Tests
 

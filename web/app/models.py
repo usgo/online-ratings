@@ -229,9 +229,9 @@ class Tournament(db.Model):
 
 class TournamentPlayer(db.Model):
     __tablename__ = 'tournament_player'
-    # id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80))
-    aga_num = db.Column(db.Integer, primary_key=True)
+    aga_num = db.Column(db.Integer)
     member_ex_date = db.Column(db.String(20))
     rating = db.Column(db.String(5))
     affiliation = db.Column(db.String(80))
@@ -260,9 +260,9 @@ class Round(db.Model):
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    player_1_aga_num = db.Column(db.Integer, db.ForeignKey('tournament_player.aga_num'), nullable=True)
+    player_1_id = db.Column(db.Integer, db.ForeignKey('tournament_player.id'), nullable=True)
     player_1_name = db.Column(db.String(80))
-    player_2_aga_num = db.Column(db.Integer, db.ForeignKey('tournament_player.aga_num'), nullable=True)
+    player_2_id = db.Column(db.Integer, db.ForeignKey('tournament_player.id'), nullable=True)
     player_2_name = db.Column(db.String(80))
     result = db.Column(db.Enum(*MATCH_RESULTS, name='match_results'),
         default='No Result')
@@ -271,7 +271,7 @@ class Match(db.Model):
         default='McMahon')
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournament.id'))
     t_round = db.Column(db.Integer, db.ForeignKey('tourny_round.id'))
-    tourny_round= relationship('Round',
+    tourny_round = relationship('Round',
         backref=db.backref('Round', cascade='all, delete-orphan'))
 
 # Setup Flask-Security
