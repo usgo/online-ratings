@@ -36,6 +36,7 @@ class DockerConfiguration(BaseConfiguration):
     )
 
     MAIL_PORT = 587
+    MAIL_DEBUG = os.environ.get("MAIL_DEBUG")
     MAIL_USE_TLS = True
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
