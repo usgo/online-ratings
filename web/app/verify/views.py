@@ -6,8 +6,8 @@ from flask.ext.security import login_required
 from flask.ext.login import current_user
 from flask.ext.wtf import Form
 from flask.ext.mail import Message
+from sqlalchemy.sql import and_
 from itsdangerous import BadSignature, URLSafeSerializer
-import app
 from app.models import User, db
 import logging
 
@@ -50,6 +50,10 @@ def get_verify_link(user, aga_id):
     return url_for('.verify_player', payload=payload, 
                    _external=True)
 
+def aga_id_already_used(user, aga_id):
+    exists = User.query.filter(and_(User.id!=user.id, User.aga_id==str(aga_id), User.fake==False)).count() > 0
+    return exists
+
 def send_verify_email(user, aga_id):
     aga_info = get_aga_info(aga_id)
     if aga_info is None:
@@ -72,6 +76,8 @@ def verify_form():
     form = LinkUserWithAGANumberForm()
     if form.validate_on_submit():
         aga_id = form.aga_id.data
+        if aga_id_already_used(current_user, aga_id):
+            return render_template('verify/verify_form_post_submit_conflict.html', aga_id=aga_id)
         success = send_verify_email(current_user, aga_id)
         if success:
             return render_template('verify/verify_form_post_submit.html')
