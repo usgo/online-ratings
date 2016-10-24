@@ -31,7 +31,7 @@ def email_exception(exception):
     recipients defined in config.ADMINS
     '''
 
-    msg = Message("[AGA Online Ratings|Flask] Exception: %s" % exception,
+    msg = Message("[AGA Online Ratings|Flask] Exception: %s" % exception.__class__.__name__,
                     recipients=current_app.config['ADMINS'])
     msg_contents = [
         'Traceback:',
