@@ -38,7 +38,7 @@ class User(db.Model, UserMixin):
     aga_id = db.Column(db.String(25))
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255))
-    claimed = db.Column(db.Boolean, default=False, nullable=False)
+    fake = db.Column(db.Boolean, default=False, nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
@@ -50,13 +50,12 @@ class User(db.Model, UserMixin):
     login_count = db.Column(db.Integer, default=0, nullable=False)
     players = relationship("Player")
 
-    # For every AGA member, a fake user (aga_id, claimed=False) is created.
+    # For every AGA member, a fake user (aga_id, fake=True) is created.
     # (This fake user holds onto their real life game history for them.)
-    # When that AGA member signs up, the fake user is updated to 
-    # (aga_id, claimed=True), and the real user gets (aga_id, claimed=False).
+    # When that AGA member signs up, they gets (aga_id, fake=False).
     # Thus, only one fake and one real user can ever exist for an aga_id.
     __table_args__ = (
-        db.Index("aga_id__claimed", "aga_id", "claimed", unique=True),
+        db.Index("aga_id__fake", "aga_id", "fake", unique=True),
     )
 
     def is_server_admin(self):

@@ -46,8 +46,8 @@ class AGAHistoricalGamesLoader(Command):
                                  if line['old'] != line['new']}  # Prevents infinite lookup loops
 
     def get_or_make_user(self, aga_id):
-        """Returns the User object for the given AGA ID or creates it and an RLGS
-        player if it does not exist.
+        """Gets or creates a fake User object for an AGA ID,
+        along with an AGA player
         If the AGA ID has had one or more PIN changes, the most recent ID will
         be used.
         """
@@ -56,7 +56,7 @@ class AGAHistoricalGamesLoader(Command):
         if aga_id in self._users:
             return self._users[aga_id]
         else:
-            user = User(aga_id=aga_id, email=uuid4())
+            user = User(aga_id=aga_id, email=uuid4(), fake=True)
             player = Player(id=aga_id, name='', user_id=user.id, server_id=self.server_id)
 
             db.session.add(user)
