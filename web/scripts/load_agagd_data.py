@@ -1,4 +1,3 @@
-from app import get_app
 from app.models import db, Game, GoServer, Player, User
 from app.tokengen import generate_token
 from flask.ext.script import Command, Option
@@ -18,7 +17,7 @@ def create_server(name):
         return server.id
 
 
-class RealLifeGoServerLoader(Command):
+class AGAHistoricalGamesLoader(Command):
     """Class which holds a little bit of state used while loading the AGAGD data."""
 
     option_list = (
@@ -31,12 +30,12 @@ class RealLifeGoServerLoader(Command):
         at construction time, and we are constructed regardless of whether
         this script is being run or not.
         """
-        name = 'Real Life Go Server'
+        name = 'AGA'
         server = db.session.query(GoServer).filter_by(name=name).first()
         if server:
             self.server_id = server.id
         else:
-            print('Creating RLGS Server object')
+            print('Creating AGA Server object')
             self.server_id = create_server(name)
 
         self._users = {}
@@ -91,22 +90,7 @@ class RealLifeGoServerLoader(Command):
                     print('Loading row', i)
                 self.store_game(row)
 
-    def run(self, agagd_dump_filename, pin_change_dump_filename, app=None):
-        if app is None:
-            app = get_app('config.DockerConfiguration')
-        with app.app_context():
-            self.setup(pin_change_dump_filename)
-            self.load_data(agagd_dump_filename)
+    def run(self, agagd_dump_filename, pin_change_dump_filename):
+        self.setup(pin_change_dump_filename)
+        self.load_data(agagd_dump_filename)
 
-
-def main():
-    import sys
-    loader = RealLifeGoServerLoader()
-    app = get_app('config.TestConfiguration')
-    with app.app_context():
-        db.create_all()
-
-    loader.run(sys.argv[1], sys.argv[2], app=app)
-
-if __name__ == '__main__':
-    main()
