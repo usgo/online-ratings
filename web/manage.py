@@ -3,7 +3,7 @@ from flask_migrate import MigrateCommand
 
 from app import get_app
 
-from create_db import drop_all_tables, create_barebones_data, create_all_data, create_server
+from scripts.create_db import drop_all_tables, create_barebones_data, create_all_data, create_server
 from scripts.load_agagd_data import AGAHistoricalGamesLoader
 
 app = get_app('config.DockerConfiguration')

@@ -52,7 +52,7 @@ Before you get started working on Online Ratings, you'll need to do some setup:
 * Install the Docker command line tools.
 * Get set up with a VM to use with Docker
 * Build and run the app on the VM with Docker
-* log in using the fake login credentials found in `web/create_db.py`
+* log in using the fake login credentials found in `web/scripts/create_db.py`
 
 ## Package Managers
 
