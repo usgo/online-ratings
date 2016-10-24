@@ -63,7 +63,7 @@ def send_verify_email(user, aga_id):
         subject=email_subject,
         html=email_body,
     )
-    app.mail.send(email)
+    current_app.extensions.get('mail').send(email)
     return True
 
 @verify.route('/verify', methods=['GET', 'POST'])
