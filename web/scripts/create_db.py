@@ -55,7 +55,7 @@ def create_test_data():
 
 
     basedir = os.path.abspath(os.path.dirname(__file__))
-    with open(os.path.join(basedir, 'tests/testsgf.sgf'), 'rb') as sgf_file:
+    with open(os.path.join(basedir, '../tests/testsgf.sgf'), 'rb') as sgf_file:
         sgf_data = sgf_file.read()
 
     db.session.add(Game(server_id=1, white_id=1, black_id=2, rated=True, result="B+0.5", game_record=sgf_data,
