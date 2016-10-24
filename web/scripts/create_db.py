@@ -30,7 +30,7 @@ def _create_server(u_email, u_password, s_name, s_url, s_token=None):
     if s_token is None:
         s_token = uuid4()
     server_admin_role = user_datastore.find_role(SERVER_ADMIN_ROLE.name)
-    server_admin = create_user(u_email, u_password, server_admin_role)
+    server_admin = create_user(u_email, u_password, server_admin_role, confirmed_at=datetime.datetime.now())
     server = GoServer(name=s_name, url=s_url, token=s_token)
     server.admins.append(server_admin)
     db.session.add(server)
@@ -39,13 +39,13 @@ def _create_server(u_email, u_password, s_name, s_url, s_token=None):
 
 def create_test_data():
     role_user, role_gs_admin, role_aga_admin = create_roles()
-    superadmin = create_user("admin@usgo.org", "usgo", role_aga_admin)
+    superadmin = create_user("admin@usgo.org", "usgo", role_aga_admin, confirmed_at=datetime.datetime.now())
     kgs_server = _create_server("admin@gokgs.com", "kgs", "KGS", "http://gokgs.com", s_token="secret_kgs")
     ogs_server = _create_server("admin@ogs.com", "ogs", "OGS", "http://online-go.com", s_token="secret_ogs")
 
-    foo_user = create_user("foo@foo.com", "foo", role_user, aga_id=10)
-    bar_user = create_user("bar@bar.com", "bar", role_user, aga_id=20)
-    baz_user = create_user("baz@baz.com", "baz", role_user, aga_id=30)
+    foo_user = create_user("foo@foo.com", "foo", role_user, aga_id=10, confirmed_at=datetime.datetime.now())
+    bar_user = create_user("bar@bar.com", "bar", role_user, aga_id=20, confirmed_at=datetime.datetime.now())
+    baz_user = create_user("baz@baz.com", "baz", role_user, aga_id=30, confirmed_at=datetime.datetime.now())
     db.session.add(Player(id=1, name="FooPlayerKGS", server_id=kgs_server.id, user_id=foo_user.id,token="secret_foo_KGS"))
     db.session.add(Player(id=4, name="FooPlayerOGS", server_id=ogs_server.id, user_id=foo_user.id,token="secret_foo_OGS"))
     db.session.add(Player(id=2, name="BarPlayerKGS", server_id=kgs_server.id, user_id=bar_user.id,token="secret_bar_KGS"))
@@ -152,7 +152,6 @@ def drop_all_tables(force=False):
 def create_barebones_data():
     'Initialize database without any data fixtures; just a superuser account.'
     initialize_db_connections()
-    db.create_all()
     role_user, role_gs_admin, role_aga_admin = create_roles()
     admin_username = input("Enter a superuser email address > ")
     admin_password = getpass.getpass("Enter the superuser password > ")
@@ -162,7 +161,6 @@ def create_barebones_data():
 def create_all_data():
     'Initialize database tables, create fake servers, users, players, game data, etc.'
     initialize_db_connections()
-    db.create_all()
     create_test_data()
     create_extra_data()
 

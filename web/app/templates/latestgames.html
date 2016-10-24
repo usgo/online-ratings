@@ -9,8 +9,8 @@
     <th>White AGA ID (nick)</th>
     <th>Black AGA ID (nick)</th>
     <th>Result</th>
-    <th>Rated?</th>
     <th>Date Played</th>
+    <th>Date reported</th>
     <th>Game Record</th>
 </tr>
 {% for g in games %}
@@ -19,8 +19,8 @@
     <td>{{g.white.user.aga_id}} ({{g.white.name}})</td>
     <td>{{g.black.user.aga_id}} ({{g.black.name}})</td>
     <td>{{g.result}}</td>
-    <td>{{g.rated}}</td>
     <td>{{g.date_played}}</td>
+    <td>{{g.date_reported}}</td>
     <td>
     {% if g.game_record is not none %}
       <a href="{{ url_for('ratings.gamedetail', game_id=g.id) }}">link</a>

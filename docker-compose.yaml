@@ -1,34 +1,53 @@
-web:
-  restart: always
-  build: ./web
-  expose:
-    - "5000"
-  env_file: .env
-  command: /usr/local/bin/gunicorn -w 2 -b :5000 manage:app
-  links:
-    - postgres:postgres
+version: '2'
+services:
+  web:
+    restart: always
+    build: ./web
+    expose:
+      - "5000"
+    env_file: .env
+    command: /usr/local/bin/gunicorn -w 2 -b :5000 manage:app
+    links:
+      - postgres:postgres
 
-nginx:
-  restart: always
-  # build also includes static assets to be served by nginx
-  build: ./nginx
-  ports:
-    - "80:80"
-  links:
-    - web:web
+  nginx:
+    restart: always
+    # build also includes static assets to be served by nginx
+    build: ./nginx
+    ports:
+      # You may wish to use :8080 for dev
+      - "80:80"
+    links:
+      - web:web
 
-data:
-  image: postgres:latest
-  volumes:
-    - /var/lib/postgresql
+  postgres:
+    restart: always
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    # the same env file defines both the postgres user/password
+    # so that postgres creates the user, and the app uses those creds
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql
 
-postgres:
-  restart: always
-  image: postgres:latest
-  ports:
-    - "5432:5432"
-  # the same env file defines both the postgres user/password
-  # so that postgres creates the user, and the app uses those creds
-  env_file: .env
-  volumes_from:
-    - data
+  db_migrate:
+    build: ./web
+    env_file: .env
+    links:
+      - postgres:postgres
+    volumes:
+      - ./web/migrations/versions:/usr/src/app/migrations/versions
+    command: python manage.py db migrate -m "description of schema changes"
+
+  psql:
+    image: postgres:latest
+    env_file: .env
+    links:
+      - postgres:postgres
+    # psql relies on env variable PGPASSWORD to bypass the usual password prompt
+    command: psql -h postgres -d $DB_NAME -U $DB_USER
+
+volumes:
+  pgdata: {}
+

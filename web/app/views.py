@@ -17,6 +17,10 @@ ratings = Blueprint("ratings", __name__)
 def home():
     return render_template('index.html')
 
+@ratings.route('/help')
+def help():
+    return render_template('help.html')
+
 @ratings.route('/profile')
 @login_required
 def profile():
@@ -31,36 +35,31 @@ def profile():
 
 @ratings.route('/games', methods=['GET'])
 def listgames():
-    limit = 30
-    player_games = []
+    limit = request.args.get('limit', 30)
+    aga_id = request.args.get('aga_id')
+    player_id = request.args.get('player_id')
+    sid = request.args.get('server_id')
+
+    players = []
     games = []
 
-    if request.args:
-        aga_id = request.args.get('aga_id')
-        player_id = request.args.get('player_id')
-        sid = request.args.get('server_id')
-        limit = request.args.get('limit')
+    if aga_id:
+        user_ids = [tup[0] for tup in User.query.filter(User.aga_id == aga_id).with_entities(User.id).all()]
+        players = Player.query.filter(Player.user_id.in_(user_ids)).all()
+    elif player_id:
+        players = Player.query.filter(Player.id == player_id).all()
 
-        if aga_id:
-            user = User.query.filter(User.aga_id == aga_id).first()
-            player_list = Player.query.filter(Player.user_id == user.id)
-            if user and player_list:
-                for p in player_list:
-                    game_filter = ((Game.white_id==p.id) | (Game.black_id==p.id))
-                    if sid:
-                        game_filter = game_filter & (Game.server_id==sid)
-                    player_games.append(Game.query.filter(game_filter))
-        elif player_id:
-            player_games.append(Game.query.filter((Game.white_id==player_id) | (Game.black_id==player_id)))
-        elif sid:
-            player_games.append(Game.query.filter(Game.server_id==sid))
-        else:
-            games = Game.query.limit(limit)
+    if players:
+        for p in players:
+            game_filter = ((Game.white_id==p.id) | (Game.black_id==p.id))
+            if sid:
+                game_filter = game_filter & (Game.server_id==sid)
+            games.extend(Game.query.filter(game_filter).all())
     else:
-        games = Game.query.limit(limit)
-
-    for p in player_games:
-        games.extend(p.all())
+        query = Game.query.order_by(Game.date_reported.desc()).limit(limit)
+        if sid:
+            query = query.filter(Game.server_id == sid)
+        games = query.all()
 
     return render_template('latestgames.html', user=current_user, games=games)
 

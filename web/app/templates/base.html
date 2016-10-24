@@ -12,7 +12,7 @@
         <div class="navbar-collapse collapse">
             <img class="navbar-brand" style="padding: 5px"src="/static/agalogo2.png"><a class="navbar-brand" href="/">AGA Online Ratings</a>
             <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
+                <li><a href="{{url_for('ratings.home')}}">Home</a></li>
                 {% if current_user.has_role('ratings_admin') %}
                 <li class="dropdown">
                     <a href="#" data-toggle="dropdown" class="dropdown-toggle">Ratings Admin<b class="caret"></b></a>
@@ -41,12 +41,14 @@
                     </ul>
                 </li>
                 {% endif %}
+                <li><a href={{url_for('ratings.help')}}>Help</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
             {% if current_user.is_authenticated() %}
                 <li class="navbar-text">Logged in as {{current_user.email}}</li>
                 <li><a href="{{url_for_security('logout')}}">Logout</a></li>
             {% else %}
+                <li><a href="{{url_for_security('register')}}">Register</a></li>
                 <li><a href="{{url_for_security('login')}}">Login</a></li>
             {% endif %}
             </ul>

@@ -23,6 +23,8 @@ class TestGameResource(BaseTestCase):
         "white_id": 2,
         "server_id": 1,
         'result': 'B+0.5',
+        'handicap': 0,
+        'komi': 6.5,
         'date_played': '2014-08-19T10:30:00',
         'game_record': '\n'.join(open('tests/testsgf.sgf').readlines())
     }
@@ -66,10 +68,10 @@ class TestGameResource(BaseTestCase):
         bodyparams.pop("game_record")
         bodyparams['game_url'] = game_url
         r = self.client.post(self.games_endpoint, data=json.dumps(bodyparams), headers=self.good_headers)
+        self.assertEqual(r.status_code, 201)
         actual = r.json
         for key, value in self.expected_return.items():
             self.assertEqual(value, actual[key])
-        self.assertEqual(r.status_code, 201)
 
     def test_validate_missing_auth(self):
         for k in self.good_headers.keys():

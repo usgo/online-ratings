@@ -52,7 +52,7 @@ Before you get started working on Online Ratings, you'll need to do some setup:
 * Install the Docker command line tools.
 * Get set up with a VM to use with Docker
 * Build and run the app on the VM with Docker
-* log in using the fake login credentials found in `web/create_db.py`
+* log in using the fake login credentials found in `web/scripts/create_db.py`
 
 ## Package Managers
 
@@ -105,32 +105,61 @@ Then the following commands should start the app running and start tailing the l
 ```shell
 cp .env_example .env
 docker-compose build
-docker-compose up -d
-docker-compose logs
+docker-compose up
 ```
 
 The `build` step will create docker containers for each part of the app (nginx,
 flask, etc.). The `up -d` step will coordinate the running of all the containers
 as specified in the docker-compose yaml file.
 
-If this is the first time you've set up the database, you'll need to create the
-initial tables with
+**Important Note!** If this is the first time you've set up the database,
+you'll need to create the initial tables with:
+```shell
+docker-compose run --rm web python /usr/src/app/manage.py db upgrade
+```
+
+and then create some fake data to populate the db
 
 ```shell
 docker-compose run --rm web python /usr/src/app/manage.py create_all_data
 ```
 
-The dockerfile configuration will then serve the app at localhost:80.
+The dockerfile configuration will then serve the app at `localhost:80`.
 
 You can remap the ports that the app listens on by editing `docker-compose.yml` and changing the nginx ports mapping to something like `"8080:80"`
 
 ## Development
 You might find it useful to have a python shell in Docker. This lets you interactively play with database queries and such.
 ```
-docker-compose -f docker-compose.dev.yml run --rm web python -i /usr/src/app/manage.py shell
+docker-compose run --rm web python /usr/src/app/manage.py shell
 >>> from app.models import Player
 >>> print(Player.query.filter(Player.id==1).first())
 Player FooPlayerKGS, id 1
+```
+
+You might also find it useful to have a postgres shell.
+```
+docker-compose run --rm psql
+```
+
+## Making database changes
+We use Alembic / Flask-Migrate to run database schema updates.
+
+To make a database schema change, first make your changes to `models.py`, and rebuild the docker containers with `docker-compose build`.
+
+Then, run the following command to autogenerate an Alembic migration file.
+```shell
+docker-compose run --rm db_migrate python manage.py db migrate -m "description of schema changes"
+```
+
+The `db_migrate` container is specifically build to mount your local filesystem's alembic migrations directory to the container's migration directory. That way, the alembic-generated files are mirrored in your own filesystem, and you'll be able to commit them to source control.
+
+See [Alembic documentation](http://alembic.zzzcomputing.com/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect) for limitations on what schema changes the autogenerate can/cannot detect.
+
+To actually execute the migration, run
+```shell
+docker-compose build
+docker-compose run --rm web python manage.py db upgrade
 ```
 
 ## Running Locally

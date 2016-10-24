@@ -3,7 +3,7 @@ from dateutil.parser import parse as parse_iso8601
 import logging
 import requests
 
-from flask import jsonify, request, Response
+from flask import jsonify, request, Response, current_app
 from . import api
 from app.api_1_0.api_exception import ApiException
 from app.api_1_0.utils import requires_json
@@ -36,6 +36,8 @@ def validate_game_submission(headers, body_json):
         'black_id': body_json.get('black_id'),
         'white_id': body_json.get('white_id'),
         'result': body_json.get('result'),
+        'handicap': body_json.get('handicap'),
+        'komi': body_json.get('komi'),
         'date_played': body_json.get('date_played'),
     }
 
@@ -54,7 +56,7 @@ def validate_game_submission(headers, body_json):
     white_token = headers.get('X-Auth-White-Player-Token')
 
     if any(token is None for token in (server_token, black_token, white_token)):
-        raise ApiException('Did not submit required X-Auth-(Server-Token|Black-Player-Token|White_Player-Token) headers.', 403)
+        raise ApiException('Did not submit required X-Auth-(Server-Token|Black-Player-Token|White-Player-Token) headers.', 403)
 
     gs = GoServer.query.filter_by(id=data['server_id'], token=server_token).first()
     if gs is None:
@@ -81,17 +83,28 @@ def validate_game_submission(headers, body_json):
         game_record = data['game_record'].encode()
     else:
         try:
-            response = requests.get(data['game_url'], verify=False)
+            timeout = current_app.config['GAME_FETCH_HTTP_TIMEOUT']
+            response = requests.get(data['game_url'], verify=False, timeout=timeout)
             game_record = response.content
-        except Exception as e:
-            logging.info("Got invalid game_url %s" % data.get("game_url", ""))
+        except requests.exceptions.Timeout as e:
+            logging.info('Request to %s timed out' % data.get('game_url', ''))
             logging.info(e)
-            raise ApiException('game_url provided (%s) was invalid!' % data.get('game_url', '<None>'))
+            raise ApiException('game_url provided (%s) timed out upon fetch' % data.get('game_url', ''))
+        except Exception as e:
+            logging.info('Got invalid game_url %s' % data.get('game_url', ''))
+            logging.info(e)
+            raise ApiException('game_url provided (%s) was invalid!' % data.get('game_url', ''))
 
     try:
         date_played = parse_iso8601(data['date_played'])
     except TypeError:
         raise ApiException(error='date_played must be in ISO 8601 format')
+
+    try:
+        handicap = int(data['handicap'])
+        komi = float(data['komi'])
+    except ValueError:
+        raise ApiException('invalid handicap or komi')
 
     logging.info(" White: %s, Black: %s " % (w,b))
     game = Game(server_id=gs.id,
@@ -101,6 +114,9 @@ def validate_game_submission(headers, body_json):
                 date_played=date_played,
                 date_reported=datetime.now(),
                 result=data['result'],
+                handicap=handicap,
+                komi=komi,
+                game_url=data['game_url'],
                 game_record=game_record
                 )
     return game

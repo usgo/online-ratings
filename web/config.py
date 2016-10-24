@@ -14,12 +14,15 @@ class BaseConfiguration(object):
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
     SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'defaultsalt')
     SECURITY_POST_LOGIN_VIEW = '/profile'
+    SECURITY_POST_REGISTER_VIEW = '/help'
     SECURITY_CHANGEABLE = True
+    SECURITY_CONFIRMABLE = True
     SECURITY_RECOVERABLE = True
     SECURITY_REGISTERABLE = True
     SECURITY_TRACKABLE = True
 
     MAIL_DEBUG = 0
+    GAME_FETCH_HTTP_TIMEOUT = 10
 
 class DockerConfiguration(BaseConfiguration):
     DEBUG = False
