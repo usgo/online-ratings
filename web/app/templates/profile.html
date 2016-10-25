@@ -38,8 +38,8 @@
         <tr>
             <th>Server</th>
             <th>Name <a href="#" data-toggle="tooltip" title="This is your nickname or handle on the server">?</a> </th>
-            <th>Password <a href="#" data-toggle="tooltip" title="Anyone with your password can play rated games as this profile.  Keep it secret!">?</a> &nbsp; <a href="#"id="show-token-button" onClick="showTokens()">(Show Passwords)</a></th>
-            <th>Reset password <a href="#" data-toggle="tooltip" title="Reset this password - games will stop being submitted until you re-enter your new password">?</a></th></tr>
+            <th>Token <a href="#" data-toggle="tooltip" title="Anyone with your token can play rated games as this profile.  Keep it secret!">?</a> &nbsp; <a href="#"id="show-token-button" onClick="showTokens()">(Show tokens)</a></th>
+            <th>Reset token <a href="#" data-toggle="tooltip" title="Reset this token - games will stop being submitted until you re-enter your new token">?</a></th></tr>
         {% for p in players %}
         <tr>
             <td>{{p.server.name}}</td>
@@ -78,7 +78,7 @@ function reset_token(player_id) {
         method: "POST",
         url: TOKEN_RESET_ENDPOINT.replace("replacethis", player_id)
     }).then(function(response) {
-        alert("Password successfully reset.")
+        alert("Token successfully reset.")
         location.reload();
     }).fail(function(response) {
         alert("Uhoh, something went wrong. Please contact an admin.")
