@@ -28,7 +28,6 @@ def get_app(config):
     stream_handler = logging.StreamHandler()
     app.logger.setLevel(logging.DEBUG)
     app.logger.addHandler(stream_handler)
-    app.logger.info("Logging configured!")
 
     db.init_app(app)
     Migrate(app, db)

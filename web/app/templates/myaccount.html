@@ -63,6 +63,49 @@
 </form>
 
 
+<h2>My Games</h2>
+<div class="panel panel-default">
+<table class="table">
+  <tr>
+    <th>Game Server</th>
+    <th>White</th>
+    <th>Black</th>
+    <th>Result</th>
+    <th>Date Played</th>
+    <th>Game Record</th>
+  </tr>
+{% for g in games %}
+  <tr>
+    <td>{{g.game_server.name}}</td>
+    <td>
+      <a href="{{url_for('ratings.player', player_id=g.white.id)}}">
+      {% if g.result.upper().startswith('W') %}
+          <strong>AGA {{g.white.user.aga_id}} ({{g.white.name}})</strong>
+      {% else %}
+          AGA {{g.white.user.aga_id}} ({{g.white.name}})
+      {% endif %}
+      </a>
+    </td>
+    <td>
+      <a href="{{url_for('ratings.player', player_id=g.black.id)}}">
+      {% if g.result.upper().startswith('B') %}
+          <strong>AGA {{g.black.user.aga_id}} ({{g.black.name}})</strong>
+      {% else %}
+          AGA {{g.black.user.aga_id}} ({{g.black.name}})
+      {% endif %}
+      </a>
+    </td>
+    <td>{{g.result}}</td>
+    <td>{{g.date_played}}</td>
+    <td><a href="{{url_for('ratings.gamedetail', game_id=g.id)}}">link</a></td>
+  </tr>
+{% else %}
+  <tr><td colspan="6">No games played yet.</td></tr>
+{% endfor %}
+</table>
+
+</div>
+
 {% endblock %}
 {% block scripts %}
 {{super()}}
