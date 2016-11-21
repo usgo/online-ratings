@@ -9,7 +9,6 @@ from .tokengen import generate_token
 from .forms import AddGameServerForm, SearchPlayerForm, AddPlayerForm
 from .models import GoServer, Game, User, Player, SERVER_ADMIN_ROLE, RATINGS_ADMIN_ROLE
 from . import db, user_datastore
-import logging
 
 ratings = Blueprint("ratings", __name__)
 
@@ -91,7 +90,7 @@ def reset_server_token(server_id):
     server.token = generate_token()
     db.session.add(server)
     db.session.commit()
-    logging.info("Reset server token for {}".format(server_id))
+    current_app.logger.info("Reset server token for {}".format(server_id))
     return "Success"
 
 @ratings.route('/users')
@@ -145,7 +144,7 @@ def reset_player_token(player_id):
     player.token = generate_token()
     db.session.add(player)
     db.session.commit()
-    logging.info("Reset player token for {}".format(player_id))
+    current_app.logger.info("Reset player token for {}".format(player_id))
     return "Success"
 
 @ratings.route('/game_servers/new', methods=['GET', 'POST'])

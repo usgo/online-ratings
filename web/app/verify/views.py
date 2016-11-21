@@ -9,7 +9,6 @@ from flask.ext.mail import Message
 from sqlalchemy.sql import and_
 from itsdangerous import BadSignature, URLSafeSerializer
 from app.models import User, db
-import logging
 
 from wtforms import IntegerField, SubmitField
 from wtforms.validators import Required
@@ -27,11 +26,11 @@ def verify_player(payload):
     try:
         user_id, aga_id = s.loads(payload)
     except BadSignature:
-        logging.info('Verify called with invalid paylod')
+        current_app.logger.info('Verify called with invalid paylod')
         abort(404)
 
     if user_id != current_user.id:
-        logging.warn("Verify called for id %s, but wrong user answered, %s" % (user_id, current_user))
+        current_app.logger.warn("Verify called for id %s, but wrong user answered, %s" % (user_id, current_user))
         abort(404)
 
     # TODO: Fetch the fake user account with this aga_id, take its AGA player
@@ -40,8 +39,8 @@ def verify_player(payload):
     user.aga_id = aga_id
     db.session.add(user)
     db.session.commit()
-    msg = 'Linked account with AGA #%s' %user.aga_id
-    logging.info(msg)
+    msg = 'Linked account with AGA #%s' % user.aga_id
+    current_app.logger.info(msg)
     return redirect(url_for('ratings.profile'))
 
 def get_verify_link(user, aga_id):

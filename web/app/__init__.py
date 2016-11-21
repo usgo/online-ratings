@@ -26,11 +26,9 @@ def get_app(config):
     csrf.exempt(api_1_0_blueprint)
 
     stream_handler = logging.StreamHandler()
-    if app.debug:
-        stream_handler.setLevel(logging.INFO)
-    else:
-        stream_handler.setLevel(logging.WARN)
+    app.logger.setLevel(logging.DEBUG)
     app.logger.addHandler(stream_handler)
+    app.logger.info("Logging configured!")
 
     db.init_app(app)
     Migrate(app, db)
