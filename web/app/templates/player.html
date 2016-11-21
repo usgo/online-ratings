@@ -6,13 +6,12 @@
 
 {% block page_content %}
 
-<h1>{{player.name}}</h1>
+<h1>{{player.user.name}}</h1>
 
 <table border class="table">
     <tr><td>AGA ID</td><td>{{ player.user.aga_id }}</td></tr>
     <tr><td>Server</td><td>{{ player.server.name }}</td></tr>
 </table>
-{% if games %}
 <table border class="table">
   <tr>
     <th>Game Server</th>
@@ -22,34 +21,35 @@
     <th>Date Played</th>
     <th>Game Record</th>
   </tr>
-  {% for g in games %}
-    <tr>
-      <td>{{g.game_server.name}}</td>
-      <td>
-        <a href="{{url_for('ratings.player', player_id=g.white.id)}}">
-        {% if g.result.upper().startswith('W') %}
-            <strong>AGA {{g.white.user.aga_id}} ({{g.white.name}})</strong>
-        {% else %}
-            AGA {{g.white.user.aga_id}} ({{g.white.name}})
-        {% endif %}
-        </a>
-      </td>
-      <td>
-        <a href="{{url_for('ratings.player', player_id=g.black.id)}}">
-        {% if g.result.upper().startswith('B') %}
-            <strong>AGA {{g.black.user.aga_id}} ({{g.black.name}})</strong>
-        {% else %}
-            AGA {{g.black.user.aga_id}} ({{g.black.name}})
-        {% endif %}
-        </a>
-      </td>
-      <td>{{g.result}}</td>
-      <td>{{g.date_played}}</td>
-      <td><a href="{{url_for('ratings.gamedetail', game_id=g.id)}}">link</a></td>
-    </tr>
-  {%endfor%}
+{% for g in games %}
+  <tr>
+    <td>{{g.game_server.name}}</td>
+    <td>
+      <a href="{{url_for('ratings.player', player_id=g.white.id)}}">
+      {% if g.result.upper().startswith('W') %}
+          <strong>AGA {{g.white.user.aga_id}} ({{g.white.name}})</strong>
+      {% else %}
+          AGA {{g.white.user.aga_id}} ({{g.white.name}})
+      {% endif %}
+      </a>
+    </td>
+    <td>
+      <a href="{{url_for('ratings.player', player_id=g.black.id)}}">
+      {% if g.result.upper().startswith('B') %}
+          <strong>AGA {{g.black.user.aga_id}} ({{g.black.name}})</strong>
+      {% else %}
+          AGA {{g.black.user.aga_id}} ({{g.black.name}})
+      {% endif %}
+      </a>
+    </td>
+    <td>{{g.result}}</td>
+    <td>{{g.date_played}}</td>
+    <td><a href="{{url_for('ratings.gamedetail', game_id=g.id)}}">link</a></td>
+  </tr>
+{% else %}
+  <tr><td colspan="6">No games played under this profile.</td></tr>
+{% endfor %}
 </table>
-{% endif %}
 
 
 {% endblock %}

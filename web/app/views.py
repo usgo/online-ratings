@@ -1,6 +1,6 @@
 import itertools
 
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from flask import Blueprint, render_template, request, current_app, redirect, url_for
 from flask.ext.login import current_user
 from flask.ext.security import login_required
@@ -120,12 +120,15 @@ def players():
     player_query = Player.query
 
     if form.validate_on_submit():
+        player_query = player_query.join(User)
         if form.player_name.data:
-            player_query = player_query.filter(Player.name.contains(form.player_name.data))
+            player_query = player_query.filter(
+                func.lower(User.name).contains(form.player_name.data.lower()))
         if form.aga_id.data:
-            player_query = player_query.join(User).filter(User.aga_id == form.aga_id.data)
+            player_query = player_query.filter(
+                User.aga_id == form.aga_id.data)
 
-    players = player_query.limit(30).all()
+    players = player_query.limit(100).all()
 
     return render_template('players.html', players=players, form=form)
 

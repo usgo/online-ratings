@@ -13,12 +13,11 @@
 <hr/>
 
 <table border class="table">
-  <tr><th>Server</th><th>Username</th><th> Name </th> <th> AGA ID </th></tr>
+  <tr><th>Name</th><th>Server</th> <th>AGA ID</th></tr>
   {% for player in players %}
   <tr>
+    <td><a href="{{ url_for('ratings.player', player_id=player.id) }}" >{{ player.user.name }}</td>
     <td>{{ player.server.name }}</td>
-    <td><a href="{{ url_for('ratings.player', player_id=player.id) }}" >{{ player.name }}</a></td>
-    <td>{{ player.user.name }}</td>
     <td>{{ player.user.aga_id }}</td>
   </tr>
   {% endfor %}
