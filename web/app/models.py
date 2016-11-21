@@ -37,6 +37,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     aga_id = db.Column(db.String(25))
     email = db.Column(db.String(255), unique=True, nullable=False)
+    name = db.Column(db.String(255), default="", nullable=False)
     password = db.Column(db.String(255))
     fake = db.Column(db.Boolean, default=False, nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
