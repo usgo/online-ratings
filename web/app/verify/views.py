@@ -33,10 +33,17 @@ def verify_player(payload):
         current_app.logger.warn("Verify called for id %s, but wrong user answered, %s" % (user_id, current_user))
         abort(404)
 
+    aga_info = get_aga_info(aga_id)
+    if aga_info is None:
+        current_app.logger.warn("Could not fetch AGA info for aga_id %s" % aga_id)
+        abort(404)
+    user_realname = aga_info.get('full_name', '')
+
     # TODO: Fetch the fake user account with this aga_id, take its AGA player
     # and reassign it to the real user
     user = User.query.get_or_404(user_id)
     user.aga_id = aga_id
+    user.name = user_realname
     db.session.add(user)
     db.session.commit()
     msg = 'Linked account with AGA #%s' % user.aga_id
