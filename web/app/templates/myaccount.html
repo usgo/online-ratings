@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Account{% endblock %}
+{% block title %}My Account{% endblock %}
 
 {% block page_content %}
 
-<h1> Your Account </h1>
+<h1> My Account </h1>
 <table class="table">
    <tr><td>AGA ID</td>
        {% if user.aga_id is none %}
@@ -18,7 +18,7 @@
 </table>
 
 {% if user.is_server_admin() %}
-<h2>Your Game Server(s)</h2>
+<h2>My Game Server(s)</h2>
 <table class="table">
     <tr><th>Name</th><th>URL</th><th>Token</th></tr>
     {% for s in user.servers %}
@@ -31,7 +31,7 @@
 </table>
 {% endif %}
 
-<h2> Your profiles </h2>
+<h2> My profiles </h2>
 
 <div class="panel panel-default">
     <table class="table">

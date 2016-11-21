@@ -48,7 +48,7 @@ def verify_player(payload):
     db.session.commit()
     msg = 'Linked account with AGA #%s' % user.aga_id
     current_app.logger.info(msg)
-    return redirect(url_for('ratings.profile'))
+    return redirect(url_for('ratings.myaccount'))
 
 def get_verify_link(user, aga_id):
     s = get_serializer()

@@ -20,9 +20,9 @@ def home():
 def help():
     return render_template('help.html')
 
-@ratings.route('/profile')
+@ratings.route('/myaccount')
 @login_required
-def profile():
+def myaccount():
     form = AddPlayerForm()
     form.server.choices = [(server.id, server.name) for server in GoServer.query.all()]
     players = Player.query.filter(Player.user_id == current_user.id).order_by(Player.name.asc()).all()
@@ -30,7 +30,7 @@ def profile():
         games = Game.query.limit(30).all()
     else:
         games = itertools.chain(*(Game.query.filter(or_(Game.white_id == player.id, Game.black_id == player.id)) for player in players))
-    return render_template('profile.html', user=current_user, games=games, players=players, form=form)
+    return render_template('myaccount.html', user=current_user, games=games, players=players, form=form)
 
 @ratings.route('/games', methods=['GET'])
 def listgames():
@@ -111,7 +111,7 @@ def create_player():
         db.session.add(Player(name=name, server_id=server_id, user_id=current_user.id, token=generate_token()))
         db.session.commit()
 
-    return redirect(url_for('ratings.profile'))
+    return redirect(url_for('ratings.myaccount'))
 
 
 @ratings.route('/players/search', methods=['GET', 'POST'])
