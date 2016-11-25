@@ -14,7 +14,7 @@ class BaseConfiguration(object):
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
     SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'defaultsalt')
     SECURITY_POST_LOGIN_VIEW = '/myaccount'
-    SECURITY_POST_REGISTER_VIEW = '/help'
+    SECURITY_POST_REGISTER_VIEW = '/login'
     SECURITY_CHANGEABLE = True
     SECURITY_CONFIRMABLE = True
     SECURITY_RECOVERABLE = True
