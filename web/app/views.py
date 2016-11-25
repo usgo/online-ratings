@@ -26,10 +26,11 @@ def myaccount():
     form = AddPlayerForm()
     form.server.choices = [(server.id, server.name) for server in GoServer.query.all()]
     players = Player.query.filter(Player.user_id == current_user.id).order_by(Player.name.asc()).all()
-    if current_user.is_ratings_admin():
-        games = Game.query.limit(30).all()
-    else:
-        games = itertools.chain(*(Game.query.filter(or_(Game.white_id == player.id, Game.black_id == player.id)) for player in players))
+    # shows all games so far. Needs to be replaced with a join query that
+    # orders by date played and limits to latest 10 games.
+    games = itertools.chain(*(
+        Game.query.filter(or_(Game.white_id == player.id, Game.black_id == player.id))
+        for player in players))
     return render_template('myaccount.html', user=current_user, games=games, players=players, form=form)
 
 @ratings.route('/games', methods=['GET'])
