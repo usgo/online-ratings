@@ -15,6 +15,7 @@
     </tr>
     <tr><td>Contact Email</td><td>{{ user.email }}</td></tr>
     <tr><td>Rating</td><td> {{ user.last_rating() or "No rating available"}}</td></tr>
+    <!-- User ID: {{user.id}} -->
 </table>
 
 {% if user.is_server_admin() %}
