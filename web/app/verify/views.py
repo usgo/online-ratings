@@ -37,16 +37,10 @@ def verify_player(payload):
     if aga_info is None:
         current_app.logger.warn("Could not fetch AGA info for aga_id %s" % aga_id)
         abort(404)
-    user_realname = aga_info.get('full_name', '')
+    name = aga_info.get('full_name', '')
 
-    # TODO: Fetch the fake user account with this aga_id, take its AGA player
-    # and reassign it to the real user
-    user = User.query.get_or_404(user_id)
-    user.aga_id = aga_id
-    user.name = user_realname
-    db.session.add(user)
-    db.session.commit()
-    msg = 'Linked account with AGA #%s' % user.aga_id
+    update_user_info(user_id, aga_id, name)
+    msg = 'Linked account with AGA #%s' % aga_id
     current_app.logger.info(msg)
     return redirect(url_for('ratings.myaccount'))
 
@@ -55,6 +49,16 @@ def get_verify_link(user, aga_id):
     payload = s.dumps([user.id, aga_id])
     return url_for('.verify_player', payload=payload, 
                    _external=True)
+
+def update_user_info(user_id, aga_id, name):
+    # TODO: Fetch the fake user account with this aga_id, take its AGA player
+    # and reassign it to the real user
+    user = User.query.get_or_404(user_id)
+    user.aga_id = aga_id
+    user.name = name
+    db.session.add(user)
+    db.session.commit()
+
 
 def aga_id_already_used(user, aga_id):
     exists = User.query.filter(and_(User.id!=user.id, User.aga_id==str(aga_id), User.fake==False)).count() > 0
