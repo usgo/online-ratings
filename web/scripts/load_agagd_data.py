@@ -52,20 +52,27 @@ class AGAHistoricalGamesLoader(Command):
         be used.
         """
         while aga_id in self._pin_changes:
+            if self._pin_changes[aga_id] is None:
+                print ("Pin would change to none: %s" % aga_id)
             aga_id = self._pin_changes[aga_id]
         if aga_id in self._users:
             return self._users[aga_id]
         else:
             user = User(aga_id=aga_id, email=uuid4(), fake=True)
-            player = Player(id=aga_id, name='', user_id=user.id, server_id=self.server_id)
 
             db.session.add(user)
+            db.session.commit()
+
+            player = Player(id=aga_id, name='', user_id=user.id, server_id=self.server_id, token=uuid4())
             db.session.add(player)
 
             self._users[aga_id] = user
             return user
 
     def store_game(self, row):
+        if row['Pin_Player_1'] is None or row['Pin_Player_2'] is None:
+            print(row)
+
         user1 = self.get_or_make_user(row['Pin_Player_1'])
         user2 = self.get_or_make_user(row['Pin_Player_2'])
 
@@ -87,10 +94,13 @@ class AGAHistoricalGamesLoader(Command):
         with open(filename) as f:
             for i, row in enumerate(agagd_parser(f)):
                 if i % 1000 == 0:
-                    print('Loading row', i)
+                    print('-Loading row', i)
+                    db.session.commit()
+                    print('Committed', i)
                 self.store_game(row)
 
     def run(self, agagd_dump_filename, pin_change_dump_filename):
         self.setup(pin_change_dump_filename)
         self.load_data(agagd_dump_filename)
+        db.session.commit()
 
