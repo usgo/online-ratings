@@ -33,10 +33,10 @@ class RatingsMathTestCase(unittest.TestCase):
         self.assertAlmostEqual(rm.time_weight(t1, t1, t2), 0, places=3) 
 
     def test_neighborhoods(self): 
-        games = [Game(Player(1), Player(2), 'W+R', date(2000,1,1)),
-                 Game(Player(1), Player(3), 'B+R', date(2000,1,2)),
-                 Game(Player(1), Player(4), 'W+R', date(2000,1,3)),
-                 Game(Player(3), Player(2), 'B+R', date(2000,1,4))]
+        games = [(1, 2, 'W+R', date(2000,1,1)),
+                 (1, 3, 'B+R', date(2000,1,2)),
+                 (1, 4, 'W+R', date(2000,1,3)),
+                 (3, 2, 'B+R', date(2000,1,4))]
         neighbors = rm.neighbors(games)
 
         self.assertEqual(len(neighbors[1]), 3)
@@ -45,11 +45,30 @@ class RatingsMathTestCase(unittest.TestCase):
         self.assertEqual(len(neighbors[4]), 1)
 
     def test_compute_avgs(self): 
-        ratings = {1:2, 2:4, 3:2, 4:3}
-        games = [Game(Player(1), Player(2), 'W+R', date(2000,1,1)),
-                 Game(Player(1), Player(3), 'B+R', date(2000,1,1)),
-                 Game(Player(1), Player(4), 'W+R', date(2000,1,1)),
-                 Game(Player(3), Player(2), 'B+R', date(2000,1,1))]
+        ratings = {1:2, 2:4, 3:2, 4:3, 5:2}
+        games = [(1, 2, '1', date(2000,1,1)),
+                 (1, 3, '0', date(2000,1,2)),
+                 (1, 4, '1', date(2000,1,3)),
+                 (2, 5, '1', date(2000,1,3)),
+                 (3, 2, '0', date(2000,1,4))]
         averages = rm.compute_avgs(games, ratings)
 
-        self.assertEqual(averages, {1: 3.0, 2: 2.0, 3: 3.0, 4: 2.0})
+        # 2 & 4 both only played people with the same rating,
+        # so they should have the same weighted average opponent rating
+        self.assertEqual(averages[2], averages[4]) 
+
+        # 1 faced lower average opposition than 3 did, so 3's average opponent rating should be higher.
+        self.assertLess(averages[1], averages[3]) 
+
+
+
+        # a clear strongest player, two equal players
+        ratings = {1:10, 2:3, 3:3}
+        games = [(1, 2, '1', date(2000,1,1)),
+                 (1, 3, '0', date(2000,1,3)),
+                 (2, 3, '1', date(2000,1,5))]
+        averages = rm.compute_avgs(games, ratings)
+
+        #the player who faced the strongest player most recently should have the higher average
+        self.assertLess(averages[2], averages[3])
+
