@@ -10,7 +10,6 @@ def sanitized_users(g_vec):
     users_with_games = set([g[0] for g in g_vec])
     users_with_games = users_with_games.union(set([g[1] for g in g_vec]))
     new_users = [u for u in users if u.aga_id and int(u.aga_id) in users_with_games] # aga_id is text?!?
-    print ("%d users with games" % len(users_with_games))
     return new_users
 
 def sanitized_games(games):
@@ -20,7 +19,6 @@ def sanitized_games(games):
     """
 
     g_vec = []
-    print("Cleaning games...")
     for g in games:
         if g.white.user_id is None or g.black.user_id is None:
             print('No ids        :  ', g) #should probably strip them from the db.
@@ -64,19 +62,19 @@ def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
     g_vec = sanitized_games(games)
     users = sanitized_users(g_vec)
 
-    aga_ids_to_uids = dict([(u.aga_id, u.id) for u in users])
-
     print("found %d users with %d valid games" % (len(users), len(g_vec)) )
+
+    aga_ids_to_uids = dict([(int(u.aga_id), u.id) for u in users])
 
     ratings = {int(u.aga_id): u.last_rating() for u in users}
     rating_prior = {id: v.rating if (v and v.rating) else 20 for id,v in ratings.items()} 
+    print ("%d users with no priors" % len(list(filter(lambda v: v == 20, rating_prior.values()))))
 
     neighbors = rm.neighbors(g_vec)
     neighbor_avgs = rm.compute_avgs(g_vec, rating_prior) 
 
     t_min = min(g_vec, key=lambda g: g[3] or datetime.datetime.now().timestamp())[3]
     t_max = max(g_vec, key=lambda g: g[3] or datetime.datetime.now().timestamp())[3]
-    print("Games range between %s and %s" % (t_min, t_max))
 
     lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.3 #Control the learning rate over time.
 
@@ -105,7 +103,8 @@ def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
 
         #update neighborhood averages?
         neighbor_avgs = rm.compute_avgs(g_vec, rating_prior) 
-        print('%d : %.4f' % (i, loss))
+        if (i % 50 == 0):
+            print('%d : %.4f' % (i, loss))
 
     # Update the ratings and show how we did.
     wins, losses = {}, {}
@@ -115,11 +114,12 @@ def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
         wins[g[1]] = wins.get(g[1], 0) + 1-g[2]
         losses[g[1]] = losses.get(g[1], 0) + g[2]
 
-    
     for k in sorted(rating_prior, key=lambda k: rating_prior[k])[-10:]: 
-        #db.session.add(Rating(user_id=k, rating=rating_prior[k]))
-        print("%d: %f (%d - %d)" % (k, rating_prior[k], wins.get(k,0), losses.get(k,0)) )
-    #db.session.commit()
+        print("%d (uid: %d): %f (%d - %d)" % (k, aga_ids_to_uids[k], rating_prior[k], wins.get(k,0), losses.get(k,0)) )
+    
+    for k in sorted(rating_prior, key=lambda k: rating_prior[k]): 
+        db.session.add(Rating(user_id=aga_ids_to_uids[k], rating=rating_prior[k]))
+    db.session.commit()
 
 
 class RatingsAtCommand(Command):
