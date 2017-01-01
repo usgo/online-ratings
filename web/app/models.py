@@ -125,7 +125,7 @@ class Rating(db.Model):
     user = db.relationship('User',
                              foreign_keys=user_id,
                              backref=db.backref('user_rating', lazy='dynamic'))
-    sigma = db.Column(db.Float, nullable=False)
+    sigma = db.Column(db.Float, nullable=True) # Not all rating algorithms use sigma
     rating = db.Column(db.Float, nullable=False)
     created = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
