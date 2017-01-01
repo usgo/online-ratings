@@ -118,7 +118,7 @@ def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
         print("%d (uid: %d): %f (%d - %d)" % (k, aga_ids_to_uids[k], rating_prior[k], wins.get(k,0), losses.get(k,0)) )
     
     for k in sorted(rating_prior, key=lambda k: rating_prior[k]): 
-        db.session.add(Rating(user_id=aga_ids_to_uids[k], rating=rating_prior[k]))
+        db.session.add(Rating(user_id=aga_ids_to_uids[k], rating=rating_prior[k], created=t_to))
     db.session.commit()
 
 
@@ -129,7 +129,6 @@ class RatingsAtCommand(Command):
             Option('--to', '-t', dest='t_to'),
             Option('--iterations', '-i', dest='iters', default=200),
             Option('--neighborhood', '-n', dest='neighborhood', default=0.15)
-            
             )
 
     def run(self, t_from, t_to, iters, neighborhood):
@@ -161,7 +160,12 @@ class RatingsAtCommand(Command):
             print("Neighborhood should be an integer, defaulting to .15")
             neighborhood = .15
 
-        print("Generating ratings of games played between %s and %s" % (t_from, t_to)) 
-        print("%d iterations, neighborhood pull parameter %f" % (iters, neighborhood))
-        rate_all(t_from, t_to, iters, neighborhood)
+        this_to = t_from + datetime.timedelta(365*2)
+        while this_to < t_to:
+            print("==")
+            print("Generating ratings of games played between %s and %s" % (t_from, this_to)) 
+            print("%d iterations, neighborhood pull parameter %f" % (iters, neighborhood))
+            rate_all(t_from, this_to, iters, neighborhood)
+            this_to += datetime.timedelta(30) 
+        #rate_all(t_from, t_to, iters, neighborhood)
 
