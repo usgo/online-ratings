@@ -8,7 +8,7 @@ def sanitized_users(g_vec):
     """ Strip out users with no games from our list """
     users = User.query.all() 
     users_with_games = set([g[0] for g in g_vec])
-    users_with_games = users_with_games.union(set([g[1] for g in g_vec]))
+    users_with_games = users_with_games | set([g[1] for g in g_vec])
     new_users = [u for u in users if u.aga_id and int(u.aga_id) in users_with_games] # aga_id is text?!?
     return new_users
 
@@ -34,7 +34,7 @@ def sanitized_games(games):
         elif not (g.result.startswith('W') or g.result.startswith('B')):
             print('unknown result:  ', g)
             pass
-        elif g.date_played is None:
+        elif g.date_played is None or g.date_played.timestamp() == 0.0:
             print('No date played:  ', g)
             pass
         else:
@@ -47,17 +47,15 @@ def sanitized_games(games):
                          g.komi)) 
     return g_vec 
 
-def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
+def rate_all(t_from=datetime.datetime.utcfromtimestamp(1.0), 
+             t_to=datetime.datetime.now(),
+             iters=200, lam=.22):
     """
     t_from -- datetime obj, rate all games after this 
     t_to -- datetime obj, rate all games up to this
     iters -- number of iterations
     lam -- 'neighborhood pull' parameter.  higher = more error from moving a rank away from ranks in its neighborhood
     """
-    if t_to is None:
-        t_to = datetime.datetime.now()
-    if t_from is None:
-        t_from = datetime.datetime.utcfromtimestamp(1.0)
     games = Game.query.filter(Game.date_played < t_to, Game.date_played > t_from) 
     g_vec = sanitized_games(games)
     users = sanitized_users(g_vec)
@@ -73,8 +71,8 @@ def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
     neighbors = rm.neighbors(g_vec)
     neighbor_avgs = rm.compute_avgs(g_vec, rating_prior) 
 
-    t_min = min(g_vec, key=lambda g: g[3] or datetime.datetime.now().timestamp())[3]
-    t_max = max(g_vec, key=lambda g: g[3] or datetime.datetime.now().timestamp())[3]
+    t_min = min([g[3] for g in g_vec])
+    t_max = max([g[3] for g in g_vec])
 
     lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.3 #Control the learning rate over time.
 
@@ -84,7 +82,7 @@ def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
         for id, neighbor_wgt in neighbor_avgs.items():
             loss += lam * ((rating_prior[id] - neighbor_wgt) ** 2)
 
-        # Shuffle the vector of result-tuples
+        # Shuffle the vector of result-tuples and step through them, accumulating error.
         random.shuffle(g_vec)
         for g in g_vec:
             w, b, actual, t, handi, komi = g
