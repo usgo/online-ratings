@@ -36,12 +36,15 @@ def sanitized_games(games):
         elif not (g.result.startswith('W') or g.result.startswith('B')):
             print('unknown result:  ', g)
             pass
+        elif g.date_played is None:
+            print('No date played:  ', g)
+            pass
         else:
             # Vector of result_tuples.  Just what we need to compute ratings...
             g_vec.append( (g.white.id, 
                          g.black.id,
                          1.0 if g.result.startswith('W') else 0.0,
-                         g.date_played,
+                         g.date_played.timestamp(),
                          g.handicap,
                          g.komi)) 
     return g_vec 
@@ -71,8 +74,8 @@ def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
     neighbors = rm.neighbors(g_vec)
     neighbor_avgs = rm.compute_avgs(g_vec, rating_prior) 
 
-    t_min = min(g_vec, key=lambda g: g[3] or datetime.datetime.now())[3]
-    t_max = max(g_vec, key=lambda g: g[3] or datetime.datetime.now())[3]
+    t_min = min(g_vec, key=lambda g: g[3] or datetime.datetime.now().timestamp())[3]
+    t_max = max(g_vec, key=lambda g: g[3] or datetime.datetime.now().timestamp())[3]
     print("Games range between %s and %s" % (t_min, t_max))
 
     lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.3 #Control the learning rate over time.
@@ -100,6 +103,7 @@ def rate_all(t_from=None, t_to=None, iters=200, lam=.22):
             for k,v in rating_prior.items():
                 rating_prior[k] = (rating_prior[k] - r_min) / (r_max - r_min) * 40.0
 
+        #update neighborhood averages?
         neighbor_avgs = rm.compute_avgs(g_vec, rating_prior) 
         print('%d : %.4f' % (i, loss))
 

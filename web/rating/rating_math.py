@@ -26,17 +26,23 @@ def neighbors(g_vec):
         neighbors[g[1]].add(g[0]) 
     return neighbors
 
-def time_weight(t, tmin, tmax):
+def time_weight_dt(t, tmin, tmax):
+    """ Compute time_weight with datetime objects """
     return ((1.0 + (t - tmin).total_seconds()) / (1.0 + (tmax - tmin).total_seconds())) ** 1.2
+
+def time_weight(t, tmin, tmax):
+    """ Compute time_weight with POSIX timestamps (seconds) """
+
+    return ((1.0 + (t - tmin)) / (1.0 + (tmax - tmin))) ** 1.2
 
 def compute_avgs(games, ratings):
     """
-    games is a vector of tuples (w_id, b_id, 1-if-W+else-0, datetime, handi, komi)
+    games is a vector of tuples (w_id, b_id, 1-if-W+else-0, datetime-as-timestamp, handi, komi)
 
     Computes the time-weighted average rating of opponents.
     """
-    tmin = min(games, key=lambda g: g[3] or datetime.datetime.now())[3]
-    tmax = max(games, key=lambda g: g[3] or datetime.datetime.now())[3]
+    tmin = min(games, key=lambda g: g[3] or datetime.datetime.now().timestamp())[3]
+    tmax = max(games, key=lambda g: g[3] or datetime.datetime.now().timestamp())[3]
 
     ids = set([g[0] for g in games]).union(set([g[1] for g in games]))
     rate_weight_accums = dict(zip(ids, [0.0] * len(ids)))
