@@ -51,8 +51,8 @@ def compute_avgs(games, ratings):
         weight = time_weight(g[3], tmin, tmax) 
         weight_accums[g[0]] += weight 
         weight_accums[g[1]] += weight
-        rate_weight_accums[g[0]] += weight * ratings[g[1]]
-        rate_weight_accums[g[1]] += weight * ratings[g[0]]
+        rate_weight_accums[g[0]] += weight * (ratings[g[1]] + g[-2]) # white's weight is rating of opponent + handi stones
+        rate_weight_accums[g[1]] += weight * (ratings[g[0]] - g[-2]) # black's weight is rating of opponent - handi stones
 
     averages = {k: rate_weight_accums[k]/weight_accums[k] for k in weight_accums.keys()}
     return averages
