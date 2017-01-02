@@ -126,44 +126,76 @@ class RatingsAtCommand(Command):
             Option('--from', '-f', dest='t_from'),
             Option('--to', '-t', dest='t_to'),
             Option('--iterations', '-i', dest='iters', default=200),
-            Option('--neighborhood', '-n', dest='neighborhood', default=0.15)
+            Option('--neighborhood', '-n', dest='neighborhood', default=0.10),
+            Option('--dryrun', '-d', dest='dryrun', default=False)
             )
 
-    def run(self, t_from, t_to, iters, neighborhood):
-        if t_to is None:
-            t_to = datetime.datetime.now()
-        else:
-            try: 
-                t_to = datetime.datetime.utcfromtimestamp(float(t_to))
-            except ValueError: 
-                t_to = datetime.datetime.strptime(t_to, "%Y-%m-%d")
+    def run(self, t_from, t_to, iters, neighborhood, dryrun):
+        parse_params(t_from, t_to, iters, neighborhood)
+        setup()
+        while keep_rating:
+            these_games = Game.query.filter(Game.date_played < t_to, Game.date_played > t_from) 
+            g_vec = filter(self._all_g_vecsanitized_games(games)
+            these_users = sanitized_users(g_vec)
+            new_ratings = rate...
 
-        if t_from is None:
-            t_from = datetime.datetime.utcfromtimestamp(1.0)
+            #while this_to < t_to:
+            #    this_to += datetime.timedelta(100) 
+            #    print("==")
+            #    print("Generating ratings of games played between %s and %s" % (t_from, this_to)) 
+            #    print("%d iterations, neighborhood pull parameter %f" % (iters, neighborhood))
+            #    rate_all(t_from, this_to, iters, neighborhood)
+
+            if not dryrun:
+                write(new_ratings)
+
+
+
+    def sanitized_users(self, g_vec):
+        """ Returns a subset of User objects where u.aga_id appears in the game vector. """
+        users_with_games = set([g[0] for g in g_vec])
+        users_with_games = users_with_games | set([g[1] for g in g_vec])
+        new_users = [u for u in self._users if u.aga_id and int(u.aga_id) in users_with_games] # aga_id is text?!?
+        return new_users
+
+    def setup(self):
+        self._games = Game.query.all()
+        self._users = User.query.all() 
+        self._aga_ids_to_uids = dict([(int(u.aga_id), u.id) for u in self._users if u.aga_id is not None])
+
+        self._all_g_vec = sanitized_games(self._games)
+        print("found %d users with %d valid games" % (len(self._users), len(self._all_g_vec)) ) 
+
+    def write_ratings(self, new_ratings, timestamp):
+        for k in new_ratings: 
+            db.session.add(Rating(user_id=aga_ids_to_uids[k], rating=new_ratings[k], created=timestamp))
+        db.session.commit()
+
+    def parse_params(t_from, t_to, iters, neighborhood, dry_run):
+        if t_to is None:
+            self._t_to = datetime.datetime.now()
         else:
             try: 
-                t_from = datetime.datetime.utcfromtimestamp(float(t_from))
+                self._t_to = datetime.datetime.utcfromtimestamp(float(t_to))
             except ValueError: 
-                t_from = datetime.datetime.strptime(t_from, "%Y-%m-%d")
+                self._t_to = datetime.datetime.strptime(t_to, "%Y-%m-%d")
+
+        if self._t_from is None:
+            self._t_from = datetime.datetime.utcfromtimestamp(1.0)
+        else:
+            try: 
+                self._t_from = datetime.datetime.utcfromtimestamp(float(t_from))
+            except ValueError: 
+                self._t_from = datetime.datetime.strptime(t_from, "%Y-%m-%d")
 
         try:
-            iters = int(iters)
+            self._iters = int(iters)
         except ValueError:
             print("Iters should be an integer, defaulting to 200")
-            iters = 200
+            self._iters = 200
 
         try:
-            neighborhood = float(neighborhood)
+            self._neighborhood = float(neighborhood)
         except ValueError:
-            print("Neighborhood should be an integer, defaulting to .15")
-            neighborhood = .15
-
-        this_to = t_from + datetime.timedelta(365*2)
-        while this_to < t_to:
-            print("==")
-            print("Generating ratings of games played between %s and %s" % (t_from, this_to)) 
-            print("%d iterations, neighborhood pull parameter %f" % (iters, neighborhood))
-            rate_all(t_from, this_to, iters, neighborhood)
-            this_to += datetime.timedelta(30) 
-        #rate_all(t_from, t_to, iters, neighborhood)
-
+            print("Neighborhood should be a float, defaulting to .15")
+            self._neighborhood = .15 
