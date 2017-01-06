@@ -16,6 +16,8 @@ class RatingsAtCommand(Command):
             )
 
     def setup(self, continuous_mode):
+        start_time = time.clock()
+        print("Loading games... ", end="", flush=True)
         if(continuous_mode):
             self._games = Game.query.all()
 
@@ -27,6 +29,7 @@ class RatingsAtCommand(Command):
         else:
             self._games = Game.query.filter(Game.date_played < self._t_to, Game.date_played > self._t_from) 
             self._ranges = [(self._t_from, self._t_to)] 
+        print ("Done. (%.2f s)" % (time.clock() - start_time))
 
         start_time = time.clock()
         print("Loading users... ", end="", flush=True)
@@ -71,9 +74,6 @@ class RatingsAtCommand(Command):
             if continuous_mode and idx == 0:
                 print("1st iteration, neighborhood overridden to .03, iters 1k")
                 self.rate(this_g_vec, ratings, 1000, 0.03)
-            elif idx % 10 == 0:
-                print("Catch-up iteration, 3x iters")
-                self.rate(this_g_vec, ratings, iters * 3, neighborhood)
             else: 
                 self.rate(this_g_vec, ratings, iters, neighborhood)
 
@@ -100,7 +100,7 @@ class RatingsAtCommand(Command):
         t_max = max([g[3] for g in g_vec])
 
         # Control the learning rate over time.  The exponent is a SWAG, as is the last constant.
-        lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.3  + 0.4
+        lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.3  + 0.2
 
         for i in range(iters):
             loss = 0
