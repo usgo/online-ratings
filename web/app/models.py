@@ -165,7 +165,10 @@ class Game(db.Model):
     komi = db.Column(db.Float, default=7.5, nullable=False)
 
     def __str__(self):
-        return "%s (w) vs %s (b) %s handicap, %s komi, played on %s, result %s" % (self.white.name, self.black.name, self.handicap, self.komi, self.game_server, self.result)
+        return "%s-%d (w) vs %s-%d (b) %s handicap, %s komi, played on %s, result %s" % (
+                self.white.name, self.white_id,
+                self.black.name, self.black_id,
+                self.handicap, self.komi, self.game_server, self.result)
 
     def to_dict(self):
         return {
