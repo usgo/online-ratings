@@ -12,11 +12,13 @@ class RatingsAtCommand(Command):
             Option('--iterations', '-i', dest='iters', default=200, type=int),
             Option('--neighborhood', '-n', dest='neighborhood', default=0.10, type=float),
             Option('--dryrun', '-d', dest='dryrun', default=False),
-            Option('--continuous_mode', '-c', dest='continuous_mode', default=False, type=bool)
+            Option('--continuous_mode', '-c', dest='continuous_mode', default=False, type=bool),
+            Option('--predict', '-p', dest='predict', default=False, type=bool)
             )
 
     def setup(self, continuous_mode):
         start_time = time.clock()
+        print("Continuous is: ", continuous_mode)
         print("Loading games... ", end="", flush=True)
         if(continuous_mode):
             self._games = Game.query.all()
@@ -42,6 +44,11 @@ class RatingsAtCommand(Command):
         ratings = {int(u.aga_id): u.last_rating() for u in self._users if u.aga_id}
         print ("Done. (%.2f s)" % (time.clock() - start_time))
 
+        for r in list(ratings.values()):
+            if r is not None and r.created is not None:
+                self._last_to = r.created
+                break
+        print("Last run detected at: ", self._last_to)
         self._rating_priors = {id: v.rating if (v and v.rating) else 20 for id,v in ratings.items()} 
 
         start_time = time.clock()
@@ -49,7 +56,7 @@ class RatingsAtCommand(Command):
         self._all_g_vec = self.sanitize_games(self._games) 
         print ("Done. (%.2f s)" % (time.clock() - start_time))
 
-    def run(self, t_from, t_to, iters, neighborhood, dryrun, continuous_mode):
+    def run(self, t_from, t_to, iters, neighborhood, dryrun, continuous_mode, predict):
         self.parse_params(t_from, t_to, iters, neighborhood)
         self.setup(continuous_mode)
 
@@ -75,7 +82,27 @@ class RatingsAtCommand(Command):
                 print("1st iteration, neighborhood overridden to .03, iters 1k")
                 self.rate(this_g_vec, ratings, 1000, 0.03)
             else: 
+                if predict:
+                    new_g_vec = list(filter(lambda g: g[3] > self._last_to.timestamp(), this_g_vec))
+                    correct, not_applicable = self.check_predictions(new_g_vec, ratings)
+                    print("Before training: %d/%d new (unseen) games predicted (%.2f) " % (
+                        correct,
+                        len(new_g_vec) - not_applicable,
+                        (100.0 * correct)/(1.0 * (len(new_g_vec)-not_applicable))))
+
                 self.rate(this_g_vec, ratings, iters, neighborhood)
+
+                if predict:
+                    correct, not_applicable = self.check_predictions(this_g_vec, ratings)
+                    if not_applicable != 0:
+                        print("uh, we still don't have some ratings?  Weird...")
+                    print("After training: %d/%d of training data games predicted (%.2f) " % (
+                        correct,
+                        len(this_g_vec) - not_applicable,
+                        (100.0 * correct)/(1.0 * (len(this_g_vec)-not_applicable))))
+
+
+
 
             self._rating_priors.update(ratings) 
 
@@ -83,6 +110,25 @@ class RatingsAtCommand(Command):
             if not dryrun:
                 self.write_ratings(ratings, this_to)
             print ("Written %.2f sec" % (time.clock() - start_time))
+
+            self._last_to = this_to
+
+    def check_predictions(self, g_vec, ratings): 
+        correct = 0
+        not_applicable = 0
+        for g in g_vec:
+            if ratings[g[0]] == 20 or ratings[g[1]] == 20:
+                not_applicable +=1 
+                continue
+
+            w, b, actual, t, handi, komi = g
+            odds = rm.expect(ratings[b], ratings[w], handi, komi)
+            if odds > 0.5 and actual == 1:
+                correct += 1
+            elif odds < 0.5 and actual == 0:
+                correct += 1
+        return correct, not_applicable
+
 
     def rate(self, g_vec, rating_priors, iters=200, lam=.22):
         """
