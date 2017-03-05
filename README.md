@@ -65,7 +65,7 @@ This dev guide assumes a POSIX tool chain. Most developers on this project use O
 
 To get things working (without docker), you'll need
 
-*   [virtual environment](https://virtualenv.pypa.io/en/latest/) 
+*   [virtualenv](https://virtualenv.pypa.io/en/latest/) 
 *   Python3
 *   Pip
 *   Postgres
@@ -76,8 +76,10 @@ Assuming you're running on OSX:
     * OSX: `brew install python3`
     * Linux: You probably already have Python3 installed. If not: `sudo apt-get
       install python3`
-1.  Create a [virtual environment](https://virtualenv.pypa.io/en/latest/) for
-    online-ratings.
+1.  Install [virtualenv](https://virtualenv.pypa.io/en/latest/) for
+    * OSX: `brew install pyenv-virtualenv`
+    * Linux: ? TODO(someone with a linux box): fill this in.
+1.  Create a virtual environment for online-ratings.
     * `virtualenv -p /usr/local/bin/python3 ~/py3-or`
     * `source ~/py3-or/bin/activate`
 4.  Install [pip](https://en.wikipedia.org/wiki/Pip_(package_manager))
