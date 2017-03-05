@@ -76,11 +76,11 @@ Assuming you're running on OSX:
     * OSX: `brew install python3`
     * Linux: You probably already have Python3 installed. If not: `sudo apt-get
       install python3`
-1.  Install [virtualenv](https://virtualenv.pypa.io/en/latest/) for
+2.  Install [virtualenv](https://virtualenv.pypa.io/en/latest/) for
     * OSX: `brew install pyenv-virtualenv`
     * Linux: ? TODO(someone with a linux box): fill this in.
-1.  Create a virtual environment for online-ratings.
-    * `virtualenv -p /usr/local/bin/python3 ~/py3-or`
+3.  Create a virtual environment for online-ratings.
+    * `virtualenv -p $(which python3) ~/py3-or`
     * `source ~/py3-or/bin/activate`
 4.  Install [pip](https://en.wikipedia.org/wiki/Pip_(package_manager))
     * `curl https://bootstrap.pypa.io/get-pip.py | python3`
