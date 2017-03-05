@@ -2,9 +2,9 @@
 
 [![Travis Build Status](https://travis-ci.org/usgo/online-ratings.svg?branch=master)](https://travis-ci.org/usgo/online-ratings)
 
-AGA Online Ratings protocol and implementation
+AGA Online Ratings Server and implementation
 
-The goal of the AGA Online Ratings Protocol is to provide Go Servers with a
+The goal of the AGA Online Ratings Server is to provide Go Servers with a
 standard way to report results between AGA members that happen on their servers
 to us for computing a cross-server rating.
 
@@ -63,10 +63,25 @@ This dev guide assumes a POSIX tool chain. Most developers on this project use O
 
 ## Python and Dependencies
 
+To get things working (without docker), you'll need
+
+*   [virtualenv](https://virtualenv.pypa.io/en/latest/) 
+*   Python3
+*   Pip
+*   Postgres
+
+Assuming you're running on OSX:
+
 1.  Install Python3
     * OSX: `brew install python3`
     * Linux: You probably already have Python3 installed. If not: `sudo apt-get
       install python3`
+1.  Install [virtualenv](https://virtualenv.pypa.io/en/latest/) for
+    * OSX: `brew install pyenv-virtualenv`
+    * Linux: ? TODO(someone with a linux box): fill this in.
+1.  Create a virtual environment for online-ratings.
+    * `virtualenv -p /usr/local/bin/python3 ~/py3-or`
+    * `source ~/py3-or/bin/activate`
 4.  Install [pip](https://en.wikipedia.org/wiki/Pip_(package_manager))
     * `curl https://bootstrap.pypa.io/get-pip.py | python3`
 5.  Install postgres
@@ -75,21 +90,7 @@ This dev guide assumes a POSIX tool chain. Most developers on this project use O
 6.  Install the python dependencies with pip.
     * cd to `online-ratings/web` directory and run: `pip install -r requirements.txt`
 7.  Run the tests!
-    * cd to `online-ratings/web` directory and run: `python3 -m unittest
-      discover`
-
-**[Optional]**
-
-Optionally, you can install VirtualEnv, which makes working with python versions
-a little easier.
-
-1.  Install Virtual Environment: mkvirtualenv
-    * `pip install virtualenvwrapper`
-    * Add `source /usr/local/bin/virtualenvwrapper.sh` to your `.bash_profile`
-      or `.bashrc`. Alternatively, just run `source
-      /usr/local/bin/virtualenvwrapper.sh` when you need it.
-2.  Use VirtualWrapper to make a new virtual env:;
-    * `mkvirtualenv --python=/usr/local/bin/python3 online-ratings-env`
+    * cd to `online-ratings/web` directory and run: `python3 -m unittest discover`
 
 ## Getting set up with Docker
 
