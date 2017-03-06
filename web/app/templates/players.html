@@ -16,9 +16,9 @@
   <tr><th>Name</th><th>Server</th> <th>AGA ID</th></tr>
   {% for player in players %}
   <tr>
-    <td><a href="{{ url_for('ratings.player', player_id=player.id) }}" >{{ player.user.name }}</td>
+      <td><a href="{{ url_for('ratings.player', player_id=player.id) }}" >{{ player.user.name }}</a></td>
     <td>{{ player.server.name }}</td>
-    <td>{{ player.user.aga_id }}</td>
+    <td><a href="{{ url_for('ratings.player', player_id=player.id) }}" >{{ player.user.aga_id }}</a></td>
   </tr>
   {% endfor %}
 </table>

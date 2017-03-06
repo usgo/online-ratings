@@ -52,8 +52,6 @@ class AGAHistoricalGamesLoader(Command):
         be used.
         """
         while aga_id in self._pin_changes:
-            if self._pin_changes[aga_id] is None:
-                print ("Pin would change to none: %s" % aga_id)
             aga_id = self._pin_changes[aga_id]
         if aga_id in self._users:
             return self._users[aga_id]
@@ -70,9 +68,6 @@ class AGAHistoricalGamesLoader(Command):
             return user
 
     def store_game(self, row):
-        if row['Pin_Player_1'] is None or row['Pin_Player_2'] is None:
-            print(row)
-
         user1 = self.get_or_make_user(row['Pin_Player_1'])
         user2 = self.get_or_make_user(row['Pin_Player_2'])
 
