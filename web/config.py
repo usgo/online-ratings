@@ -37,9 +37,9 @@ class DockerConfiguration(BaseConfiguration):
         DB_USER, DB_PASS, DB_SERVICE, DB_PORT, DB_NAME
     )
 
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
+    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "True") == "True"
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
+    MAIL_PORT = os.environ.get("MAIL_PORT", 587)
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
