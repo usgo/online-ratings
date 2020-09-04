@@ -16,7 +16,7 @@ services:
     # build also includes static assets to be served by nginx
     build: ./nginx
     ports:
-      # You may wish to use :8080 for dev
+      # You may be tempted to change this to 8080:80 locally, but limitations in Flask-Security will cause problems for you
       - "80:80"
     links:
       - web:web
