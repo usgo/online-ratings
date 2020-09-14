@@ -12,7 +12,7 @@ roles_users = db.Table(
     'roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('myuser.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-) 
+)
 
 go_server_admins = db.Table(
     'go_server_admin',
@@ -46,8 +46,8 @@ class User(db.Model, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
     last_login_at = db.Column(db.DateTime())
     current_login_at = db.Column(db.DateTime())
-    last_login_ip = db.Column(db.String(25))
-    current_login_ip = db.Column(db.String(25))
+    last_login_ip = db.Column(db.String(45))
+    current_login_ip = db.Column(db.String(45))
     login_count = db.Column(db.Integer, default=0, nullable=False)
     players = relationship("Player")
 

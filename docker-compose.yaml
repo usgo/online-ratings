@@ -9,13 +9,14 @@ services:
     command: /usr/local/bin/gunicorn -w 2 -b :5000 manage:app
     links:
       - postgres:postgres
+      - mailhog:mailhog
 
   nginx:
     restart: always
     # build also includes static assets to be served by nginx
     build: ./nginx
     ports:
-      # You may wish to use :8080 for dev
+      # You may be tempted to change this to 8080:80 locally, but limitations in Flask-Security will cause problems for you
       - "80:80"
     links:
       - web:web
@@ -48,6 +49,11 @@ services:
     # psql relies on env variable PGPASSWORD to bypass the usual password prompt
     command: psql -h postgres -d $DB_NAME -U $DB_USER
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
 volumes:
   pgdata: {}
-

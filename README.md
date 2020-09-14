@@ -65,7 +65,7 @@ This dev guide assumes a POSIX tool chain. Most developers on this project use O
 
 To get things working (without docker), you'll need
 
-*   [virtualenv](https://virtualenv.pypa.io/en/latest/) 
+*   [virtualenv](https://virtualenv.pypa.io/en/latest/)
 *   Python3
 *   Pip
 *   Postgres
@@ -127,8 +127,6 @@ docker-compose run --rm web python /usr/src/app/manage.py create_all_data
 
 The dockerfile configuration will then serve the app at `localhost:80`.
 
-You can remap the ports that the app listens on by editing `docker-compose.yml` and changing the nginx ports mapping to something like `"8080:80"`
-
 ## Development
 You might find it useful to have a python shell in Docker. This lets you interactively play with database queries and such.
 ```
@@ -142,6 +140,8 @@ You might also find it useful to have a postgres shell.
 ```
 docker-compose run --rm psql
 ```
+
+The system needs to be able to connect to an smtp server, and in development that can be a little cumbersome. To make this easier, docker-compose spins up a mailhog instance that the example env file uses by default. You can see any emails that have been delivered by going to port 8025.
 
 ## Making database changes
 We use Alembic / Flask-Migrate to run database schema updates.
@@ -171,7 +171,7 @@ following:
 
 ```shell
 cd online-ratings
-sed 's/^\([^#]\)/export \1/g' .env_example > .env_local 
+sed 's/^\([^#]\)/export \1/g' .env_example > .env_local
 source .env_local
 cd web
 pip install -r requirements.txt
