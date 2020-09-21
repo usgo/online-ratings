@@ -2,7 +2,7 @@
 
 # Simple script to Build a docker image and push to the USGO Org's Docker hub
 # repository.
-if [ "$TRAVIS_BRANCH" == "release" ]; then
+if [ "$TRAVIS_BRANCH" == "master" ]; then
   # Take the first 7 digits of the hash.
   WEB_IMAGE=usgo/online-ratings-web:${TRAVIS_COMMIT:0:7}
   WEB_IMAGE_LATEST=usgo/online-ratings-web:latest
