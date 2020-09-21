@@ -1,6 +1,5 @@
 from datetime import datetime
 from dateutil.parser import parse as parse_iso8601
-import logging
 import requests
 
 from flask import jsonify, request, Response, current_app
@@ -87,12 +86,12 @@ def validate_game_submission(headers, body_json):
             response = requests.get(data['game_url'], verify=False, timeout=timeout)
             game_record = response.content
         except requests.exceptions.Timeout as e:
-            logging.info('Request to %s timed out' % data.get('game_url', ''))
-            logging.info(e)
+            current_app.logger.warn('Request to %s timed out' % data.get('game_url', ''))
+            current_app.logger.warn(e)
             raise ApiException('game_url provided (%s) timed out upon fetch' % data.get('game_url', ''))
         except Exception as e:
-            logging.info('Got invalid game_url %s' % data.get('game_url', ''))
-            logging.info(e)
+            current_app.logger.warn('Got invalid game_url %s' % data.get('game_url', ''))
+            current_app.logger.warn(e)
             raise ApiException('game_url provided (%s) was invalid!' % data.get('game_url', ''))
 
     try:
@@ -106,7 +105,7 @@ def validate_game_submission(headers, body_json):
     except ValueError:
         raise ApiException('invalid handicap or komi')
 
-    logging.info(" White: %s, Black: %s " % (w,b))
+    current_app.logger.info("Creating game, White: %s, Black: %s " % (w,b))
     game = Game(server_id=gs.id,
                 white_id=w.id,
                 black_id=b.id,

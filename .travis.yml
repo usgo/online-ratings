@@ -3,8 +3,8 @@ language: python
 env:
   global:
     # Docker:
-    - secure: "U21QfZbe3BasafwItwydmHjv7AnJf2XgSiIBOxJqkWjizrW1vR5S6+yQTsD7mlkk1Z+uyRd3zBEnh3UiPoaPxmtWoMbDVxA+qSYWe11IpkAgK5/j8Re/IIcwHiMug/l705qs1DpkPQm1vR8yJhqWOyMTxQNdnGeyOdrs/De46ls="
-    - secure: "V6Nzz/c+3YoC1WtapnIV3KnllzMxCIsGTKDPGKRI6slrGTew5zBX9KbkZZlvBGH4s7Yx4o6vEIwOEDCFixjuAuWqo6wPJt5HKhHws3UQ7yXYifUKJyBcSXwxXBfd/5slgJvevjjUXUP9+D/kABjJ3thUEdZn5ukh0HIPBpl03EM="
+    - secure: "ZPtxtMNBaCevGN2Ke8pbEhT+mmOJwzCOm2lUU9k1TPcdf5koJ5x/omQbcYwBkYQc0SGKVUvyi6SyqY8aElmqPkgsOUa5DpGcBI3JdzCV5mIWwJuj+Z4z7GqKfvc8LHMX5KC18w6Z09Of7LM/7x2namEHvLZvskno5bVAPEr6h8s="
+    - secure: "Wo+aUw82bFU123piTeAma7oCai1Qt2Tw2aFcAN+MH8jy58duoH3ZjiE9k4hLJ+IbAjND9JLKIdpSXqwhEpj+vNCeZ7J5qVEh2hZeVViif6sSgUJY9nEXARTE1N0pF/PUZ4qT9C67pfTUEyJ03qZ1rCo0kXfQrPAvpXL9xtF0usg="
 
 python:
   - 3.5

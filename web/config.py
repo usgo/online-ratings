@@ -13,8 +13,8 @@ class BaseConfiguration(object):
 
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
     SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'defaultsalt')
-    SECURITY_POST_LOGIN_VIEW = '/profile'
-    SECURITY_POST_REGISTER_VIEW = '/help'
+    SECURITY_POST_LOGIN_VIEW = '/myaccount'
+    SECURITY_POST_REGISTER_VIEW = '/login'
     SECURITY_CHANGEABLE = True
     SECURITY_CONFIRMABLE = True
     SECURITY_RECOVERABLE = True
@@ -37,9 +37,9 @@ class DockerConfiguration(BaseConfiguration):
         DB_USER, DB_PASS, DB_SERVICE, DB_PORT, DB_NAME
     )
 
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
+    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "True") == "True"
     MAIL_SERVER = os.environ.get("MAIL_SERVER")
+    MAIL_PORT = os.environ.get("MAIL_PORT", 587)
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")

@@ -6,10 +6,9 @@ from flask.ext.security import login_required
 from flask.ext.login import current_user
 from flask.ext.wtf import Form
 from flask.ext.mail import Message
+from sqlalchemy.sql import and_
 from itsdangerous import BadSignature, URLSafeSerializer
-import app
 from app.models import User, db
-import logging
 
 from wtforms import IntegerField, SubmitField
 from wtforms.validators import Required
@@ -27,28 +26,43 @@ def verify_player(payload):
     try:
         user_id, aga_id = s.loads(payload)
     except BadSignature:
-        logging.info('Verify called with invalid paylod')
+        current_app.logger.info('Verify called with invalid paylod')
         abort(404)
 
     if user_id != current_user.id:
-        logging.warn("Verify called for id %s, but wrong user answered, %s" % (user_id, current_user))
+        current_app.logger.warn("Verify called for id %s, but wrong user answered, %s" % (user_id, current_user))
         abort(404)
 
-    # TODO: Fetch the fake user account with this aga_id, take its RLGS player
-    # and reassign it to the real user; also do bookkeeping with claimed=True
-    user = User.query.get_or_404(user_id)
-    user.aga_id = aga_id
-    db.session.add(user)
-    db.session.commit()
-    msg = 'Linked account with AGA #%s' %user.aga_id
-    logging.info(msg)
-    return redirect(url_for('ratings.profile'))
+    aga_info = get_aga_info(aga_id)
+    if aga_info is None:
+        current_app.logger.warn("Could not fetch AGA info for aga_id %s" % aga_id)
+        abort(404)
+    name = aga_info.get('full_name', '')
+
+    update_user_info(user_id, aga_id, name)
+    msg = 'Linked account with AGA #%s' % aga_id
+    current_app.logger.info(msg)
+    return redirect(url_for('ratings.myaccount'))
 
 def get_verify_link(user, aga_id):
     s = get_serializer()
     payload = s.dumps([user.id, aga_id])
     return url_for('.verify_player', payload=payload, 
                    _external=True)
+
+def update_user_info(user_id, aga_id, name):
+    # TODO: Fetch the fake user account with this aga_id, take its AGA player
+    # and reassign it to the real user
+    user = User.query.get_or_404(user_id)
+    user.aga_id = aga_id
+    user.name = name
+    db.session.add(user)
+    db.session.commit()
+
+
+def aga_id_already_used(user, aga_id):
+    exists = User.query.filter(and_(User.id!=user.id, User.aga_id==str(aga_id), User.fake==False)).count() > 0
+    return exists
 
 def send_verify_email(user, aga_id):
     aga_info = get_aga_info(aga_id)
@@ -72,6 +86,8 @@ def verify_form():
     form = LinkUserWithAGANumberForm()
     if form.validate_on_submit():
         aga_id = form.aga_id.data
+        if aga_id_already_used(current_user, aga_id):
+            return render_template('verify/verify_form_post_submit_conflict.html', aga_id=aga_id)
         success = send_verify_email(current_user, aga_id)
         if success:
             return render_template('verify/verify_form_post_submit.html')

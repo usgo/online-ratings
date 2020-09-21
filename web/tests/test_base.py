@@ -2,7 +2,7 @@ from flask.ext.testing import TestCase
 
 from app import get_app
 from app.models import db
-from create_db import create_test_data
+from scripts.create_db import create_test_data
 
 # The test strategy is based on the tutorial found here:
 # https://realpython.com/blog/python/python-web-applications-with-flask-part-iii/

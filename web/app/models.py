@@ -12,7 +12,7 @@ roles_users = db.Table(
     'roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('myuser.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-) 
+)
 
 go_server_admins = db.Table(
     'go_server_admin',
@@ -37,26 +37,26 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     aga_id = db.Column(db.String(25))
     email = db.Column(db.String(255), unique=True, nullable=False)
+    name = db.Column(db.String(255), default="", nullable=False)
     password = db.Column(db.String(255))
-    claimed = db.Column(db.Boolean, default=False, nullable=False)
+    fake = db.Column(db.Boolean, default=False, nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
     last_login_at = db.Column(db.DateTime())
     current_login_at = db.Column(db.DateTime())
-    last_login_ip = db.Column(db.String(25))
-    current_login_ip = db.Column(db.String(25))
+    last_login_ip = db.Column(db.String(45))
+    current_login_ip = db.Column(db.String(45))
     login_count = db.Column(db.Integer, default=0, nullable=False)
     players = relationship("Player")
 
-    # For every AGA member, a fake user (aga_id, claimed=False) is created.
+    # For every AGA member, a fake user (aga_id, fake=True) is created.
     # (This fake user holds onto their real life game history for them.)
-    # When that AGA member signs up, the fake user is updated to 
-    # (aga_id, claimed=True), and the real user gets (aga_id, claimed=False).
+    # When that AGA member signs up, they gets (aga_id, fake=False).
     # Thus, only one fake and one real user can ever exist for an aga_id.
     __table_args__ = (
-        db.Index("aga_id__claimed", "aga_id", "claimed", unique=True),
+        db.Index("aga_id__fake", "aga_id", "fake", unique=True),
     )
 
     def is_server_admin(self):
@@ -125,9 +125,9 @@ class Rating(db.Model):
     user = db.relationship('User',
                              foreign_keys=user_id,
                              backref=db.backref('user_rating', lazy='dynamic'))
-    sigma = db.Column(db.Float, nullable=False)
+    sigma = db.Column(db.Float, nullable=True) # Not all rating algorithms use sigma
     rating = db.Column(db.Float, nullable=False)
-    created = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+    created = db.Column(db.DateTime, onupdate=datetime.datetime.now, index=True)
 
     def __str__(self):
         return "(%f) for user %d" % (self.rating, self.user_id)

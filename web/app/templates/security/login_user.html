@@ -5,7 +5,6 @@
 {% block page_content %}
 
 {% from "security/_macros.html" import render_field_with_errors, render_field %}
-{% include "security/_messages.html" %}
 <h1>Login</h1>
 <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
   {{ login_user_form.hidden_tag() }}

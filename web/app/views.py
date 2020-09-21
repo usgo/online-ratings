@@ -1,6 +1,6 @@
 import itertools
 
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from flask import Blueprint, render_template, request, current_app, redirect, url_for
 from flask.ext.login import current_user
 from flask.ext.security import login_required
@@ -9,7 +9,6 @@ from .tokengen import generate_token
 from .forms import AddGameServerForm, SearchPlayerForm, AddPlayerForm
 from .models import GoServer, Game, User, Player, SERVER_ADMIN_ROLE, RATINGS_ADMIN_ROLE
 from . import db, user_datastore
-import logging
 
 ratings = Blueprint("ratings", __name__)
 
@@ -21,17 +20,18 @@ def home():
 def help():
     return render_template('help.html')
 
-@ratings.route('/profile')
+@ratings.route('/myaccount')
 @login_required
-def profile():
+def myaccount():
     form = AddPlayerForm()
     form.server.choices = [(server.id, server.name) for server in GoServer.query.all()]
     players = Player.query.filter(Player.user_id == current_user.id).order_by(Player.name.asc()).all()
-    if current_user.is_ratings_admin():
-        games = Game.query.limit(30).all()
-    else:
-        games = itertools.chain(*(Game.query.filter(or_(Game.white_id == player.id, Game.black_id == player.id)) for player in players))
-    return render_template('profile.html', user=current_user, games=games, players=players, form=form)
+    # shows all games so far. Needs to be replaced with a join query that
+    # orders by date played and limits to latest 10 games.
+    games = itertools.chain(*(
+        Game.query.filter(or_(Game.white_id == player.id, Game.black_id == player.id))
+        for player in players))
+    return render_template('myaccount.html', user=current_user, games=games, players=players, form=form)
 
 @ratings.route('/games', methods=['GET'])
 def listgames():
@@ -91,7 +91,7 @@ def reset_server_token(server_id):
     server.token = generate_token()
     db.session.add(server)
     db.session.commit()
-    logging.info("Reset server token for {}".format(server_id))
+    current_app.logger.info("Reset server token for {}".format(server_id))
     return "Success"
 
 @ratings.route('/users')
@@ -112,7 +112,7 @@ def create_player():
         db.session.add(Player(name=name, server_id=server_id, user_id=current_user.id, token=generate_token()))
         db.session.commit()
 
-    return redirect(url_for('ratings.profile'))
+    return redirect(url_for('ratings.myaccount'))
 
 
 @ratings.route('/players/search', methods=['GET', 'POST'])
@@ -121,12 +121,15 @@ def players():
     player_query = Player.query
 
     if form.validate_on_submit():
+        player_query = player_query.join(User)
         if form.player_name.data:
-            player_query = player_query.filter(Player.name.contains(form.player_name.data))
+            player_query = player_query.filter(
+                func.lower(User.name).contains(form.player_name.data.lower()))
         if form.aga_id.data:
-            player_query = player_query.join(User).filter(User.aga_id == form.aga_id.data)
+            player_query = player_query.filter(
+                User.aga_id == form.aga_id.data)
 
-    players = player_query.limit(30).all()
+    players = player_query.limit(100).all()
 
     return render_template('players.html', players=players, form=form)
 
@@ -145,7 +148,7 @@ def reset_player_token(player_id):
     player.token = generate_token()
     db.session.add(player)
     db.session.commit()
-    logging.info("Reset player token for {}".format(player_id))
+    current_app.logger.info("Reset player token for {}".format(player_id))
     return "Success"
 
 @ratings.route('/game_servers/new', methods=['GET', 'POST'])

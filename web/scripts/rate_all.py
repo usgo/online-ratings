@@ -1,16 +1,16 @@
 import random, datetime
 
 from app.models import Game, User, Rating, db
-from app import get_app
+from flask.ext.script import Command, Option
 import rating.rating_math as rm
 
-def sanitized_users(games):
+def sanitized_users(g_vec):
     """ Strip out users with no games from our list """
     users = User.query.all() 
-    users_with_games = set([g.white_id for g in games])
-    users_with_games.union(set([g.black_id for g in games]))
-    users = [u for u in users if u.id in users_with_games]
-    return users
+    users_with_games = set([g[0] for g in g_vec])
+    users_with_games = users_with_games | set([g[1] for g in g_vec])
+    new_users = [u for u in users if u.aga_id and int(u.aga_id) in users_with_games] # aga_id is text?!?
+    return new_users
 
 def sanitized_games(games):
     """ Sanitizes a list of games into result tuples for rating.
@@ -19,45 +19,62 @@ def sanitized_games(games):
     """
 
     g_vec = []
-    print("Cleaning games...")
     for g in games:
         if g.white.user_id is None or g.black.user_id is None:
-            print('  ', g) #should probably strip them.
+            print('No ids        :  ', g) #should probably strip them from the db.
+            pass
         elif g.handicap > 1 and (-1 > g.komi > 1):
-            print('  ', g)
+            #print('bad komi      :  ', g)
+            pass
         elif g.handicap > 6:
             continue
         elif g.komi < 0 or g.komi > 8.6:
-            print('  ', g)
-        elif not (g.result.startswith('W+') or g.result.startswith('B+')):
-            print('  ', g)
+            #print('bad komi      :  ', g)
+            pass
+        elif not (g.result.startswith('W') or g.result.startswith('B')):
+            print('unknown result:  ', g)
+            pass
+        elif g.date_played is None or g.date_played.timestamp() == 0.0:
+            print('No date played:  ', g)
+            pass
         else:
-            # Vector of result_tuples.  Just what we need to compute stuff...
-            g_vec.append( (g.white.user_id, 
-                         g.black.user_id,
+            # Vector of result_tuples.  Just what we need to compute ratings...
+            g_vec.append( (g.white.id, 
+                         g.black.id,
                          1.0 if g.result.startswith('W') else 0.0,
-                         g.date_played,
+                         g.date_played.timestamp(),
                          g.handicap,
                          g.komi)) 
     return g_vec 
 
-def rate_all():
-    games = Game.query.all() 
-    users = sanitized_users(games)
+def rate_all(t_from=datetime.datetime.utcfromtimestamp(1.0), 
+             t_to=datetime.datetime.now(),
+             iters=200, lam=.22):
+    """
+    t_from -- datetime obj, rate all games after this 
+    t_to -- datetime obj, rate all games up to this
+    iters -- number of iterations
+    lam -- 'neighborhood pull' parameter.  higher = more error from moving a rank away from ranks in its neighborhood
+    """
+    games = Game.query.filter(Game.date_played < t_to, Game.date_played > t_from) 
     g_vec = sanitized_games(games)
+    users = sanitized_users(g_vec)
 
-    ratings = {u.id: u.last_rating() for u in users}
-    rating_prior = {u: v.rating if (v and v.rating) else 0 for u,v in ratings.items()} 
+    print("found %d users with %d valid games" % (len(users), len(g_vec)) )
 
-    neighbors = rm.neighbors(games)
-    neighbor_avgs = rm.compute_avgs(games, rating_prior) 
+    aga_ids_to_uids = dict([(int(u.aga_id), u.id) for u in users])
 
-    t_min = min(games, key=lambda g: g.date_played or datetime.datetime.now()).date_played
-    t_max = max(games, key=lambda g: g.date_played or datetime.datetime.now()).date_played
+    ratings = {int(u.aga_id): u.last_rating() for u in users}
+    rating_prior = {id: v.rating if (v and v.rating) else 20 for id,v in ratings.items()} 
+    print ("%d users with no priors" % len(list(filter(lambda v: v == 20, rating_prior.values()))))
 
-    iters = 100
-    lam = .37 # Weight for controlling 'pull' of neighborhood weighted average. Higher = stays in the neighborhood.  
-    lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.6 #Control the learning rate over time.
+    neighbors = rm.neighbors(g_vec)
+    neighbor_avgs = rm.compute_avgs(g_vec, rating_prior) 
+
+    t_min = min([g[3] for g in g_vec])
+    t_max = max([g[3] for g in g_vec])
+
+    lrn = lambda i: ((1. + .1*iters)/(i + .1 * iters))**.3 #Control the learning rate over time.
 
     for i in range(iters):
         loss = 0
@@ -65,7 +82,7 @@ def rate_all():
         for id, neighbor_wgt in neighbor_avgs.items():
             loss += lam * ((rating_prior[id] - neighbor_wgt) ** 2)
 
-        # Shuffle the vector of result-tuples
+        # Shuffle the vector of result-tuples and step through them, accumulating error.
         random.shuffle(g_vec)
         for g in g_vec:
             w, b, actual, t, handi, komi = g
@@ -82,8 +99,10 @@ def rate_all():
             for k,v in rating_prior.items():
                 rating_prior[k] = (rating_prior[k] - r_min) / (r_max - r_min) * 40.0
 
-        neighbor_avgs = rm.compute_avgs(games, rating_prior) 
-        print('%d : %.4f' % (i, loss))
+        #update neighborhood averages?
+        neighbor_avgs = rm.compute_avgs(g_vec, rating_prior) 
+        if (i % 50 == 0):
+            print('%d : %.4f' % (i, loss))
 
     # Update the ratings and show how we did.
     wins, losses = {}, {}
@@ -93,18 +112,58 @@ def rate_all():
         wins[g[1]] = wins.get(g[1], 0) + 1-g[2]
         losses[g[1]] = losses.get(g[1], 0) + g[2]
 
+    for k in sorted(rating_prior, key=lambda k: rating_prior[k])[-10:]: 
+        print("%d (uid: %d): %f (%d - %d)" % (k, aga_ids_to_uids[k], rating_prior[k], wins.get(k,0), losses.get(k,0)) )
     
     for k in sorted(rating_prior, key=lambda k: rating_prior[k]): 
-        db.session.add(Rating(user_id=k, rating=rating_prior[k]))
-        print("%d: %f (%d - %d)" % (k,rating_prior[k], wins.get(k,0), losses.get(k,0)) )
+        db.session.add(Rating(user_id=aga_ids_to_uids[k], rating=rating_prior[k], created=t_to))
     db.session.commit()
 
-if __name__ == '__main__': 
-    app = get_app('config.DockerConfiguration')
-    with app.app_context():
-        #db.session.remove()
-        #Rating.__table__.drop(db.engine)
-        #db.get_engine(app).dispose()
-        #db.create_all()
-        rate_all()
+
+class RatingsAtCommand(Command):
+    """ Class that holds the state for computing a single ratings run at a given point in time"""
+    option_list = (
+            Option('--from', '-f', dest='t_from'),
+            Option('--to', '-t', dest='t_to'),
+            Option('--iterations', '-i', dest='iters', default=200),
+            Option('--neighborhood', '-n', dest='neighborhood', default=0.15)
+            )
+
+    def run(self, t_from, t_to, iters, neighborhood):
+        if t_to is None:
+            t_to = datetime.datetime.now()
+        else:
+            try: 
+                t_to = datetime.datetime.utcfromtimestamp(float(t_to))
+            except ValueError: 
+                t_to = datetime.datetime.strptime(t_to, "%Y-%m-%d")
+
+        if t_from is None:
+            t_from = datetime.datetime.utcfromtimestamp(1.0)
+        else:
+            try: 
+                t_from = datetime.datetime.utcfromtimestamp(float(t_from))
+            except ValueError: 
+                t_from = datetime.datetime.strptime(t_from, "%Y-%m-%d")
+
+        try:
+            iters = int(iters)
+        except ValueError:
+            print("Iters should be an integer, defaulting to 200")
+            iters = 200
+
+        try:
+            neighborhood = float(neighborhood)
+        except ValueError:
+            print("Neighborhood should be an integer, defaulting to .15")
+            neighborhood = .15
+
+        this_to = t_from + datetime.timedelta(365*2)
+        while this_to < t_to:
+            print("==")
+            print("Generating ratings of games played between %s and %s" % (t_from, this_to)) 
+            print("%d iterations, neighborhood pull parameter %f" % (iters, neighborhood))
+            rate_all(t_from, this_to, iters, neighborhood)
+            this_to += datetime.timedelta(30) 
+        #rate_all(t_from, t_to, iters, neighborhood)
 

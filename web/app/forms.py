@@ -11,8 +11,8 @@ class AddGameServerForm(Form):
     submit = SubmitField()
 
 class SearchPlayerForm(Form):
-    player_name = StringField('Username', validators=[])
-    aga_id = StringField('AGA id', validators=[Optional()])
+    player_name = StringField('Name', validators=[])
+    aga_id = StringField('AGA ID', validators=[Optional()])
     submit = SubmitField()
 
 class AddPlayerForm(Form):

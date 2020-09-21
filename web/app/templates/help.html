@@ -16,21 +16,24 @@
 
 <p> Here's how it works:</p>
 <ol>
-    <li> For each account you have, generate a new password </li>
-    <li> Submit this password to the server (OGS, KGS, etc.) </li>
+    <li> For each account you have (OGS, KGS, etc.), generate a new profile/token combination on your Online Ratings account.</li>
+    <li> Take that profile's token and give it to the server.</li>
 </ol>
 
 <p> That's it! Once the server knows who you are, they'll do the rest of the work in sending us the game data. </p>
 
-<p> Head over to <a href="{{url_for('ratings.profile')}}"> your account page</a> to get started</p>
+<p> Head over to <a href="{{url_for('ratings.myaccount')}}"> your account page</a> to get started</p>
 
 
 <h2> Specific instructions for...</h2>
 <h3> OGS (Online Go Server)</h3>
 
-<p> Head over to your <a href="https://online-go.com/user/settings">OGS User Settings page</a> and under "AGA Settings", paste your password into the Token/Password field. Then, click Link AGA Account.</p>
+<p> Head over to your <a href="https://online-go.com/user/settings" target="_blank">OGS User Settings page</a> and under "AGA Settings", paste your token into the Token field. Then, click Link AGA Account.</p>
 
+<!--
+(For the future!)
 <h3> AGA rated games </h3>
-<p> To add your existing AGA rated games, head over to <a href="{{url_for('ratings.profile')}}">your account page</a> and click "Link your AGA Account".  Enter your AGA ID and check your email inbox for a verification link.</p>
+<p> To add your existing AGA rated games, head over to <a href="{{url_for('ratings.myaccount')}}">your account page</a> and click "Link your AGA Account".  Enter your AGA ID and check your email inbox for a verification link.</p>
+-->
 
 {% endblock %}

@@ -46,8 +46,8 @@ class AGAHistoricalGamesLoader(Command):
                                  if line['old'] != line['new']}  # Prevents infinite lookup loops
 
     def get_or_make_user(self, aga_id):
-        """Returns the User object for the given AGA ID or creates it and an RLGS
-        player if it does not exist.
+        """Gets or creates a fake User object for an AGA ID,
+        along with an AGA player
         If the AGA ID has had one or more PIN changes, the most recent ID will
         be used.
         """
@@ -56,10 +56,12 @@ class AGAHistoricalGamesLoader(Command):
         if aga_id in self._users:
             return self._users[aga_id]
         else:
-            user = User(aga_id=aga_id, email=uuid4())
-            player = Player(id=aga_id, name='', user_id=user.id, server_id=self.server_id)
+            user = User(aga_id=aga_id, email=uuid4(), fake=True)
 
             db.session.add(user)
+            db.session.commit()
+
+            player = Player(id=aga_id, name='', user_id=user.id, server_id=self.server_id, token=uuid4())
             db.session.add(player)
 
             self._users[aga_id] = user
@@ -87,10 +89,13 @@ class AGAHistoricalGamesLoader(Command):
         with open(filename) as f:
             for i, row in enumerate(agagd_parser(f)):
                 if i % 1000 == 0:
-                    print('Loading row', i)
+                    print('-Loading row', i)
+                    db.session.commit()
+                    print('Committed', i)
                 self.store_game(row)
 
     def run(self, agagd_dump_filename, pin_change_dump_filename):
         self.setup(pin_change_dump_filename)
         self.load_data(agagd_dump_filename)
+        db.session.commit()
 

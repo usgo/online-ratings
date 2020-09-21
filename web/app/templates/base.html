@@ -36,7 +36,7 @@
                 <li class="dropdown">
                     <a href="#" data-toggle="dropdown" class="dropdown-toggle">Account<b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{url_for('ratings.profile')}}">Profile</a></li>
+                        <li><a href="{{url_for('ratings.myaccount')}}">My Account</a></li>
                         <li><a href="{{url_for_security('change_password')}}">Change Password</a></li>
                     </ul>
                 </li>
@@ -56,6 +56,8 @@
     </div>
 </nav>
 {% endblock %}
+
+{% include "security/_messages.html" %}
 
 {% block content %}
 <div class="container">
