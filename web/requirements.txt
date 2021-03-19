@@ -16,7 +16,7 @@ Flask-Testing==0.4.2
 Flask-WTF==0.12
 gunicorn==19.3.0
 itsdangerous==0.24
-Jinja2==2.8
+Jinja2==2.11.3
 Mako==1.0.4
 MarkupSafe==0.23
 passlib==1.6.5
